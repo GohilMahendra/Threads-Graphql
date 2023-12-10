@@ -3,9 +3,15 @@ import cors from "cors"
 import mongoose from "mongoose"
 import bodyparser from "body-parser"
 import UserRoutes from "./src/routes/UserRoutes"
+import PostRoutes from "./src/routes/PostRoutes"
 import dotenv from 'dotenv';
 
 dotenv.config()
+
+console.log('AWS_ACCESS_KEY:', process.env.AWS_ACCESS_KEY);
+console.log('AWS_SECRET_ACCESS_KEY:', process.env.AWS_SECRET_ACCESS_KEY);
+console.log('AWS_REGION:', process.env.AWS_REGION);
+console.log('AWS_S3_BUCKET_NAME:', process.env.AWS_S3_BUCKET_NAME);
 const app = express()
 const port  = 3000
 
@@ -13,10 +19,7 @@ app.use(cors())
 app.use(bodyparser.urlencoded({extended:false}))
 app.use(bodyparser.json())
 
-
-const MONGODB_URL = process.env.MONGO_URL || ""
-
-mongoose.connect(MONGODB_URL,{
+mongoose.connect(process.env.MONGO_URL || "",{
      
 })
 .then(()=>{
@@ -32,3 +35,4 @@ app.listen(port,()=>{
 })
 
 app.use("/",UserRoutes)
+app.use("/",PostRoutes)

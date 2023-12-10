@@ -5,11 +5,21 @@ const PostSchema = new mongoose.Schema({
         ref:"User", 
         required: true
     },
-    is_media:{
-        type: Boolean,
-        default: false
+    content:{
+        type: String,
+        default:"",
+        required: true
     },
-    media_type
+    media:[{
+       media_type: {
+        type: String,
+        required: true
+       },
+       media_url:{
+        type: String,
+        required: true
+       }
+    }],
     likes:[{
         type: mongoose.Schema.Types.ObjectId,
         ref: "User",
