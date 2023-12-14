@@ -8,7 +8,7 @@ const PostSchema = new mongoose.Schema({
     content:{
         type: String,
         default:"",
-        required: true
+        maxlength:400,
     },
     media:[{
        media_type: {
@@ -19,6 +19,9 @@ const PostSchema = new mongoose.Schema({
         type: String,
         required: true
        }
+    }],
+    hashtags:[{
+        type: String,
     }],
     likes:[{
         type: mongoose.Schema.Types.ObjectId,
@@ -31,7 +34,15 @@ const PostSchema = new mongoose.Schema({
             type: String,
             required: true
         }
-    }]
+    }],
+    isRepost:{
+        type: Boolean,
+        default: false
+    },
+    Repost:{
+        type: mongoose.Schema.Types.ObjectId,
+        ref:"Post"
+    }
 },{timestamps: { createdAt: 'created_at', updatedAt: 'updated_at' }})
 
 const Post = mongoose.model("Post",PostSchema)

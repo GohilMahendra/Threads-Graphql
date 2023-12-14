@@ -5,6 +5,7 @@ import AntDesign from "react-native-vector-icons/AntDesign";
 import FontAwesome5 from "react-native-vector-icons/FontAwesome5";
 import { NavigationProp, useNavigation } from '@react-navigation/native';
 import { AuthStackType } from '../../navigations/AuthStack';
+import { signUpUser } from '../../apis/UserAPI';
 const { height, width} = Dimensions.get("screen")
 const SignUp = () =>
 {
@@ -15,6 +16,28 @@ const SignUp = () =>
     const [fullName,setFullName] = useState("")
     const navigation = useNavigation<NavigationProp<AuthStackType,"SignIn">>()
 
+    const SignUp = async() =>
+    {
+        try
+        {
+
+          const email_lowercase = email.toLowerCase()
+          const username_lowercase = userName.toLowerCase()
+          const fullname_lowercase = fullName.toLowerCase()
+           const response = await signUpUser({
+            email: email_lowercase,
+            password: password,
+            fullname: fullname_lowercase,
+            username: username_lowercase
+           })
+
+           console.log(response)
+        }
+        catch(err)
+        {
+            console.log(JSON.stringify(err))
+        }
+    }
     return(
         <SafeAreaView style={{
             flex:1,
@@ -32,6 +55,7 @@ const SignUp = () =>
             }}>
                 <TextInput
                 value={userName}
+                autoCapitalize={"none"}
                 onChangeText={text=>setUserName(text)}
                 placeholderTextColor={"grey"}
                 placeholder={"username ..."}
@@ -51,6 +75,7 @@ const SignUp = () =>
             }}>
                 <TextInput
                 value={fullName}
+                autoCapitalize={"none"}
                 onChangeText={text=>setFullName(text)}
                 placeholderTextColor={"grey"}
                 placeholder={"fullname ..."}
@@ -70,6 +95,7 @@ const SignUp = () =>
             }}>
                 <TextInput
                 value={email}
+                autoCapitalize={"none"}
                 onChangeText={text=>setEmail(text)}
                 placeholderTextColor={"grey"}
                 placeholder={"email ..."}
@@ -89,6 +115,7 @@ const SignUp = () =>
             }}>
                 <TextInput
                 value={password}
+                autoCapitalize={"none"}
                 onChangeText={text=>setPassword(text)}
                 placeholderTextColor={"grey"}
                 placeholder={"password ..."}
@@ -109,6 +136,7 @@ const SignUp = () =>
             }}>
                 <TextInput
                 secureTextEntry
+                autoCapitalize={"none"}
                 value={rePassword}
                 onChangeText={text=>setRePassword(text)}
                 placeholderTextColor={"grey"}
@@ -121,6 +149,7 @@ const SignUp = () =>
             </View>
 
             <TouchableOpacity
+            onPress={()=>SignUp()}
             style={{
                 width: width*90/100,
                 padding:20,

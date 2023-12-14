@@ -504,9 +504,12 @@ PODS:
     - React-Core
   - RNKeychain (8.1.2):
     - React-Core
-  - RNPermissions (3.10.1):
+  - RNPermissions (4.0.0):
     - React-Core
   - RNScreens (3.27.0):
+    - RCT-Folly (= 2021.07.22.00)
+    - React-Core
+  - RNVectorIcons (10.0.2):
     - RCT-Folly (= 2021.07.22.00)
     - React-Core
   - SocketRocket (0.6.1)
@@ -586,6 +589,7 @@ DEPENDENCIES:
   - RNKeychain (from `../node_modules/react-native-keychain`)
   - RNPermissions (from `../node_modules/react-native-permissions`)
   - RNScreens (from `../node_modules/react-native-screens`)
+  - RNVectorIcons (from `../node_modules/react-native-vector-icons`)
   - Yoga (from `../node_modules/react-native/ReactCommon/yoga`)
 
 SPEC REPOS:
@@ -701,6 +705,8 @@ EXTERNAL SOURCES:
     :path: "../node_modules/react-native-permissions"
   RNScreens:
     :path: "../node_modules/react-native-screens"
+  RNVectorIcons:
+    :path: "../node_modules/react-native-vector-icons"
   Yoga:
     :path: "../node_modules/react-native/ReactCommon/yoga"
 
@@ -762,12 +768,13 @@ SPEC CHECKSUMS:
   RNCMaskedView: f7c74478c83c4fdfc5cf4df51f80c0dd5cf125c6
   RNGestureHandler: 32a01c29ecc9bb0b5bf7bc0a33547f61b4dc2741
   RNKeychain: a65256b6ca6ba6976132cc4124b238a5b13b3d9c
-  RNPermissions: 4e3714e18afe7141d000beae3755e5b5fb2f5e05
+  RNPermissions: b8c136d8dc745e1e51a5698b1034681c7736f42e
   RNScreens: 3c2d122f5e08c192e254c510b212306da97d2581
+  RNVectorIcons: 23b6e11af4aaf104d169b1b0afa7e5cf96c676ce
   SocketRocket: f32cd54efbe0f095c4d7594881e52619cfe80b17
   Yoga: 4c3aa327e4a6a23eeacd71f61c81df1bcdf677d5
   YogaKit: f782866e155069a2cca2517aafea43200b01fd5a
 
-PODFILE CHECKSUM: 45e489c970b53aed0547f010081a22b3bbdde5d9
+PODFILE CHECKSUM: 0a6eee234bf4db54675267985c38d3784f89016d
 
 COCOAPODS: 1.14.3

@@ -3,11 +3,15 @@ import React from 'react'
 import AuthStack from './AuthStack'
 import { NavigationContainer } from '@react-navigation/native'
 import UserTab from './UserTab'
+import CreatePost from '../screens/home/CreatePost'
+import MediaViewer from '../screens/home/MediaViewer'
 
 export type RootStackType = 
 {
      AuthStack: undefined,
-     UserTab: undefined
+     UserTab: undefined,
+     CreatePost: undefined,
+     MediaViewer: undefined
 }
 
 
@@ -20,7 +24,7 @@ const RootStack = () =>
              screenOptions={{
                 headerShown:false
             }}
-            initialRouteName='UserTab'
+            initialRouteName='AuthStack'
             >
                 <RootStackNavigator.Screen
                 name='AuthStack'
@@ -30,6 +34,15 @@ const RootStack = () =>
                 name='UserTab'
                 component={UserTab}
                 />
+                <RootStackNavigator.Screen
+                name='CreatePost'
+                component={CreatePost}
+                />
+                <RootStackNavigator.Screen
+                name='MediaViewer'
+                component={MediaViewer}
+                />
+               
             </RootStackNavigator.Navigator>
         </NavigationContainer>
     )

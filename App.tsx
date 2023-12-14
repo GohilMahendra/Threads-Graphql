@@ -12,17 +12,21 @@ import {
 } from 'react-native';
 import RootStack from './src/navigations/RootStack';
 import { ThemeProvider } from './src/globals/ThemeProvider';
+import { Provider } from 'react-redux';
+import store from './src/redux/store';
 
 const App = () =>
 {
   return(
-    <ThemeProvider>
-       <SafeAreaView style={{
-      flex:1
-    }}>
-       <RootStack/>
-      </SafeAreaView>
-    </ThemeProvider>
+    <Provider store={store}>
+      <ThemeProvider>
+        <SafeAreaView style={{
+        flex:1
+      }}>
+        <RootStack/>
+        </SafeAreaView>
+      </ThemeProvider>
+    </Provider>
   )
 }
 export default App;

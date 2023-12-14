@@ -1,7 +1,8 @@
 import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
 import Home from "../screens/home/Home";
 import FontAwesome from "react-native-vector-icons/FontAwesome";
-
+import Fontisto from "react-native-vector-icons/Fontisto";
+import Profile from "../screens/profile/Profile";
 export type UserTabType = 
 {
     Home: undefined,
@@ -17,7 +18,8 @@ const UserTab = () =>
         <UserTabNavigator.Navigator
         initialRouteName={"Home"}
         screenOptions={{
-            headerShown: false
+            headerShown: false,
+            tabBarShowLabel: false
         }}
         >
             <UserTabNavigator.Screen
@@ -26,9 +28,48 @@ const UserTab = () =>
             options={{
                 tabBarIcon:({color,focused,size})=>(
                     <FontAwesome
-                    name="music"
+                    name="home"
                     size={30}
-                    color={"black"}
+                    color={focused?"black":"silver"}
+                    />
+                )
+            }}
+            />
+             <UserTabNavigator.Screen
+            name="Search"
+            component={Home}
+            options={{
+                tabBarIcon:({color,focused,size})=>(
+                    <FontAwesome
+                    name="search"
+                    size={25}
+                    color={focused?"black":"grey"}
+                    />
+                )
+            }}
+            />
+             <UserTabNavigator.Screen
+            name="Likes"
+            component={Home}
+            options={{
+                tabBarIcon:({color,focused,size})=>(
+                    <FontAwesome
+                    name="heart"
+                    size={25}
+                    color={focused?"black":"grey"}
+                    />
+                )
+            }}
+            />
+             <UserTabNavigator.Screen
+            name="Profile"
+            component={Profile}
+            options={{
+                tabBarIcon:({color,focused,size})=>(
+                    <FontAwesome
+                    name="user"
+                    size={30}
+                    color={focused?"black":"grey"}
                     />
                 )
             }}

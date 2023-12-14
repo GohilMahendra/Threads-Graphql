@@ -35,4 +35,4 @@ app.listen(port,()=>{
 })
 
 app.use("/",UserRoutes)
-app.use("/",PostRoutes)
+app.use("/posts",PostRoutes)

@@ -13,9 +13,20 @@ const userSchema = new mongoose.Schema({
         unique: true,
         required: true
     },
+    bio:{
+        type:String
+    },
     password:{
         type: String,
         required: true
+    },
+    followers:{
+        type:Number,
+        default: 0
+    },
+    following:{
+        type:Number,
+        default: 0
     },
     profile_picture:{
         type:String
@@ -24,7 +35,9 @@ const userSchema = new mongoose.Schema({
         type:Boolean,
         default: false
     },
-    token: String
+    token: {
+        type: String 
+    }
 })
 
 const User = mongoose.model("User",userSchema)

@@ -1,11 +1,10 @@
 import express from "express";
-import { createPost } from "../controllers/PostController";
-import multer from "multer";
+import { createPost, getPosts } from "../controllers/PostController";
+import { upload } from "../middlewares/multer";
+import { verifyRequest } from "../middlewares/jwtTokenAuth";
 
-const storage = multer.memoryStorage();
-const upload = multer({ storage });
 const router = express.Router()
 
-router.post("/create_post",upload.array("media",4),createPost)
-
+router.post("/",verifyRequest,upload.array("media",4),createPost)
+router.get("/",verifyRequest,getPosts)
 export default router;

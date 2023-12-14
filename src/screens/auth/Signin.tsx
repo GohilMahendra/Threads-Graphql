@@ -4,9 +4,10 @@ import { NavigationProp, useNavigation } from '@react-navigation/native';
 import { AuthStackType } from '../../navigations/AuthStack';
 import UseTheme from '../../globals/UseTheme';
 import { loginUser } from '../../apis/UserAPI';
-import Keychain from "react-native-keychain";
-import AsyncStorage from "@react-native-async-storage/async-storage";
 import { RootStackType } from '../../navigations/RootStack';
+import { UserResponse } from '../../types/User';
+import { useAppDispatch } from '../../redux/store';
+import { SignInAction } from '../../redux/slices/UserSlice';
 const { height, width} = Dimensions.get("window")
 const SignIn = () =>
 {
@@ -16,25 +17,19 @@ const SignIn = () =>
     const {theme} = UseTheme()
     const navigation = useNavigation<NavigationProp<AuthStackType,"SignIn">>()
     const root_navigation  = useNavigation<NavigationProp<RootStackType,"AuthStack">>()
+    const dispatch = useAppDispatch()
     const signInUser = async() =>
     {
-        try
-        {
-            const response:any = await loginUser(email,password)
-            const user = response.user
-            
-            const userName = user.username
-            const userToken = user.token
+      const responseStaus = await dispatch(SignInAction({
+        email: email,
+        password:password
+       }))
 
-            console.log(userName,userToken)
-            await AsyncStorage.setItem("token",JSON.stringify(userToken))
-
-            root_navigation.navigate("UserTab")
-        }
-        catch(err)
-        {
-            console.log(err)
-        }
+       console.log(responseStaus)
+       if(SignInAction.fulfilled.match(responseStaus))
+       {
+        root_navigation.navigate("CreatePost")
+       }
     }
     return(
         <SafeAreaView style={{
