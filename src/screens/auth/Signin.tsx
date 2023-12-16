@@ -1,6 +1,6 @@
 import React, { useState } from 'react'
 import { View, Text, SafeAreaView, Image, Dimensions,TextInput, TouchableOpacity, Switch, Pressable } from 'react-native'
-import { NavigationProp, useNavigation } from '@react-navigation/native';
+import { NavigationProp,CompositeNavigationProp, useNavigation } from '@react-navigation/native';
 import { AuthStackType } from '../../navigations/AuthStack';
 import UseTheme from '../../globals/UseTheme';
 import { loginUser } from '../../apis/UserAPI';
@@ -8,15 +8,16 @@ import { RootStackType } from '../../navigations/RootStack';
 import { UserResponse } from '../../types/User';
 import { useAppDispatch } from '../../redux/store';
 import { SignInAction } from '../../redux/slices/UserSlice';
+import { UserTabType } from '../../navigations/UserTab';
 const { height, width} = Dimensions.get("window")
 const SignIn = () =>
 {
+    type composeTeAuthTab = CompositeNavigationProp<NavigationProp<AuthStackType>,NavigationProp<UserTabType>>
     const [email,setEmail] = useState("")
     const [password,setPassword] = useState("")
     const [active,setActive] = useState(false)
     const {theme} = UseTheme()
-    const navigation = useNavigation<NavigationProp<AuthStackType,"SignIn">>()
-    const root_navigation  = useNavigation<NavigationProp<RootStackType,"AuthStack">>()
+    const navigation = useNavigation<composeTeAuthTab>()
     const dispatch = useAppDispatch()
     const signInUser = async() =>
     {
@@ -28,7 +29,7 @@ const SignIn = () =>
        console.log(responseStaus)
        if(SignInAction.fulfilled.match(responseStaus))
        {
-        root_navigation.navigate("CreatePost")
+        navigation.navigate("Home")
        }
     }
     return(

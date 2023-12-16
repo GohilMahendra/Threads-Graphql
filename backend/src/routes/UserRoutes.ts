@@ -10,7 +10,7 @@ const router = express.Router()
 
 router.post("/login",signInUser)
 router.post("/register",signUpUser)
-router.post("/verify/:token",verifyEmail)
+router.post("/verify",verifyEmail)
 router.patch("/update_profile",verifyRequest,upload.single("profile_picture"),updateUser)
 
 export default router;

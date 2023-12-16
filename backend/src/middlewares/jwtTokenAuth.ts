@@ -32,7 +32,7 @@ export const verifyRequest = async(req:CustomRequest,res:Response,next:NextFunct
         const decodedToken = verifyToken(token)
         if(decodedToken.success)
         {
-            req.userId = decodedToken.userId
+            req.userId = decodedToken.userId || ""
             next()
         }
         else 

@@ -7,6 +7,7 @@ import nodemailer from "nodemailer";
 import { v4 as uuidv4 } from "uuid";
 import { getSignedUrl, uploadToS3 } from "../utilities/S3Utils";
 import { CustomRequest } from "../middlewares/jwtTokenAuth";
+import otpGenerator from "otp-generator";
 interface UpdateUserRequestBody {
     fullname?: string;
     bio?: string;
@@ -91,10 +92,11 @@ const signUpUser = async (req: Request, res: Response) => {
             password: hashedPassword
         })
 
-        newUser.token = crypto.randomBytes(20).toString("hex")
+        const otp =  otpGenerator.generate(6,{digits:true,upperCaseAlphabets: false, specialChars: false,lowerCaseAlphabets:false})
+        newUser.otp = otp
         await newUser.save()
 
-        sendVerificationEmail(newUser.email, newUser.token)
+        sendVerificationEmail(newUser.email,otp)
         res.status(200).json({
             message: "success !! please check your email for verification"
         })
@@ -176,7 +178,7 @@ const signOutUser = async (req: CustomRequest, res: Response) => {
         })
     }
 }
-const sendVerificationEmail = async (email: string, token: string) => {
+const sendVerificationEmail = async (email: string,otp:string) => {
     const mailer_email = process.env.MAILER_EMAIL
     const mailer_password = process.env.MAILER_PASS
     const transporter = nodemailer.createTransport({
@@ -191,7 +193,7 @@ const sendVerificationEmail = async (email: string, token: string) => {
         from: "Threds app",
         to: email,
         subject: "email verificaiton",
-        text: `here is the link please verify the email  http://localhost:3000/verify/${token}`
+        text: `here is the otp for varification ${otp} `
     }
     try {
         await transporter.sendMail(mailOptions)
@@ -201,13 +203,21 @@ const sendVerificationEmail = async (email: string, token: string) => {
     }
 }
 
-const verifyEmail = async (req: Request, res: Response) => {
+const verifyEmail = async (req: CustomRequest, res: Response) => {
     try {
-        const token = req.params.token
-        const user = await User.findOne({ token })
+        const email = req.body.email
+        const otp = req.body.otp
+        const user = await User.findOne({email})
         if (!user) {
-            return res.status(400).json({
+            return res.status(404).json({
                 message: "User does not exist!"
+            })
+        }
+
+        if(otp != user.otp)
+        {
+            return res.status(501).json({
+                message:"invalid Otp"
             })
         }
 

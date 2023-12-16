@@ -31,7 +31,9 @@ const SignUp = () =>
             username: username_lowercase
            })
 
-           console.log(response)
+           navigation.navigate("OtpVerification",{
+            email: email_lowercase
+           })
         }
         catch(err)
         {

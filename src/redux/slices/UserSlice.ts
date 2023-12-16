@@ -42,6 +42,7 @@ export const SignInAction = createAsyncThunk(
                 username: userResponse.username,
                 profile_picture: userResponse.profile_picture
             }
+            await AsyncStorage.setItem("user",JSON.stringify(user))
             return user
         }
         catch(err)
@@ -66,7 +67,11 @@ export const UserSlice = createSlice({
     name:"User",
     initialState: initialState,
     reducers:{
-
+        setUser: (state, action) => {
+            state.user = action.payload;
+            state.loading = false;
+            state.error = null;
+          },
     },
     extraReducers(builder){
         builder.addCase(SignInAction.pending,state=>{
@@ -97,5 +102,5 @@ export const UserSlice = createSlice({
         })
     }
 })
-
+export const { setUser } = UserSlice.actions
 export default UserSlice.reducer

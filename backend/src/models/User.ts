@@ -37,8 +37,12 @@ const userSchema = new mongoose.Schema({
     },
     token: {
         type: String 
+    },
+    otp:{
+        type:String,
     }
 })
 
 const User = mongoose.model("User",userSchema)
+export type UserType = typeof User
 export default User

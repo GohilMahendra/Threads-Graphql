@@ -24,7 +24,7 @@ const RootStack = () =>
              screenOptions={{
                 headerShown:false
             }}
-            initialRouteName='AuthStack'
+            initialRouteName='UserTab'
             >
                 <RootStackNavigator.Screen
                 name='AuthStack'

@@ -18,23 +18,23 @@ const PostSchema = new mongoose.Schema({
        media_url:{
         type: String,
         required: true
+       },
+       thumbnail:{
+        type: String,
+        default: null
        }
     }],
     hashtags:[{
         type: String,
     }],
-    likes:[{
-        type: mongoose.Schema.Types.ObjectId,
-        ref: "User",
-    }],
-    replies:[{
-        type: mongoose.Schema.Types.ObjectId,
-        ref:"User",
-        content: {
-            type: String,
-            required: true
-        }
-    }],
+    likes:{
+        type:Number,
+        default:0
+    },
+    replies:{
+        type:Number,
+        default:0
+    },
     isRepost:{
         type: Boolean,
         default: false
@@ -42,8 +42,13 @@ const PostSchema = new mongoose.Schema({
     Repost:{
         type: mongoose.Schema.Types.ObjectId,
         ref:"Post"
+    },
+    isLiked:{
+        type:Boolean,
+        default: false
     }
 },{timestamps: { createdAt: 'created_at', updatedAt: 'updated_at' }})
 
 const Post = mongoose.model("Post",PostSchema)
+export type PostType = typeof Post
 export default Post
