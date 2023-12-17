@@ -12,7 +12,7 @@ import { UserTabType } from '../../navigations/UserTab';
 const { height, width} = Dimensions.get("window")
 const SignIn = () =>
 {
-    type composeTeAuthTab = CompositeNavigationProp<NavigationProp<AuthStackType>,NavigationProp<UserTabType>>
+    type composeTeAuthTab = CompositeNavigationProp<NavigationProp<AuthStackType>,NavigationProp<RootStackType>>
     const [email,setEmail] = useState("")
     const [password,setPassword] = useState("")
     const [active,setActive] = useState(false)
@@ -29,7 +29,7 @@ const SignIn = () =>
        console.log(responseStaus)
        if(SignInAction.fulfilled.match(responseStaus))
        {
-        navigation.navigate("Home")
+        navigation.navigate("UserTab")
        }
     }
     return(
@@ -48,6 +48,7 @@ const SignIn = () =>
                 marginVertical:20
             }}>
                 <TextInput
+                autoCapitalize={"none"}
                 value={email}
                 onChangeText={text=>setEmail(text)}
                 placeholderTextColor={"grey"}

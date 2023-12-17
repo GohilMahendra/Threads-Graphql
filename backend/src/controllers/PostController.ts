@@ -114,7 +114,7 @@ const getPosts = async (req: CustomRequest, res: Response) => {
         const userId = req.userId
         const posts = await Post.find({}).populate({
             path: "user",
-            select: "-password -token",
+            select: "-password -token -otp",
         })
 
         let userPosts = posts
@@ -128,6 +128,15 @@ const getPosts = async (req: CustomRequest, res: Response) => {
                     Key: media[j].media_url,
                     Expires: 2*60*60
                 });
+
+                if(media[j].thumbnail)
+                {
+                    media[j].thumbnail = await s3.getSignedUrlPromise('getObject', {
+                        Bucket: process.env.AWS_S3_BUCKET_NAME,
+                        Key: media[j].thumbnail,
+                        Expires: 2*60*60
+                    });
+                }
             }
 
             const exist_liked = await Like.exists({userId:userId,postId: post._id})
@@ -139,7 +148,7 @@ const getPosts = async (req: CustomRequest, res: Response) => {
                     path:"Repost",
                     populate: {
                         path: 'user',
-                        select: '-password -token',
+                        select: '-password -token -otp',
                     }
                 })
             }
@@ -202,12 +211,60 @@ const likePost = async(req:CustomRequest,res:Response)=>
     }
 }
 
+const unLikePost = async(req:CustomRequest,res:Response)=>
+{
+    try
+    {
+        const userId = req.userId
+        const postId = req.params.postId
+        if(!userId || !postId)
+        {
+            return res.status(404).json({
+                message:"invalid params"
+            })
+        }
+        
+        const post = await Post.findById(postId)
+        if(!post)
+        {
+            return res.status(404).json({
+                message:"not found the post"
+            })
+        }
+        const exist_liked = await Like.exists({userId:userId,postId: post._id})
+        const isLiked = exist_liked!=null
+        if(!isLiked)
+        {
+            return res.status(200).json({
+                message:"post is already un-liked"
+            })
+        }
+
+        if(post.likes > 0)
+        post.likes--
+
+        Like.deleteOne(exist_liked)
+        await post.save()
+
+        res.status(200).json({
+            success: true,
+            message:"unLiked succesfully"
+        })
+    }
+    catch(err)
+    {
+        return res.status(500).json({
+            message: err
+        })
+    }
+}
+
 const commentPost = async(req:CustomRequest,res:Response)=>
 {
     try
     {
         const userId = req.userId
-        const postId = req.body.postId
+        const postId = req.params.postId
         const content = req.body.content
 
         const post = await Post.findById(postId)
@@ -279,4 +336,4 @@ const deletePost = async(req:CustomRequest,res:Response)=>
     }
 }
 
-export { createPost, getPosts,likePost,commentPost,deletePost }
+export { createPost, getPosts,likePost,commentPost,deletePost,unLikePost }

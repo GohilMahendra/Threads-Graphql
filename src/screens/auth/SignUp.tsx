@@ -30,7 +30,6 @@ const SignUp = () =>
             fullname: fullname_lowercase,
             username: username_lowercase
            })
-
            navigation.navigate("OtpVerification",{
             email: email_lowercase
            })

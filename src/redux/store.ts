@@ -1,9 +1,11 @@
 import { useDispatch } from "react-redux";
 import { configureStore } from "@reduxjs/toolkit";
 import UserReducer from "./slices/UserSlice";
+import FeedReducer from "./slices/FeedSlice";
 const store = configureStore({
     reducer:{
-        User: UserReducer
+        User: UserReducer,
+        Feed: FeedReducer
     }
 })
 

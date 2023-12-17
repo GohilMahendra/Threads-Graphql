@@ -2,41 +2,53 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import { NavigationProp, useNavigation,CompositeNavigationProp} from '@react-navigation/native';
 import React, { useEffect } from 'react'
 import { SafeAreaView, Text } from "react-native";
-import { AuthStackType } from '../../navigations/AuthStack';
 import { RootStackType } from '../../navigations/RootStack';
 import { UserTabType } from '../../navigations/UserTab';
 import { useAppDispatch } from '../../redux/store';
-import { setUser } from '../../redux/slices/UserSlice';
+import { SignInAction } from '../../redux/slices/UserSlice';
 
 const SplashScreen = () =>
 {
     const dispatch = useAppDispatch()
-    type compositeAuthUser = CompositeNavigationProp<NavigationProp<AuthStackType>,NavigationProp<UserTabType>>
+    type compositeAuthUser = CompositeNavigationProp<NavigationProp<RootStackType>,NavigationProp<UserTabType>>
     const navigation = useNavigation<compositeAuthUser>()
     const signIn = async() =>
     {
-        const token = await AsyncStorage.getItem("token")
+        try
+        {
+            const email = await AsyncStorage.getItem("email")
+            const password = await AsyncStorage.getItem("password")
 
-        if(token)
-        {
-            const user = await AsyncStorage.getItem("user")
-            const user_obj = user ?JSON.parse(user): null
-            if(user_obj)
+            if(!email || !password)
             {
-                dispatch(setUser(user_obj))
+                navigation.navigate("AuthStack")
             }
-            navigation.navigate("Home")
+            else
+            {
+                const fullfilled = await dispatch(SignInAction({email,password}))
+                if(SignInAction.fulfilled.match(fullfilled))
+                {
+                    navigation.reset({
+                        index: 0,
+                        routes: [{ name: "UserTab" }],
+                      });
+                }
+                else
+                {
+                    navigation.navigate("AuthStack")
+                }
+            }
         }
-        else
+        catch(err)
         {
-            navigation.navigate("SignIn")
+            console.log(err)
         }
 
     }
     useEffect(()=>{
         setTimeout(() => {
             signIn()
-        }, 1000);
+        }, 2000);
     },[])
     return(
         <SafeAreaView style={{

@@ -21,15 +21,11 @@ const AuthStack = () =>
 {
     return(
         <AuthStackNavigator.Navigator
-        initialRouteName='SignIn'
+        initialRouteName='SplashScreen'
         screenOptions={{
             headerShown:false
         }}
         >
-            <AuthStackNavigator.Screen
-            name='SplashScreen'
-            component={SplashScreen}
-            />
             <AuthStackNavigator.Screen
             name='SignIn'
             component={SignIn}

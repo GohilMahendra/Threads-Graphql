@@ -1,5 +1,24 @@
-export type Post = 
+import { User } from "./User"
+
+export type Media =
+{
+    media_type:string,
+    media_url: string,
+    _id:string,
+    thumbnail: string | undefined
+}
+export type Thread = 
 {
     _id: string,
-    
+    user: User,
+    content: String | undefined
+    media: Media[],
+    hashtags: string[],
+    likes: number,
+    replies: number,
+    isRepost: boolean,
+    isLiked: boolean,
+    created_at: string,
+    updated_at: string,
+    Repost: Thread | undefined
 }

@@ -1,9 +1,9 @@
 import mongoose,{ Schema } from "mongoose";
 
 const followerSchema = new Schema({
-    userId:{
+    _id: {
         type: Schema.Types.ObjectId,
-        ref:"User"
+        ref: "User", 
     },
     followers:[{
         type: Schema.Types.ObjectId,

@@ -5,6 +5,9 @@ export type User =
     username: string,
     followers: number,
     following: number,
+    fullname:string,
+    bio?: string,
+    verified: boolean,
     profile_picture?: string,
 }
 
@@ -13,11 +16,24 @@ export type UserResponse = User &
     token: string
 }
 
+
 export type SignUpArgsType = 
 {
     email: string,
     password: string,
     username: string,
     fullname: string,
+}
+
+type imageType = {
+    type:string,
+    name:string,
+    uri:string
+}
+export type UpdateArgsType = 
+{
+    fullname?:string,
+    profile_picture?: imageType,
+    bio?:string
 }
 

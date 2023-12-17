@@ -3,12 +3,13 @@ import Home from "../screens/home/Home";
 import FontAwesome from "react-native-vector-icons/FontAwesome";
 import Fontisto from "react-native-vector-icons/Fontisto";
 import Profile from "../screens/profile/Profile";
+import ProfileStack from "./ProfileStack";
 export type UserTabType = 
 {
     Home: undefined,
     Search: undefined,
     Likes: undefined
-    Profile: undefined
+    ProfileStack: undefined
 }
 const UserTab = () =>
 {
@@ -62,8 +63,8 @@ const UserTab = () =>
             }}
             />
              <UserTabNavigator.Screen
-            name="Profile"
-            component={Profile}
+            name="ProfileStack"
+            component={ProfileStack}
             options={{
                 tabBarIcon:({color,focused,size})=>(
                     <FontAwesome

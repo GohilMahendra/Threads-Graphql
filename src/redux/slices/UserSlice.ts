@@ -1,6 +1,6 @@
 import { PayloadAction, createAsyncThunk, createSlice } from "@reduxjs/toolkit"
-import { SignUpArgsType, User, UserResponse } from "../../types/User";
-import { loginUser, signUpUser } from "../../apis/UserAPI";
+import { SignUpArgsType, UpdateArgsType, User, UserResponse } from "../../types/User";
+import { loginUser, signUpUser, updateUser } from "../../apis/UserAPI";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 type UserStateType = 
 {
@@ -15,14 +15,18 @@ const initalUser:User =
     followers:0,
     following:0,
     _id:"",
+    bio:"",
     username:"",
-    profile_picture:""
+    fullname:"",
+    verified: false,
+    profile_picture:"",
 }
 const initialState: UserStateType = 
 {
     user:initalUser,
     loading:false,
-    error: null
+    error: null,
+
 }
 
 export const SignInAction = createAsyncThunk(
@@ -33,6 +37,8 @@ export const SignInAction = createAsyncThunk(
             const response = await loginUser(email,password)
             const userResponse = response.user as UserResponse
             await AsyncStorage.setItem("token",userResponse.token)
+            await AsyncStorage.setItem("email",email)
+            await AsyncStorage.setItem("password",password)
             const user:User = 
             {
                 email: userResponse.email,
@@ -40,9 +46,11 @@ export const SignInAction = createAsyncThunk(
                 following: userResponse.following,
                 _id: userResponse._id,
                 username: userResponse.username,
-                profile_picture: userResponse.profile_picture
+                profile_picture: userResponse.profile_picture,
+                fullname: userResponse.fullname,
+                bio: userResponse.bio,
+                verified: userResponse.verified
             }
-            await AsyncStorage.setItem("user",JSON.stringify(user))
             return user
         }
         catch(err)
@@ -56,6 +64,19 @@ export const SignUpAction = createAsyncThunk(
         try
         {
             const response = await signUpUser(args)
+            return response.message
+        }
+        catch(err)
+        {
+            return rejectWithValue(JSON.stringify(err))
+        }
+})
+export const UpdateAction = createAsyncThunk(
+    "user/UpdateAction",
+    async(args:UpdateArgsType,{rejectWithValue})=>{
+        try
+        {
+            const response = await updateUser(args)
             return response.message
         }
         catch(err)

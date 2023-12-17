@@ -5,44 +5,49 @@ import { NavigationContainer } from '@react-navigation/native'
 import UserTab from './UserTab'
 import CreatePost from '../screens/home/CreatePost'
 import MediaViewer from '../screens/home/MediaViewer'
+import SplashScreen from '../screens/auth/SplashScreen'
 
-export type RootStackType = 
-{
-     AuthStack: undefined,
-     UserTab: undefined,
-     CreatePost: undefined,
-     MediaViewer: undefined
-}
+export type RootStackType =
+    {
+        AuthStack: undefined,
+        UserTab: undefined,
+        CreatePost: undefined,
+        MediaViewer: undefined,
+        SplashScreen: undefined
+    }
 
 
 const RootStackNavigator = createNativeStackNavigator<RootStackType>()
-const RootStack = () =>
-{
-    return(
+const RootStack = () => {
+    return (
         <NavigationContainer>
             <RootStackNavigator.Navigator
-             screenOptions={{
-                headerShown:false
-            }}
-            initialRouteName='UserTab'
+                screenOptions={{
+                    headerShown: false
+                }}
+                initialRouteName='SplashScreen'
             >
                 <RootStackNavigator.Screen
-                name='AuthStack'
-                component={AuthStack}
+                    name='SplashScreen'
+                    component={SplashScreen}
                 />
                 <RootStackNavigator.Screen
-                name='UserTab'
-                component={UserTab}
+                    name='AuthStack'
+                    component={AuthStack}
                 />
                 <RootStackNavigator.Screen
-                name='CreatePost'
-                component={CreatePost}
+                    name='UserTab'
+                    component={UserTab}
                 />
                 <RootStackNavigator.Screen
-                name='MediaViewer'
-                component={MediaViewer}
+                    name='CreatePost'
+                    component={CreatePost}
                 />
-               
+                <RootStackNavigator.Screen
+                    name='MediaViewer'
+                    component={MediaViewer}
+                />
+
             </RootStackNavigator.Navigator>
         </NavigationContainer>
     )

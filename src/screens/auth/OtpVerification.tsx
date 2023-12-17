@@ -51,6 +51,7 @@ const OtpVerification = () => {
             if (otp.length != 6 || !regex.test(otp)) {
                 return
             }
+            console.log(email,otp)
 
             const result = await axios.post(`${BASE_URL}verify`, {
                 headers: { 'Content-Type': 'application/json' },
