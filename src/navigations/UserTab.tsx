@@ -4,6 +4,7 @@ import FontAwesome from "react-native-vector-icons/FontAwesome";
 import Fontisto from "react-native-vector-icons/Fontisto";
 import Profile from "../screens/profile/Profile";
 import ProfileStack from "./ProfileStack";
+import Search from "../screens/search/Search";
 export type UserTabType = 
 {
     Home: undefined,
@@ -38,7 +39,7 @@ const UserTab = () =>
             />
              <UserTabNavigator.Screen
             name="Search"
-            component={Home}
+            component={Search}
             options={{
                 tabBarIcon:({color,focused,size})=>(
                     <FontAwesome

@@ -36,10 +36,9 @@ const signInUser = async (req: Request, res: Response) => {
             })
         }
 
-        if(user.verified == false)
-        {
+        if (user.verified == false) {
             return res.status(401).json({
-                message:"user does not verified"
+                message: "user does not verified"
             })
         }
 
@@ -50,19 +49,18 @@ const signInUser = async (req: Request, res: Response) => {
                 message: "invalid credentials"
             })
         }
-
+        if (user.profile_picture) {
+            user.profile_picture = await getSignedUrl(user.profile_picture)
+        }
         const token = jwt.sign({
             userId: user._id,
         }, process.env.TOKEN_SECRET || "")
 
-        user.token = token
+        await User.findOneAndUpdate({ _id: user._id }, { token: token });
 
-        if(user.profile_picture)
-        {
-            user.profile_picture =await getSignedUrl(user.profile_picture)
-        }
-        console.log(user,"sign in Responsw")
-        await user.save()
+        user.token = token
+        console.log(user, "sign in Responsw")
+
         return res.status(200).json({ user })
     }
     catch (err) {
@@ -92,11 +90,11 @@ const signUpUser = async (req: Request, res: Response) => {
             password: hashedPassword
         })
 
-        const otp =  otpGenerator.generate(6,{digits:true,upperCaseAlphabets: false, specialChars: false,lowerCaseAlphabets:false})
+        const otp = otpGenerator.generate(6, { digits: true, upperCaseAlphabets: false, specialChars: false, lowerCaseAlphabets: false })
         newUser.otp = otp
         await newUser.save()
 
-        sendVerificationEmail(newUser.email,otp)
+        sendVerificationEmail(newUser.email, otp)
         res.status(200).json({
             message: "success !! please check your email for verification"
         })
@@ -109,9 +107,9 @@ const signUpUser = async (req: Request, res: Response) => {
 }
 const updateUser = async (req: CustomRequest, res: Response) => {
     try {
-        
-        const userId =req.userId
-        console.log(req.userId,"id getting ferom middleare..")
+
+        const userId = req.userId
+        console.log(req.userId, "id getting ferom middleare..")
         const { fullname, bio }: { fullname?: string; bio?: string } = req.body
         const profile_picture = req.file as Express.Multer.File
         if (!fullname && !bio && (!profile_picture || !profile_picture.buffer || !profile_picture.mimetype)) {
@@ -178,7 +176,7 @@ const signOutUser = async (req: CustomRequest, res: Response) => {
         })
     }
 }
-const sendVerificationEmail = async (email: string,otp:string) => {
+const sendVerificationEmail = async (email: string, otp: string) => {
     const mailer_email = process.env.MAILER_EMAIL
     const mailer_password = process.env.MAILER_PASS
     const transporter = nodemailer.createTransport({
@@ -207,17 +205,16 @@ const verifyEmail = async (req: CustomRequest, res: Response) => {
     try {
         const email = req.body.email
         const otp = req.body.otp
-        const user = await User.findOne({email})
+        const user = await User.findOne({ email })
         if (!user) {
             return res.status(404).json({
                 message: "User does not exist!"
             })
         }
 
-        if(otp != user.otp)
-        {
+        if (otp != user.otp) {
             return res.status(501).json({
-                message:"invalid Otp"
+                message: "invalid Otp"
             })
         }
 
@@ -239,4 +236,53 @@ const verifyEmail = async (req: CustomRequest, res: Response) => {
     }
 }
 
-export { signInUser, signUpUser, verifyEmail, updateUser }
+const SearchUsers = async (req: Request, res: Response) => {
+    try {
+
+        const quary = req.query.name
+
+        
+        const users = await User.aggregate([
+            {
+                $search: {
+                    index: "UserSearch",
+                    autocomplete: {
+                      query: quary,
+                      path: "username"
+                    }
+                  }
+            }
+        ]).project({
+            _id:1,
+            fullname:1,
+            username:1,
+            profile_picture:1,
+            verified:1
+        })
+
+
+
+        if(users.length == 0)
+        {
+            return res.status(200).json({
+                data:[]
+            })
+        }
+        await Promise.all(users.map(async(user)=>{
+            if(user.profile_picture )
+            user.profile_picture = await getSignedUrl(user.profile_picture )
+        }))
+        return res.status(200).json({
+            data:users
+        })
+      
+    }
+    catch (err) {
+        return res.status(500).json({
+            message: "Error" + JSON.stringify(err)
+        })
+    }
+
+}
+
+export default { signInUser, signUpUser, verifyEmail, updateUser,SearchUsers}

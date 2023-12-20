@@ -11,6 +11,8 @@ export type User =
     profile_picture?: string,
 }
 
+export type SearchUser = Omit<User,"email" | "followers" | "following" | "bio">
+
 export type UserResponse = User & 
 {
     token: string

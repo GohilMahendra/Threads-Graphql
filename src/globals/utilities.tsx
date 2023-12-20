@@ -1,7 +1,5 @@
-
-function pluralize(count: number, unit: string) {
-    return count === 1 ? unit : `${unit}s`;
-}
+import AsyncStorage from "@react-native-async-storage/async-storage";
+import { Media } from "../types/Post";
 
 export const timeDifference = (timestamp: string) => {
     const now = new Date();
@@ -33,4 +31,15 @@ export const timeDifference = (timestamp: string) => {
         const years = Math.floor(seconds / YEAR);
         return `${years}y`;
     }
+}
+export const getToken = async() =>
+{
+    const token = await AsyncStorage.getItem("token")
+    return token
+}
+export const getMediaImage = (media: Media) => {
+    if (media.media_type.includes("video"))
+        return media.thumbnail
+    else
+        return media.media_url
 }

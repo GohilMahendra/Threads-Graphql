@@ -2,9 +2,11 @@ import { PayloadAction, createAsyncThunk, createSlice } from "@reduxjs/toolkit"
 import { SignUpArgsType, UpdateArgsType, User, UserResponse } from "../../types/User";
 import { loginUser, signUpUser, updateUser } from "../../apis/UserAPI";
 import AsyncStorage from "@react-native-async-storage/async-storage";
+import { Thread } from "../../types/Post";
 type UserStateType = 
 {
     user: User,
+    Posts: Thread[],
     loading: boolean,
     error: null | string,
 }
@@ -26,7 +28,7 @@ const initialState: UserStateType =
     user:initalUser,
     loading:false,
     error: null,
-
+    Posts:[]
 }
 
 export const SignInAction = createAsyncThunk(

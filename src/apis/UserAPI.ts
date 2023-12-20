@@ -72,13 +72,12 @@ export const updateUser = async(args:any) =>
         }
         else
         {
-            console.log(JSON.stringify(response))
-          //  throw Error(JSON.stringify(response.data))
+            throw Error(JSON.stringify(response.data))
         }
     }
     catch(err:any)
     {
         console.log(JSON.stringify(err))
-       // throw Error(JSON.stringify(err))
+       
     }
 }

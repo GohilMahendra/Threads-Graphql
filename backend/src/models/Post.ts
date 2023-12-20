@@ -1,54 +1,55 @@
-import mongoose from "mongoose"
+
+import mongoose,{InferSchemaType} from "mongoose"
+import { PostDocument } from "../types/Post"
 const PostSchema = new mongoose.Schema({
     user: {
         type: mongoose.Schema.Types.ObjectId,
-        ref:"User", 
+        ref: "User",
         required: true
     },
-    content:{
+    content: {
         type: String,
-        default:"",
-        maxlength:400,
+        default: "",
+        maxlength: 400,
     },
-    media:[{
-       media_type: {
-        type: String,
-        required: true
-       },
-       media_url:{
-        type: String,
-        required: true
-       },
-       thumbnail:{
-        type: String,
-        default: null
-       }
+    media: [{
+        media_type: {
+            type: String,
+            required: true
+        },
+        media_url: {
+            type: String,
+            required: true
+        },
+        thumbnail: {
+            type: String,
+            default: null
+        }
     }],
-    hashtags:[{
+    hashtags: [{
         type: String,
     }],
-    likes:{
-        type:Number,
-        default:0
+    likes: {
+        type: Number,
+        default: 0
     },
-    replies:{
-        type:Number,
-        default:0
+    replies: {
+        type: Number,
+        default: 0
     },
-    isRepost:{
+    isRepost: {
         type: Boolean,
         default: false
     },
-    Repost:{
+    Repost: {
         type: mongoose.Schema.Types.ObjectId,
-        ref:"Post"
+        ref: "Post"
     },
-    isLiked:{
-        type:Boolean,
+    isLiked: {
+        type: Boolean,
         default: false
     }
-},{timestamps: { createdAt: 'created_at', updatedAt: 'updated_at' }})
-
-const Post = mongoose.model("Post",PostSchema)
-export type PostType = typeof Post
+}, { timestamps: { createdAt: 'created_at', updatedAt: 'updated_at' } })
+type PostType = InferSchemaType<typeof PostSchema>
+const Post = mongoose.model<PostType>("Post", PostSchema)
 export default Post

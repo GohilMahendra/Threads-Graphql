@@ -1,11 +1,19 @@
 import { User } from "./User"
 
+
 export type Media =
 {
     media_type:string,
     media_url: string,
     _id:string,
-    thumbnail: string | undefined
+    thumbnail?: string
+}
+
+export type UploadMedia =
+{
+    name:string,
+    uri:string,
+    type:string
 }
 export type Thread = 
 {

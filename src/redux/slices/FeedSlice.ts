@@ -24,10 +24,8 @@ export const FetchPostsAction = createAsyncThunk(
         try
         {
            const response =await fetchPosts()
-
            const posts:Thread[] = []
            const theads: Thread[] = response.data.data
-           console.log(theads)
            theads.forEach((item,index)=>{
             const post:Thread = 
             {
@@ -89,6 +87,14 @@ export const unLikeAction = createAsyncThunk(
         console.log(err)
         return rejectWithValue(JSON.stringify(err))
        }
+    }
+)
+
+export const repostAction = createAsyncThunk(
+    "repost/repostAction",
+    async({postId}:{postId:string},{rejectWithValue})=>
+    {
+        
     }
 )
 
