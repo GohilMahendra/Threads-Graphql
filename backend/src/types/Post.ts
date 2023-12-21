@@ -4,7 +4,7 @@ import { UserDocument } from "./User";
 export interface Media {
     media_type: string;
     media_url: string;
-    thumbnail?: string | null;
+    thumbnail?: string;
 }
 
 export interface PostDocument extends Document {

@@ -11,6 +11,7 @@ const router = express.Router()
 router.post("/login",UserController.signInUser)
 router.post("/register",UserController.signUpUser)
 router.post("/verify",UserController.verifyEmail)
-router.patch("/user",verifyRequest,upload.single("profile_picture"),UserController.updateUser)
+router.patch("/users",verifyRequest,upload.single("profile_picture"),UserController.updateUser)
 router.get("/users",verifyRequest,UserController.SearchUsers)
+router.get("/users/posts",verifyRequest,UserController.getUserPosts)
 export default router;

@@ -60,16 +60,11 @@ const EditProfile = () => {
 
     const updateProfile =async () =>
     {
-        // disptach(UpdateAction({
-        //     bio:bio,
-        //     fullname: fullname,
-        //     profile_picture: ProfilePicture
-        // }))
-       await updateUser({
-                bio:bio,
-                fullname: fullname,
-                profile_picture: ProfilePicture
-            })
+        disptach(UpdateAction({
+            bio:bio,
+            fullname: fullname,
+            profile_picture: ProfilePicture
+        }))
     }
 
     return (

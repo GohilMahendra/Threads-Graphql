@@ -8,6 +8,11 @@ import { v4 as uuidv4 } from "uuid";
 import { getSignedUrl, uploadToS3 } from "../utilities/S3Utils";
 import { CustomRequest } from "../middlewares/jwtTokenAuth";
 import otpGenerator from "otp-generator";
+import mongoose from "mongoose";
+import Post from "../models/Post";
+import { UserDocument } from "../types/User";
+import Like from "../models/Like";
+import { PostDocument } from "../types/Post";
 interface UpdateUserRequestBody {
     fullname?: string;
     bio?: string;
@@ -57,10 +62,7 @@ const signInUser = async (req: Request, res: Response) => {
         }, process.env.TOKEN_SECRET || "")
 
         await User.findOneAndUpdate({ _id: user._id }, { token: token });
-
         user.token = token
-        console.log(user, "sign in Responsw")
-
         return res.status(200).json({ user })
     }
     catch (err) {
@@ -109,7 +111,6 @@ const updateUser = async (req: CustomRequest, res: Response) => {
     try {
 
         const userId = req.userId
-        console.log(req.userId, "id getting ferom middleare..")
         const { fullname, bio }: { fullname?: string; bio?: string } = req.body
         const profile_picture = req.file as Express.Multer.File
         if (!fullname && !bio && (!profile_picture || !profile_picture.buffer || !profile_picture.mimetype)) {
@@ -128,7 +129,7 @@ const updateUser = async (req: CustomRequest, res: Response) => {
             return res.status(400).json({ error: 'Invalid profile_picture' });
         }
 
-        const user = await User.findById(userId)
+
         const updateUser: UpdateUserRequestBody = {}
         if (fullname) {
             updateUser.fullname = fullname.trim()
@@ -146,8 +147,17 @@ const updateUser = async (req: CustomRequest, res: Response) => {
         }
 
         const result = await User.updateOne({ _id: userId }, { $set: updateUser });
+        const user = await User.findById(userId).select({
+           password:false,
+           token:1,
+           otp:1
+        })
         if (result.modifiedCount > 0) {
-            res.status(200).json({ success: true, message: "successfully updated user" });
+            res.status(200).json({
+                success: true,
+                user: user
+                , message: "successfully updated user"
+            });
         } else {
             // User not found or no fields were modified
             res.status(404).json({ error: 'User not found or no fields were modified' });
@@ -241,41 +251,37 @@ const SearchUsers = async (req: Request, res: Response) => {
 
         const quary = req.query.name
 
-        
         const users = await User.aggregate([
             {
                 $search: {
                     index: "UserSearch",
                     autocomplete: {
-                      query: quary,
-                      path: "username"
+                        query: quary,
+                        path: "username"
                     }
-                  }
+                }
             }
         ]).project({
-            _id:1,
-            fullname:1,
-            username:1,
-            profile_picture:1,
-            verified:1
-        })
+            _id: 1,
+            fullname: 1,
+            username: 1,
+            profile_picture: 1,
+            verified: 1
+        }).limit(5)
 
-
-
-        if(users.length == 0)
-        {
+        if (users.length == 0) {
             return res.status(200).json({
-                data:[]
+                data: []
             })
         }
-        await Promise.all(users.map(async(user)=>{
-            if(user.profile_picture )
-            user.profile_picture = await getSignedUrl(user.profile_picture )
+        await Promise.all(users.map(async (user) => {
+            if (user.profile_picture)
+                user.profile_picture = await getSignedUrl(user.profile_picture)
         }))
         return res.status(200).json({
-            data:users
+            data: users
         })
-      
+
     }
     catch (err) {
         return res.status(500).json({
@@ -285,4 +291,78 @@ const SearchUsers = async (req: Request, res: Response) => {
 
 }
 
-export default { signInUser, signUpUser, verifyEmail, updateUser,SearchUsers}
+const getUserPosts = async (req: CustomRequest, res: Response) => {
+    try {
+        const userId = req.userId
+        const quary: any = {}
+        const lastOffset = req.query.lastOffset as string
+        const pageSizeParam = req.query.pageSize as string;
+        const pageSize = parseInt(pageSizeParam, 10) || 10;
+        if (lastOffset) {
+            quary._id = { $gt: new mongoose.Types.ObjectId(lastOffset) }
+            quary.userId = userId
+        }
+        const posts = await Post.find(quary)
+            .sort({ created_at: 1, _id: 1 })
+            .populate<{ user: UserDocument }>({
+                path: "user",
+                select: "-password -token -otp",
+            }).
+            limit(pageSize)
+
+
+        let userPosts = posts
+        const updatedUserPosts = await Promise.all(userPosts.map(async (post) => {
+            const media = post.media;
+            const user = post.user;
+            if (user.profile_picture) {
+                user.profile_picture = await getSignedUrl(user.profile_picture);
+            }
+
+            for (let j = 0; j < media.length; j++) {
+                media[j].media_url = await getSignedUrl(media[j].media_url);
+
+                if (media[j].thumbnail) {
+                    media[j].thumbnail = await getSignedUrl(media[j].thumbnail);
+                }
+            }
+
+            const exist_liked = await Like.exists({ userId: userId, postId: post._id });
+            const isLiked = exist_liked != null;
+            post.isLiked = isLiked;
+
+            if (post.isRepost) {
+                await post.populate({
+                    path: "Repost",
+                    populate: {
+                        path: 'user',
+                        select: '-password -token -otp',
+                    }
+                }) as mongoose.HydratedDocument<PostDocument>
+
+                //@ts-nocheck
+                //@ts-check
+
+            }
+
+        }));
+
+
+        res.status(200).json({
+            data: userPosts,
+            meta: {
+                pagesize: pageSize,
+
+            },
+            length: posts.length
+        })
+    }
+    catch (err) {
+        console.log("errorr  ===>", JSON.stringify(err))
+        res.status(500).json({
+            message: "internal server Error"
+        })
+    }
+}
+
+export default { signInUser, getUserPosts, signUpUser, verifyEmail, updateUser, SearchUsers }

@@ -1,7 +1,7 @@
 
 import axios from "axios";
 import React, { useEffect, useState } from "react";
-import { Dimensions, View, TextInput, Image, FlatList, TouchableOpacity } from "react-native";
+import { Dimensions, View, TextInput, Image, FlatList, TouchableOpacity, RefreshControl } from "react-native";
 import { BASE_URL } from "../../globals/constants";
 import { getToken, timeDifference } from "../../globals/utilities";
 import { Comment } from "../../types/Comment";
@@ -121,6 +121,12 @@ const Replies = (props: ReplyPropTypes) => {
                     }}>Comments</Text>
                 </View>
                 <FlatList
+                refreshControl={
+                    <RefreshControl
+                    refreshing={loading}
+                    onRefresh={()=>getComments()}
+                    />
+                }
                 style={{
                     flex:1,
                 }}

@@ -11,7 +11,7 @@ import PostItem from '../../components/feed/PostItem'
 import { fetchPosts } from '../../apis/FeedAPI'
 import { useSelector } from 'react-redux'
 import { RootState, useAppDispatch } from '../../redux/store'
-import { FetchPostsAction } from '../../redux/slices/FeedSlice'
+import { FetchMorePostsAction, FetchPostsAction } from '../../redux/slices/FeedSlice'
 import Replies from '../../components/feed/Replies'
 import { BottomSheetBackdrop, BottomSheetModal, BottomSheetModalProvider, BottomSheetView } from "@gorhom/bottom-sheet";
 import { Text } from 'react-native-elements'
@@ -40,6 +40,7 @@ const Home = () => {
   }, []);
   const renderPosts = (item: Thread, index: number) => {
     return (
+      
       <PostItem
         onPressComment={handlePresentModalPress}
         onRepost={handleRepostModal}
@@ -47,6 +48,10 @@ const Home = () => {
         post={item}
       />
     )
+  }
+  const fetcchMorePosts = async() =>
+  {
+    await dispatch(FetchMorePostsAction(""))
   }
   useEffect(() => {
     dispatch(FetchPostsAction(""))
@@ -62,7 +67,8 @@ const Home = () => {
         <FlatList
           data={posts}
           showsVerticalScrollIndicator={false}
-          keyExtractor={item => item._id}
+          keyExtractor={(item,index) => index.toString()}
+          onEndReached={()=>fetcchMorePosts()}
           renderItem={({ item, index }) => renderPosts(item, index)}
           style={{
             flex: 1

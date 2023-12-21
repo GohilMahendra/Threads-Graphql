@@ -61,20 +61,34 @@ export const createPost = async (args: CreatePostArgs) => {
 }
 
 
-export const fetchPosts = async () => {
+export const fetchPosts = async (pageSize:number=10,lastOffset?:string) => {
     try {
         const token = await getToken()
-        const response = await axios.get(BASE_URL + "posts", {
+
+        let quary = ""
+
+        if(lastOffset)
+        {
+            quary = `${BASE_URL}posts?pageSize=${pageSize}&lastOffset=${lastOffset}`
+        }
+        else
+        {
+            quary = `${BASE_URL}posts?pageSize=${pageSize}`
+        }
+
+        console.log(quary)
+
+        const response = await axios.get(quary, {
             headers: {
                 "Content-Type": "application/json",
                 "token": token
             }
         })
         if (response.status == 200) {
-            return response
+            return response.data
         }
         else {
-            console.log(response.data)
+           // console.log(response.data)
             throw Error(JSON.stringify(response.data))
         }
     }

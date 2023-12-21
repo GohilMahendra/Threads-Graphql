@@ -25,7 +25,7 @@ type PostItemsProps =
         onPressComment:(postId:string)=>void
         onRepost:()=>void
     }
-const PostItem = (props: PostItemsProps) => {
+const RepostItem = (props: PostItemsProps) => {
 
     const post = props.post
     const media = post.media
@@ -163,4 +163,4 @@ const PostItem = (props: PostItemsProps) => {
     )
 
 }
-export default PostItem
+export default RepostItem

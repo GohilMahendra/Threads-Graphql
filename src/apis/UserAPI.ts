@@ -52,7 +52,7 @@ export const updateUser = async(args:any) =>
     try
     {
         const token = await getToken()
-        const response = await axios.patch(BASE_URL+"user",
+        const response = await axios.patch(BASE_URL+"users",
         {
             fullname: args.fullname,
             profile_picture:args.profile_picture,
@@ -79,5 +79,67 @@ export const updateUser = async(args:any) =>
     {
         console.log(JSON.stringify(err))
        
+    }
+}
+
+export const fetchUserPosts = async (pageSize:number=10,lastOffset?:string) => {
+    try {
+        const token = await getToken()
+
+        let quary = ""
+
+        if(lastOffset)
+        {
+            quary = `${BASE_URL}users/posts?pageSize=${pageSize}&lastOffset=${lastOffset}`
+        }
+        else
+        {
+            quary = `${BASE_URL}users/posts?pageSize=${pageSize}`
+        }
+
+        console.log(quary)
+
+        const response = await axios.get(quary, {
+            headers: {
+                "Content-Type": "application/json",
+                "token": token
+            }
+        })
+        if (response.status == 200) {
+            return response.data
+        }
+        else {
+           // console.log(response.data)
+            throw Error(JSON.stringify(response.data))
+        }
+    }
+    catch (err) {
+        console.log(err)
+        throw Error(JSON.stringify(err))
+    }
+}
+
+export const deleteUserPost = async(postId:string) =>
+{
+    try {
+        const token = await getToken()
+        const quary = `${BASE_URL}posts/${postId}`
+        const response = await axios.delete(quary, {
+            headers: {
+                "Content-Type": "application/json",
+                "token": token
+            }
+        })
+        if (response.status == 200) {
+            return response.data
+        }
+        else {
+           // console.log(response.data)
+            throw Error(JSON.stringify(response.data))
+        }
+    }
+    catch (err) {
+        console.log(err)
+        throw Error(JSON.stringify(err))
     }
 }

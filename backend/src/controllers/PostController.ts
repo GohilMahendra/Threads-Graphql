@@ -1,6 +1,6 @@
 import { Response } from "express";
 import { v4 as uuidv4 } from "uuid";
-import Post from "../models/Post";
+import Post, { PostType } from "../models/Post";
 import { getSignedUrl, s3, uploadToS3 } from "../utilities/S3Utils";
 import { CustomRequest } from "../middlewares/jwtTokenAuth";
 import mongoose from "mongoose";
@@ -9,6 +9,7 @@ import Reply from "../models/Reply";
 import { UserDocument } from "../types/User";
 import { generateThumbnail } from "../utilities/Thumbnail";
 import { cloneDeep } from "lodash";
+import { PostDocument } from "../types/Post";
 const createPost = async (req: CustomRequest, res: Response) => {
     try {
         const userId = req.userId
@@ -24,10 +25,9 @@ const createPost = async (req: CustomRequest, res: Response) => {
         }
 
         const media = req.files as Express.Multer.File[]
-        if(!is_repost && !content && !media)
-        {
+        if (!is_repost && !content && !media) {
             return res.status(400).json({
-                message:"no content provided for post"
+                message: "no content provided for post"
             })
         }
         type mediaType = {
@@ -89,7 +89,88 @@ const getPosts = async (req: CustomRequest, res: Response) => {
             quary._id = { $gt: new mongoose.Types.ObjectId(lastOffset) }
         }
         const posts = await Post.find(quary)
-            .sort({ created_at: -1, _id: -1 })
+            .sort({ created_at: 1, _id: 1 })
+            .populate<{ user: UserDocument }>({
+                path: "user",
+                select: "-password -token -otp",
+            }).populate<{Repost:PostDocument}>({
+                path:"Repost"
+            }).populate<{ user: UserDocument }>({
+                path: "Repost.user",
+                select: "-password -token -otp",
+            }).
+            limit(pageSize)
+
+
+        let userPosts = posts
+        const updatedUserPosts = await Promise.all(userPosts.map(async (post) => {
+            const media = post.media;
+            const user = post.user;
+            if (user.profile_picture) {
+                user.profile_picture = await getSignedUrl(user.profile_picture);
+            }
+
+            for (let j = 0; j < media.length; j++) {
+                media[j].media_url = await getSignedUrl(media[j].media_url);
+
+                if (media[j].thumbnail) {
+                    media[j].thumbnail = await getSignedUrl(media[j].thumbnail);
+                }
+            }
+
+            const exist_liked = await Like.exists({ userId: userId, postId: post._id });
+            const isLiked = exist_liked != null;
+            post.isLiked = isLiked;
+
+            if(post.isRepost && post.Repost)
+            {
+                const media = post.Repost.media;
+                const user = (post.Repost.user as UserDocument);
+                if (user.profile_picture) {
+                    user.profile_picture = await getSignedUrl(user.profile_picture);
+                }
+    
+                for (let j = 0; j < media.length; j++) {
+                    media[j].media_url = await getSignedUrl(media[j].media_url);
+    
+                    if (media[j].thumbnail) {
+                        media[j].thumbnail = await getSignedUrl(media[j].thumbnail || "");
+                    }
+                }
+                
+            }
+        }));
+
+
+        res.status(200).json({
+            data: userPosts,
+            meta: {
+                pagesize: pageSize,
+                lastOffset: (userPosts.length == pageSize) ? userPosts[userPosts.length - 1]._id : null
+            }
+        })
+    }
+    catch (err) {
+        console.log("errorr  ===>", JSON.stringify(err))
+        res.status(500).json({
+            message: "internal server Error"
+        })
+    }
+}
+
+const getPostsByUser = async (req: CustomRequest, res: Response) => {
+    try {
+        const userId = req.params.userId
+        const quary: any = {}
+        const lastOffset = req.query.lastOffset as string
+        const pageSizeParam = req.query.pageSize as string;
+        const pageSize = parseInt(pageSizeParam, 10) || 10;
+        if (lastOffset) {
+            quary._id = { $gt: new mongoose.Types.ObjectId(lastOffset) }
+            quary.userId = userId
+        }
+        const posts = await Post.find(quary)
+            .sort({ created_at: 1, _id: 1 })
             .populate<{ user: UserDocument }>({
                 path: "user",
                 select: "-password -token -otp",
@@ -98,12 +179,9 @@ const getPosts = async (req: CustomRequest, res: Response) => {
 
 
         let userPosts = posts
-        // Assuming you are inside an asynchronous function
-
         const updatedUserPosts = await Promise.all(userPosts.map(async (post) => {
             const media = post.media;
             const user = post.user;
-
             if (user.profile_picture) {
                 user.profile_picture = await getSignedUrl(user.profile_picture);
             }
@@ -127,10 +205,13 @@ const getPosts = async (req: CustomRequest, res: Response) => {
                         path: 'user',
                         select: '-password -token -otp',
                     }
-                });
+                }) as mongoose.HydratedDocument<PostDocument>
+
+                //@ts-nocheck
+                //@ts-check
+
             }
 
-            return post;
         }));
 
 
@@ -246,8 +327,8 @@ const commentPost = async (req: CustomRequest, res: Response) => {
         const post = await Post.findByIdAndUpdate(
             postId,
             { $inc: { replies: 1 } },
-            { new: true } 
-          );
+            { new: true }
+        );
 
         if (!post) {
             return res.status(404).json({
@@ -298,21 +379,21 @@ const getComments = async (req: CustomRequest, res: Response) => {
                 select: "-password -token -otp",
             }).
             sort({
-               // created_at: 1,
+                // created_at: 1,
                 _id: 1
             }).limit(pageSize)
 
         await Promise.all(
-            comments.map(async(comment)=>{
-                if(comment.user.profile_picture)
-                comment.user.profile_picture =await getSignedUrl(comment.user.profile_picture)
+            comments.map(async (comment) => {
+                if (comment.user.profile_picture)
+                    comment.user.profile_picture = await getSignedUrl(comment.user.profile_picture)
             })
         )
         return res.json({
             data: comments,
             meta: {
                 pagesize: pageSize,
-                lastOffset: (comments.length==pageSize) ? comments[comments.length - 1]._id : null
+                lastOffset: (comments.length == pageSize) ? comments[comments.length - 1]._id : null
             }
         })
 
@@ -358,4 +439,4 @@ const deletePost = async (req: CustomRequest, res: Response) => {
     }
 }
 
-export default { createPost, getPosts, likePost, commentPost, deletePost, unLikePost, getComments }
+export default { createPost, getPosts, getPostsByUser, likePost, commentPost, deletePost, unLikePost, getComments }

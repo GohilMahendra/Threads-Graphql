@@ -1,6 +1,9 @@
 
-import mongoose,{InferSchemaType} from "mongoose"
+import mongoose,{InferSchemaType,PopulatedDoc} from "mongoose"
 import { PostDocument } from "../types/Post"
+
+
+type Repost = PopulatedDoc<PostDocument>
 const PostSchema = new mongoose.Schema({
     user: {
         type: mongoose.Schema.Types.ObjectId,
@@ -50,6 +53,6 @@ const PostSchema = new mongoose.Schema({
         default: false
     }
 }, { timestamps: { createdAt: 'created_at', updatedAt: 'updated_at' } })
-type PostType = InferSchemaType<typeof PostSchema>
+export type PostType = InferSchemaType<typeof PostSchema>
 const Post = mongoose.model<PostType>("Post", PostSchema)
 export default Post
