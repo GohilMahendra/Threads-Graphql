@@ -10,8 +10,9 @@ import { FlatList } from 'react-native'
 import { Thread } from '../../types/Post'
 import ProfilePost from '../../components/profile/PofilePost'
 import { DeletePostAction, FetchMoreUserPostsAction, FetchUserPostsAction } from '../../redux/slices/UserSlice'
-import { BottomSheetModal, BottomSheetModalProvider } from '@gorhom/bottom-sheet'
+import { BottomSheetBackdrop, BottomSheetModal, BottomSheetModalProvider } from '@gorhom/bottom-sheet'
 import { GestureHandlerRootView } from 'react-native-gesture-handler'
+import UseTheme from '../../globals/UseTheme'
 
 const Profile = () => {
 
@@ -22,6 +23,7 @@ const Profile = () => {
   const threeDotPressModalRef = useRef<BottomSheetModal>(null)
   const snapPoints = useMemo(() => ['30%'], []);
   const [postId,setPostId] = useState("")
+  const { theme } = UseTheme()
   const handleThreedotPress = useCallback((postId:string)=>{
     setPostId(postId)
     threeDotPressModalRef.current?.present()
@@ -57,7 +59,7 @@ const Profile = () => {
     <GestureHandlerRootView style={{flex:1}}>
     <SafeAreaView style={{
       flex: 1,
-      backgroundColor:"#fff"
+      backgroundColor: theme.background_color
     }}>
       <ScrollView style={{
         flex: 1,
@@ -71,7 +73,7 @@ const Profile = () => {
             onPress={() => navigation.navigate("EditProfile")}
             name='edit'
             size={20}
-            color={"black"}
+            color={theme.text_color}
           />
         </View>
         <View style={{
@@ -84,9 +86,12 @@ const Profile = () => {
             <View>
               <Text style={{
                 fontSize: 20,
-                fontWeight: "bold"
+                fontWeight: "bold",
+                color: theme.text_color
               }}>{user.fullname}</Text>
-              <Text>{user.username}</Text>
+              <Text style={{
+                color: theme.text_color
+              }}>{user.username}</Text>
             </View>
             <Image
               source={user.profile_picture ? { uri: user.profile_picture } : placeholder_image}
@@ -97,8 +102,8 @@ const Profile = () => {
               }}
             />
           </View>
-          <Text>{user.bio}</Text>
-          <Text>{user.followers} Followers</Text>
+          <Text style={{color: theme.text_color}}>{user.bio}</Text>
+          <Text style={{color: theme.text_color}}>{user.followers} Followers</Text>
         </View>
         <View style={{
           marginTop:20,
@@ -113,11 +118,12 @@ const Profile = () => {
             justifyContent:"center",
             alignItems:"center",
             borderBottomWidth:(selectedSection == "Threads")?1:0,
-            borderColor:"black"
+            borderColor: theme.text_color
           }}
           >
             <Text style={{
-              fontSize:15
+              fontSize:15,
+              color: theme.text_color
             }}>Threads</Text>
           </TouchableOpacity>
           <TouchableOpacity
@@ -128,11 +134,12 @@ const Profile = () => {
             justifyContent:"center",
             alignItems:"center",
             borderBottomWidth:(selectedSection == "Reposts")?1:0,
-            borderColor:"black"
+            borderColor: theme.text_color
           }}
           >
             <Text style={{
-              fontSize:15
+              fontSize:15,
+              color: theme.text_color
             }}>Reposts</Text>
           </TouchableOpacity>
           <TouchableOpacity
@@ -143,11 +150,12 @@ const Profile = () => {
             justifyContent:"center",
             alignItems:"center",
             borderBottomWidth:(selectedSection == "Replies")?1:0,
-            borderColor:"black"
+            borderColor: theme.text_color
           }}
           >
             <Text style={{
-              fontSize:15
+              fontSize:15,
+              color: theme.text_color
             }}>Replies</Text>
           </TouchableOpacity>
         </View>
@@ -168,6 +176,15 @@ const Profile = () => {
           <BottomSheetModal
             ref={threeDotPressModalRef}
             snapPoints={snapPoints}
+            backgroundStyle={
+              {
+                backgroundColor: theme.background_color,
+              }
+            }
+          
+            backdropComponent={(props) => (
+              <BottomSheetBackdrop {...props} disappearsOnIndex={-1} appearsOnIndex={0} />
+            )}
           >
            <View style={{
            padding:20,
@@ -176,14 +193,14 @@ const Profile = () => {
            }}>
             <TouchableOpacity style={{
               padding:20,
-              backgroundColor:'#f5f5f5',
+              backgroundColor: theme.secondary_background_color,
               width:"100%",
-              borderRadius:15,
+              borderRadius:10,
               marginVertical:5
             }}>
               <Text
               style={{
-               // color:"white",
+                color: theme.text_color,
                 fontSize:15,
                 fontWeight:"bold"
               }}
@@ -194,8 +211,7 @@ const Profile = () => {
             onPress={()=>onDeleteModalPress()}
             style={{
               padding:20,
-              
-              borderRadius:15,
+              borderRadius:10,
               backgroundColor:'red',
               width:"100%"
             }}>

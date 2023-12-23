@@ -9,6 +9,7 @@ export type User =
     bio?: string,
     verified: boolean,
     profile_picture?: string,
+    isFollowed: boolean
 }
 
 export type SearchUser = Omit<User,"email" | "followers" | "following" | "bio">

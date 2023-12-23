@@ -10,4 +10,5 @@ export interface UserDocument extends Document {
     verified: boolean;
     token?: string;
     otp?: string;
+    isFollowed: boolean
   }

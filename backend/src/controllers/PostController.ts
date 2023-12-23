@@ -1,14 +1,13 @@
 import { Response } from "express";
 import { v4 as uuidv4 } from "uuid";
-import Post, { PostType } from "../models/Post";
-import { getSignedUrl, s3, uploadToS3 } from "../utilities/S3Utils";
+import Post from "../models/Post";
+import { getSignedUrl, uploadToS3 } from "../utilities/S3Utils";
 import { CustomRequest } from "../middlewares/jwtTokenAuth";
 import mongoose from "mongoose";
 import Like from "../models/Like";
 import Reply from "../models/Reply";
 import { UserDocument } from "../types/User";
 import { generateThumbnail } from "../utilities/Thumbnail";
-import { cloneDeep } from "lodash";
 import { PostDocument } from "../types/Post";
 const createPost = async (req: CustomRequest, res: Response) => {
     try {
@@ -23,7 +22,6 @@ const createPost = async (req: CustomRequest, res: Response) => {
                 message: "PostId can't be null for repost"
             })
         }
-
         const media = req.files as Express.Multer.File[]
         if (!is_repost && !content && !media) {
             return res.status(400).json({
@@ -80,68 +78,73 @@ const createPost = async (req: CustomRequest, res: Response) => {
 const getPosts = async (req: CustomRequest, res: Response) => {
     try {
         const userId = req.userId
-
         const quary: any = {}
         const lastOffset = req.query.lastOffset as string
         const pageSizeParam = req.query.pageSize as string;
         const pageSize = parseInt(pageSizeParam, 10) || 10;
         if (lastOffset) {
-            quary._id = { $gt: new mongoose.Types.ObjectId(lastOffset) }
+           // quary._id = { $gt: new mongoose.Types.ObjectId(lastOffset) }
+            quary.isRepost = true
         }
-        const posts = await Post.find(quary)
+        
+        const posts = await Post.find({isRepost:true})
             .sort({ created_at: 1, _id: 1 })
             .populate<{ user: UserDocument }>({
                 path: "user",
                 select: "-password -token -otp",
-            }).populate<{Repost:PostDocument}>({
-                path:"Repost"
-            }).populate<{ user: UserDocument }>({
-                path: "Repost.user",
-                select: "-password -token -otp",
             }).
-            limit(pageSize)
-
-
+            populate<{ Repost: PostDocument}>({
+                path: "Repost",
+                populate: {
+                    path: "user",
+                    select: "-password -token -otp",
+                },
+            }).
+            limit(2).lean()
         let userPosts = posts
-        const updatedUserPosts = await Promise.all(userPosts.map(async (post) => {
+        const updatedUserPosts = await Promise.all(userPosts.map(async (post, index: number) => {
             const media = post.media;
             const user = post.user;
             if (user.profile_picture) {
                 user.profile_picture = await getSignedUrl(user.profile_picture);
             }
-
-            for (let j = 0; j < media.length; j++) {
-                media[j].media_url = await getSignedUrl(media[j].media_url);
-
-                if (media[j].thumbnail) {
-                    media[j].thumbnail = await getSignedUrl(media[j].thumbnail);
+            for(const mediaFile of media)
+            {
+                mediaFile.media_url = await getSignedUrl(mediaFile.media_url);
+                if (mediaFile.thumbnail) {
+                    mediaFile.thumbnail = await getSignedUrl(mediaFile.thumbnail);
                 }
             }
-
             const exist_liked = await Like.exists({ userId: userId, postId: post._id });
             const isLiked = exist_liked != null;
             post.isLiked = isLiked;
+          //  return post
+        }));
 
+        await Promise.all(userPosts.map(async (post, index: number) => {
             if(post.isRepost && post.Repost)
             {
-                const media = post.Repost.media;
-                const user = (post.Repost.user as UserDocument);
-                if (user.profile_picture) {
-                    user.profile_picture = await getSignedUrl(user.profile_picture);
+                const user = post.Repost.user as UserDocument
+                const media = post.Repost.media
+                if(user.profile_picture){
+                    const key = user.profile_picture
+                    const uri = await getSignedUrl(key)
+                    user.profile_picture =uri
                 }
-    
-                for (let j = 0; j < media.length; j++) {
-                    media[j].media_url = await getSignedUrl(media[j].media_url);
-    
-                    if (media[j].thumbnail) {
-                        media[j].thumbnail = await getSignedUrl(media[j].thumbnail || "");
+                for(const mediaFile of media)
+                {
+                    mediaFile.media_url = await getSignedUrl(mediaFile.media_url);
+                    if (mediaFile.thumbnail) {
+                        mediaFile.thumbnail = await getSignedUrl(mediaFile.thumbnail);
                     }
                 }
+                post.Repost.media = media
+                post.Repost.user = user
                 
             }
         }));
 
-
+       
         res.status(200).json({
             data: userPosts,
             meta: {
@@ -176,8 +179,6 @@ const getPostsByUser = async (req: CustomRequest, res: Response) => {
                 select: "-password -token -otp",
             }).
             limit(pageSize)
-
-
         let userPosts = posts
         const updatedUserPosts = await Promise.all(userPosts.map(async (post) => {
             const media = post.media;
@@ -185,7 +186,6 @@ const getPostsByUser = async (req: CustomRequest, res: Response) => {
             if (user.profile_picture) {
                 user.profile_picture = await getSignedUrl(user.profile_picture);
             }
-
             for (let j = 0; j < media.length; j++) {
                 media[j].media_url = await getSignedUrl(media[j].media_url);
 
@@ -193,11 +193,9 @@ const getPostsByUser = async (req: CustomRequest, res: Response) => {
                     media[j].thumbnail = await getSignedUrl(media[j].thumbnail);
                 }
             }
-
             const exist_liked = await Like.exists({ userId: userId, postId: post._id });
             const isLiked = exist_liked != null;
             post.isLiked = isLiked;
-
             if (post.isRepost) {
                 await post.populate({
                     path: "Repost",
@@ -206,15 +204,8 @@ const getPostsByUser = async (req: CustomRequest, res: Response) => {
                         select: '-password -token -otp',
                     }
                 }) as mongoose.HydratedDocument<PostDocument>
-
-                //@ts-nocheck
-                //@ts-check
-
             }
-
         }));
-
-
         res.status(200).json({
             data: userPosts,
             meta: {
@@ -244,7 +235,6 @@ const likePost = async (req: CustomRequest, res: Response) => {
                     message: "invalid params"
                 })
             }
-
             const post = await Post.findById(postId)
             console.log(post)
             if (!post) {
@@ -252,8 +242,14 @@ const likePost = async (req: CustomRequest, res: Response) => {
                     message: "not found the post"
                 })
             }
-            post.likes++
+            const existingLike = await Like.findOne({ userId: userId, postId });
+            if (existingLike) {
+                return res.status(200).json({
+                    message: "post is already liked by current user"
+                })
+            }
 
+            post.likes++
             const newLike = new Like({
                 postId: postId,
                 userId: userId
@@ -285,7 +281,6 @@ const unLikePost = async (req: CustomRequest, res: Response) => {
                 message: "invalid params"
             })
         }
-
         const post = await Post.findById(postId)
         if (!post) {
             return res.status(404).json({
@@ -299,7 +294,6 @@ const unLikePost = async (req: CustomRequest, res: Response) => {
                 message: "post is already un-liked"
             })
         }
-
         if (post.likes > 0)
             post.likes--
 
@@ -335,19 +329,16 @@ const commentPost = async (req: CustomRequest, res: Response) => {
                 message: "post not found!"
             })
         }
-
         const newReply = new Reply({
             content: content,
             postId: postId,
             user: userId
         })
-
         await newReply.save()
 
         res.status(200).json({
             message: "successfully replied on post!",
         })
-
     }
     catch (err) {
         return res.status(500).json({
@@ -372,7 +363,6 @@ const getComments = async (req: CustomRequest, res: Response) => {
                 message: "invalid quary params"
             })
         }
-
         const comments = await Reply.find(quary)
             .populate<{ user: UserDocument }>({
                 path: "user",
@@ -382,7 +372,6 @@ const getComments = async (req: CustomRequest, res: Response) => {
                 // created_at: 1,
                 _id: 1
             }).limit(pageSize)
-
         await Promise.all(
             comments.map(async (comment) => {
                 if (comment.user.profile_picture)
@@ -396,7 +385,6 @@ const getComments = async (req: CustomRequest, res: Response) => {
                 lastOffset: (comments.length == pageSize) ? comments[comments.length - 1]._id : null
             }
         })
-
     }
     catch (err) {
         return res.status(500).json({
@@ -416,15 +404,12 @@ const deletePost = async (req: CustomRequest, res: Response) => {
                 messsage: "post not found"
             })
         }
-
         const objectUserId = new mongoose.Types.ObjectId(userId) || ""
-
         if (!objectUserId.equals(post.user)) {
             return res.status(401).json({
                 message: "you are not allowed to do this action"
             })
         }
-
         await Reply.deleteMany({ postId: postId });
         await Like.deleteMany({ postId: postId })
         await post.deleteOne()

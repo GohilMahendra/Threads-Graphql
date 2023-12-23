@@ -54,6 +54,8 @@ const VideoPlayer = (props:VideoPlayerPropTypes) =>
             }}
             />
             <Slider
+            minimumTrackTintColor="white"
+            maximumTrackTintColor="silver"
             thumbStyle={{
                 height:20,
                 width:20,

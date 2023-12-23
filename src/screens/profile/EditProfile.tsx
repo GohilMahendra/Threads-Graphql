@@ -11,6 +11,7 @@ import {
 } from "react-native-image-picker"
 import { UpdateAction } from '../../redux/slices/UserSlice'
 import { updateUser } from '../../apis/UserAPI'
+import UseTheme from '../../globals/UseTheme'
 const { height, width } = Dimensions.get("screen")
 const EditProfile = () => {
 
@@ -26,7 +27,7 @@ const EditProfile = () => {
     const image = user.profile_picture
     const name = user.fullname
     const user_bio = user.bio
-
+    const {theme} = UseTheme()
     const [ProfilePicture, setProfilePicture] = useState<MediaType>({
         uri: image || "",
         name: "",
@@ -69,8 +70,8 @@ const EditProfile = () => {
 
     return (
         <SafeAreaView style={{
-            flex: 1
-
+            flex: 1,
+            backgroundColor: theme.background_color
         }}>
             <View style={{
                 flex: 1
@@ -91,11 +92,12 @@ const EditProfile = () => {
                             onPress={() => navigation.goBack()}
                             name='close'
                             size={20}
-                            color={"black"}
+                            color={theme.text_color}
                         />
                         <Text style={{
                             fontSize: 18,
-                            marginLeft: 30
+                            marginLeft: 30,
+                            color: theme.text_color
                         }}>Edit Profile</Text>
                     </View>
                     <TouchableOpacity 
@@ -131,7 +133,7 @@ const EditProfile = () => {
                     <View style={{
                         flexDirection: "row",
                         padding: 15,
-                        backgroundColor: "#E5E5E5",
+                        backgroundColor: theme.secondary_background_color,
                         width: width * 90 / 100,
                         borderRadius: 10,
                         marginVertical: 20
@@ -140,18 +142,19 @@ const EditProfile = () => {
                             autoCapitalize={"none"}
                             value={fullname}
                             onChangeText={text => setFullName(text)}
-                            placeholderTextColor={"grey"}
+                            placeholderTextColor={theme.placeholder_color}
                             placeholder={"full name ..."}
                             style={{
                                 flex: 1,
                                 padding: 5,
+                                color: theme.text_color
                             }}
                         />
                     </View>
                     <View style={{
                         flexDirection: "row",
                         padding: 15,
-                        backgroundColor: "#E5E5E5",
+                        backgroundColor: theme.secondary_background_color,
                         width: width * 90 / 100,
                         borderRadius: 10,
                         marginVertical: 10
@@ -162,10 +165,11 @@ const EditProfile = () => {
 
                             numberOfLines={5}
                             onChangeText={text => setBio(text)}
-                            placeholderTextColor={"grey"}
+                            placeholderTextColor={theme.placeholder_color}
                             placeholder={"bio ..."}
                             style={{
                                 flex: 1,
+                                color: theme.text_color,
                                 textAlignVertical: "top",
                                 padding: 5,
                                 height: 150

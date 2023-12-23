@@ -2,6 +2,7 @@ import React from "react";
 import { TouchableOpacity,Image,View,Text} from "react-native"
 import { SearchUser } from "../../types/User"
 import { placeholder_image } from "../../globals/asstes";
+import UseTheme from "../../globals/UseTheme";
 type UserItemProps =
 {
     user:SearchUser,
@@ -10,8 +11,11 @@ type UserItemProps =
 const UserItem = (props:UserItemProps) =>
 {
     const item  = props.user
+    const {theme} = UseTheme()
     return(
-        <TouchableOpacity style={{
+        <TouchableOpacity 
+        onPress={()=>props.onPress(item._id)}
+        style={{
             width: "100%",
             padding:10,
             borderBottomWidth:1,
@@ -31,11 +35,11 @@ const UserItem = (props:UserItemProps) =>
             <View>
               <Text style={{
                 fontSize: 18,
-                color: 'black'
+                color: theme.text_color
               }}>{item.fullname}</Text>
               <Text style={{
                 fontSize: 15,
-                color: "grey"
+                color: theme.secondary_text_color
               }}>{item.username}</Text>
             </View>
           </TouchableOpacity>

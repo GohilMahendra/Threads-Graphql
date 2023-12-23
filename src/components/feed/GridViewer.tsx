@@ -179,8 +179,9 @@ const GridViewer = (props: GridViewerPropTypes) => {
                             uri: (selectedMedia.media_type.includes("image"))
                                 ? selectedMedia.media_url : selectedMedia.thumbnail
                         }}
+                        resizeMode={"contain"}
                         style={{
-                            flex: 1
+                            flex: 1,
                         }}
                     />
                     }

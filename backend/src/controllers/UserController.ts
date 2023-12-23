@@ -1,4 +1,3 @@
-import crypto from "crypto";
 import bcrypt from "bcrypt";
 import { Request, Response } from "express";
 import User from "../models/User";
@@ -13,6 +12,7 @@ import Post from "../models/Post";
 import { UserDocument } from "../types/User";
 import Like from "../models/Like";
 import { PostDocument } from "../types/Post";
+import Follower from "../models/Follower";
 interface UpdateUserRequestBody {
     fullname?: string;
     bio?: string;
@@ -109,7 +109,6 @@ const signUpUser = async (req: Request, res: Response) => {
 }
 const updateUser = async (req: CustomRequest, res: Response) => {
     try {
-
         const userId = req.userId
         const { fullname, bio }: { fullname?: string; bio?: string } = req.body
         const profile_picture = req.file as Express.Multer.File
@@ -147,11 +146,7 @@ const updateUser = async (req: CustomRequest, res: Response) => {
         }
 
         const result = await User.updateOne({ _id: userId }, { $set: updateUser });
-        const user = await User.findById(userId).select({
-           password:false,
-           token:1,
-           otp:1
-        })
+        const user = await User.findById(userId).select("-password -top -token")
         if (result.modifiedCount > 0) {
             res.status(200).json({
                 success: true,
@@ -170,6 +165,39 @@ const updateUser = async (req: CustomRequest, res: Response) => {
         })
     }
 }
+
+const getUserById = async (req: CustomRequest, res: Response) => {
+    try {
+        const userId = req.userId
+        const profileId = req.params.userId
+        const user = await User.findOne({_id:profileId}).select("-otp -password -token")
+
+        if(!user)
+        {
+            return res.status(404).json({
+                message:"user not found!"
+            })
+        }
+        if(user.profile_picture)
+        {
+            user.profile_picture = await getSignedUrl(user.profile_picture)
+        }
+        const isFollowedBy = await Follower.findOne({follower:userId,following:profileId})
+        if(isFollowedBy)
+        {
+            user.isFollowed = true
+        }
+        return res.status(200).json({
+            user: user
+        })
+    }
+    catch (err) {
+        res.status(500).json({
+            message: "Internal server Error"
+        })
+    }
+}
+
 const signOutUser = async (req: CustomRequest, res: Response) => {
     try {
         const token = req.header("token")
@@ -246,9 +274,10 @@ const verifyEmail = async (req: CustomRequest, res: Response) => {
     }
 }
 
-const SearchUsers = async (req: Request, res: Response) => {
+const SearchUsers = async (req: CustomRequest, res: Response) => {
     try {
 
+        const userId = req.userId
         const quary = req.query.name
 
         const users = await User.aggregate([
@@ -260,28 +289,34 @@ const SearchUsers = async (req: Request, res: Response) => {
                         path: "username"
                     }
                 }
+            },
+            {
+                $project: {
+                    _id: 1,
+                    otp: 0,
+                    token: 0,
+                    password: 0
+                }
             }
-        ]).project({
-            _id: 1,
-            fullname: 1,
-            username: 1,
-            profile_picture: 1,
-            verified: 1
-        }).limit(5)
-
+        ]);
         if (users.length == 0) {
             return res.status(200).json({
                 data: []
             })
         }
-        await Promise.all(users.map(async (user) => {
+        await Promise.all(users.map(async (user: any) => {
+
+            const isUserFollowed = await Follower.findOne({ follower: userId, following: user._id })
+            if (!isUserFollowed) {
+                user.isFollowed = true
+
+            }
             if (user.profile_picture)
                 user.profile_picture = await getSignedUrl(user.profile_picture)
         }))
         return res.status(200).json({
             data: users
         })
-
     }
     catch (err) {
         return res.status(500).json({
@@ -298,18 +333,27 @@ const getUserPosts = async (req: CustomRequest, res: Response) => {
         const lastOffset = req.query.lastOffset as string
         const pageSizeParam = req.query.pageSize as string;
         const pageSize = parseInt(pageSizeParam, 10) || 10;
+        const post_type = req.query.post_type
         if (lastOffset) {
             quary._id = { $gt: new mongoose.Types.ObjectId(lastOffset) }
             quary.userId = userId
+        }
+        if (post_type == "Repost") {
+            quary.isRepost = true
         }
         const posts = await Post.find(quary)
             .sort({ created_at: 1, _id: 1 })
             .populate<{ user: UserDocument }>({
                 path: "user",
                 select: "-password -token -otp",
+            }).populate<{ Repost: PostDocument, user: UserDocument }>({
+                path: "Repost",
+                populate: {
+                    path: "user",
+                    select: "-password -token -otp",
+                },
             }).
             limit(pageSize)
-
 
         let userPosts = posts
         const updatedUserPosts = await Promise.all(userPosts.map(async (post) => {
@@ -331,23 +375,22 @@ const getUserPosts = async (req: CustomRequest, res: Response) => {
             const isLiked = exist_liked != null;
             post.isLiked = isLiked;
 
-            if (post.isRepost) {
-                await post.populate({
-                    path: "Repost",
-                    populate: {
-                        path: 'user',
-                        select: '-password -token -otp',
+            if (post.isRepost && post.Repost) {
+                const media = post.Repost.media;
+                const user = (post.Repost.user as UserDocument);
+                if (user.profile_picture) {
+                    user.profile_picture = await getSignedUrl(user.profile_picture);
+                }
+
+                for (let j = 0; j < media.length; j++) {
+                    media[j].media_url = await getSignedUrl(media[j].media_url);
+
+                    if (media[j].thumbnail) {
+                        media[j].thumbnail = await getSignedUrl(media[j].thumbnail || "");
                     }
-                }) as mongoose.HydratedDocument<PostDocument>
-
-                //@ts-nocheck
-                //@ts-check
-
+                }
             }
-
         }));
-
-
         res.status(200).json({
             data: userPosts,
             meta: {
@@ -365,4 +408,4 @@ const getUserPosts = async (req: CustomRequest, res: Response) => {
     }
 }
 
-export default { signInUser, getUserPosts, signUpUser, verifyEmail, updateUser, SearchUsers }
+export default { signInUser, getUserPosts, signUpUser, verifyEmail, updateUser, SearchUsers,getUserById }

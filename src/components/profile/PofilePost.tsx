@@ -6,6 +6,7 @@ import Entypo from "react-native-vector-icons/Entypo";
 import { Media, Thread } from "../../types/Post";
 import { getMediaImage, timeDifference } from "../../globals/utilities";
 import GridViewer from "../feed/GridViewer";
+import UseTheme from "../../globals/UseTheme";
 const { height, width } = Dimensions.get("screen")
 type PostItemsProps =
     {
@@ -16,11 +17,11 @@ const ProfilePost = (props: PostItemsProps) => {
 
     const post = props.post
     const media = post.media
-
+    const {theme} = UseTheme()
     return (
         <View style={{
             padding: 10,
-            backgroundColor: "#fff",
+            backgroundColor:theme.background_color,
             flexDirection: "row",
             borderRadius: 15,
             alignSelf: 'center',
@@ -55,7 +56,7 @@ const ProfilePost = (props: PostItemsProps) => {
                     justifyContent: 'space-between'
                 }}>
                     <Text style={{
-                        color: "black",
+                        color: theme.text_color,
                         fontSize: 18,
                         fontWeight: "bold",
                     }}>{post.user.fullname}</Text>
@@ -65,7 +66,8 @@ const ProfilePost = (props: PostItemsProps) => {
                     }}>
                         <Text style={{
                             color: "silver",
-                            marginRight: 20
+                            marginRight: 20,
+
                         }}>{timeDifference(post.created_at)}</Text>
                         <Entypo
                             onPress={()=>props.onPressThreeDots(post._id)}
@@ -75,7 +77,9 @@ const ProfilePost = (props: PostItemsProps) => {
                         />
                     </View>
                 </View>
-                <Text>{post.content}</Text>
+                <Text style={{
+                    color: theme.text_color
+                }}>{post.content}</Text>
 
                 <GridViewer
                 media={media}

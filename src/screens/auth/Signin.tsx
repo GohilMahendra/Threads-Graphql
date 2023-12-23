@@ -37,12 +37,13 @@ const SignIn = () =>
             flex:1,
             justifyContent:"center",
             alignItems:"center",
-            padding:20
+            padding:20,
+            backgroundColor: theme.background_color
         }}>
             <View style={{
                 flexDirection:"row",
                 padding:15,
-                backgroundColor:"#E5E5E5",
+                backgroundColor: theme.secondary_background_color,
                 width:width*90/100,
                 borderRadius:10,
                 marginVertical:20
@@ -51,7 +52,7 @@ const SignIn = () =>
                 autoCapitalize={"none"}
                 value={email}
                 onChangeText={text=>setEmail(text)}
-                placeholderTextColor={"grey"}
+                placeholderTextColor={theme.placeholder_color}
                 placeholder={"email ..."}
                 style={{
                     flex:1,
@@ -62,7 +63,7 @@ const SignIn = () =>
             <View style={{
                 flexDirection:"row",
                 padding:15,
-                backgroundColor:"#E5E5E5",
+                backgroundColor: theme.secondary_background_color,
                 width:width*90/100,
                 borderRadius:10,
                 marginVertical:10
@@ -70,11 +71,12 @@ const SignIn = () =>
                 <TextInput
                 value={password}
                 onChangeText={text=>setPassword(text)}
-                placeholderTextColor={"grey"}
+                placeholderTextColor={theme.placeholder_color}
                 placeholder={"password ..."}
                 style={{
                     flex:1,
                     padding:5,
+                    color: theme.text_color
                 }}
                 />
             </View>
@@ -84,7 +86,7 @@ const SignIn = () =>
             style={{
                 width: width*90/100,
                 padding:20,
-                backgroundColor:"black",
+                backgroundColor: theme.primary_color,
                 borderRadius:10,
                 justifyContent:"center",
                 alignItems:"center",
@@ -103,13 +105,14 @@ const SignIn = () =>
             <View style={{
                 flexDirection:'row'
             }}>
-                <Text>Dont have any account ? </Text>
+                <Text style={{color: theme.text_color}}>Dont have any account ? </Text>
                 <Pressable
                 onPress={()=>navigation.navigate("SignUp")}
                 >
                     <Text
                     style={{
-                        textDecorationLine:"underline"
+                        textDecorationLine:"underline",
+                        color: theme.text_color
                     }}
                     >Regsiter Here</Text>
                 </Pressable>

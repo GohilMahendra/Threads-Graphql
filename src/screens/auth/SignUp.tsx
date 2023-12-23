@@ -6,6 +6,7 @@ import FontAwesome5 from "react-native-vector-icons/FontAwesome5";
 import { NavigationProp, useNavigation } from '@react-navigation/native';
 import { AuthStackType } from '../../navigations/AuthStack';
 import { signUpUser } from '../../apis/UserAPI';
+import UseTheme from '../../globals/UseTheme';
 const { height, width} = Dimensions.get("screen")
 const SignUp = () =>
 {
@@ -15,7 +16,7 @@ const SignUp = () =>
     const [userName,setUserName] = useState("")
     const [fullName,setFullName] = useState("")
     const navigation = useNavigation<NavigationProp<AuthStackType,"SignIn">>()
-
+    const {theme} = UseTheme()
     const SignUp = async() =>
     {
         try
@@ -44,12 +45,13 @@ const SignUp = () =>
             flex:1,
             justifyContent:"center",
             alignItems:"center",
-            padding:20
+            padding:20,
+            backgroundColor: theme.background_color
         }}>
              <View style={{
                 flexDirection:"row",
                 padding:15,
-                backgroundColor:"#E5E5E5",
+                backgroundColor:theme.secondary_background_color,
                 width:width*90/100,
                 borderRadius:10,
                 marginVertical:10
@@ -62,6 +64,7 @@ const SignUp = () =>
                 placeholder={"username ..."}
                 style={{
                     flex:1,
+                    color: theme.text_color,
                     padding:5,
                 }}
                 />
@@ -69,7 +72,7 @@ const SignUp = () =>
             <View style={{
                 flexDirection:"row",
                 padding:15,
-                backgroundColor:"#E5E5E5",
+                backgroundColor:theme.secondary_background_color,
                 width:width*90/100,
                 borderRadius:10,
                 marginVertical:10
@@ -82,6 +85,7 @@ const SignUp = () =>
                 placeholder={"fullname ..."}
                 style={{
                     flex:1,
+                    color: theme.text_color,
                     padding:5,
                 }}
                 />
@@ -89,7 +93,7 @@ const SignUp = () =>
             <View style={{
                 flexDirection:"row",
                 padding:15,
-                backgroundColor:"#E5E5E5",
+                backgroundColor:theme.secondary_background_color,
                 width:width*90/100,
                 borderRadius:10,
                 marginVertical:10
@@ -102,6 +106,7 @@ const SignUp = () =>
                 placeholder={"email ..."}
                 style={{
                     flex:1,
+                    color: theme.text_color,
                     padding:5,
                 }}
                 />
@@ -109,7 +114,7 @@ const SignUp = () =>
             <View style={{
                 flexDirection:"row",
                 padding:15,
-                backgroundColor:"#E5E5E5",
+                backgroundColor:theme.secondary_background_color,
                 width:width*90/100,
                 borderRadius:10,
                 marginVertical:10
@@ -123,6 +128,7 @@ const SignUp = () =>
                 secureTextEntry
                 style={{
                     flex:1,
+                    color: theme.text_color,
                     padding:5,
                 }}
                 />
@@ -130,7 +136,7 @@ const SignUp = () =>
             <View style={{
                 flexDirection:"row",
                 padding:15,
-                backgroundColor:"#E5E5E5",
+                backgroundColor:theme.secondary_background_color,
                 width:width*90/100,
                 borderRadius:10,
                 marginVertical:10
@@ -145,6 +151,7 @@ const SignUp = () =>
                 style={{
                     flex:1,
                     padding:5,
+                    color: theme.text_color,
                 }}
                 />
             </View>
@@ -154,7 +161,7 @@ const SignUp = () =>
             style={{
                 width: width*90/100,
                 padding:20,
-                backgroundColor:"black",
+                backgroundColor: theme.primary_color,
                 borderRadius:10,
                 justifyContent:"center",
                 alignItems:"center",
@@ -173,13 +180,16 @@ const SignUp = () =>
             <View style={{
                 flexDirection:'row'
             }}>
-                <Text>Already have an account ? </Text>
+                <Text style={{
+                    color: theme.text_color
+                }}>Already have an account ? </Text>
                 <Pressable
                 onPress={()=>navigation.navigate("SignIn")}
                 >
                     <Text
                     style={{
-                        textDecorationLine:"underline"
+                        textDecorationLine:"underline",
+                        color: theme.text_color
                     }}
                     >Login Here</Text>
                 </Pressable>

@@ -45,6 +45,10 @@ const userSchema = new mongoose.Schema<UserDocument>({
     },
     otp:{
         type:String,
+    },
+    isFollowed:{
+        type: mongoose.Schema.Types.Boolean,
+        default: false
     }
 })
 

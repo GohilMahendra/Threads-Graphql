@@ -23,13 +23,13 @@ type PostItemsProps =
     {
         post: Thread,
         onPressComment:(postId:string)=>void
-        onRepost:()=>void
+        onRepost:(postId:string)=>void
     }
 const RepostItem = (props: PostItemsProps) => {
 
     const post = props.post
     const media = post.media
-
+    const repost = post.Repost as Thread
     const likeAnim = useSharedValue<number>(1)
 
     const startAnimation = () =>
@@ -93,6 +93,7 @@ const RepostItem = (props: PostItemsProps) => {
             }}>
                 <View style={{
                     flexDirection: "row",
+                    alignItems:"center",
                     justifyContent: 'space-between'
                 }}>
                     <Text style={{
@@ -116,11 +117,9 @@ const RepostItem = (props: PostItemsProps) => {
                     </View>
                 </View>
                 <Text>{post.content}</Text>
-
-                <GridViewer
-                media={media}
-                />
-
+                {/* origional post container starts */}
+            
+                {/* origional post container ends */}
                 <View style={{
                     flexDirection: 'row',
                     marginVertical: 5
@@ -144,7 +143,7 @@ const RepostItem = (props: PostItemsProps) => {
                         color={"black"}
                     />
                     <AntDesign
-                        onPress={()=>props.onRepost()}
+                        onPress={()=>props.onRepost(repost._id)}
                         name="retweet"
                         style={{ marginRight: 20 }}
                         size={20}

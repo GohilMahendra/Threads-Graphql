@@ -1,51 +1,54 @@
 import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
 import Home from "../screens/home/Home";
 import FontAwesome from "react-native-vector-icons/FontAwesome";
-import Fontisto from "react-native-vector-icons/Fontisto";
-import Profile from "../screens/profile/Profile";
 import ProfileStack from "./ProfileStack";
-import Search from "../screens/search/Search";
+import UseTheme from "../globals/UseTheme";
+import SearchStack from "./SearchStack";
+import HomeStack from "./FeedStack";
 export type UserTabType = 
 {
-    Home: undefined,
-    Search: undefined,
+    HomeStack: undefined,
+    SearchStack: undefined,
     Likes: undefined
     ProfileStack: undefined
 }
 const UserTab = () =>
 {
     const UserTabNavigator = createBottomTabNavigator<UserTabType>()
-
+    const {theme} = UseTheme()
     return(
         <UserTabNavigator.Navigator
-        initialRouteName={"Home"}
+        initialRouteName={"HomeStack"}
         screenOptions={{
             headerShown: false,
-            tabBarShowLabel: false
+            tabBarShowLabel: false,
+            tabBarStyle: {
+                backgroundColor: theme.background_color
+              },
         }}
         >
             <UserTabNavigator.Screen
-            name="Home"
-            component={Home}
+            name="HomeStack"
+            component={HomeStack}
             options={{
                 tabBarIcon:({color,focused,size})=>(
                     <FontAwesome
                     name="home"
                     size={30}
-                    color={focused?"black":"silver"}
+                    color={focused? theme.text_color: theme.secondary_text_color}
                     />
                 )
             }}
             />
              <UserTabNavigator.Screen
-            name="Search"
-            component={Search}
+            name="SearchStack"
+            component={SearchStack}
             options={{
                 tabBarIcon:({color,focused,size})=>(
                     <FontAwesome
                     name="search"
                     size={25}
-                    color={focused?"black":"grey"}
+                    color={focused? theme.text_color: theme.secondary_text_color}
                     />
                 )
             }}
@@ -58,7 +61,7 @@ const UserTab = () =>
                     <FontAwesome
                     name="heart"
                     size={25}
-                    color={focused?"black":"grey"}
+                    color={focused? theme.text_color: theme.secondary_text_color}
                     />
                 )
             }}
@@ -71,7 +74,7 @@ const UserTab = () =>
                     <FontAwesome
                     name="user"
                     size={30}
-                    color={focused?"black":"grey"}
+                    color={focused? theme.text_color: theme.secondary_text_color}
                     />
                 )
             }}
