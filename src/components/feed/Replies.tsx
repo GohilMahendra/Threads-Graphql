@@ -1,6 +1,6 @@
 
-import React, { useEffect, useState } from "react";
-import { Dimensions, View, TextInput, Image, FlatList, TouchableOpacity, RefreshControl } from "react-native";
+import React, { useEffect, useRef, useState } from "react";
+import { Dimensions, View, TextInput, Image, FlatList, TouchableOpacity, RefreshControl, KeyboardAvoidingView, Platform } from "react-native";
 import { timeDifference } from "../../globals/utilities";
 import { Comment } from "../../types/Comment";
 import { placeholder_image } from "../../globals/asstes";
@@ -11,6 +11,7 @@ import MaterialIcons from "react-native-vector-icons/MaterialIcons";
 import { commentPostAction, getCommentsAction, getMoreCommentsAction } from "../../redux/slices/ReplySlice";
 import { StyleSheet } from "react-native";
 import UseTheme from "../../globals/UseTheme";
+import Loader from "../global/Loader";
 const { height, width } = Dimensions.get("screen")
 
 type ReplyPropTypes =
@@ -21,9 +22,10 @@ const Replies = (props: ReplyPropTypes) => {
 
     const { postId } = props
     const comments = useSelector((state: RootState) => state.Reply.comments)
+    const inputRef = useRef<TextInput|null>(null)
     const loading = useSelector((state: RootState) => state.Reply.loading)
+    const screeenLoading = useSelector((state: RootState) => state.Reply.screeenLoading)
     const error = useSelector((state: RootState) => state.Reply.error)
-    const lastOffset = useSelector((state: RootState) => state.Reply.lastOffset)
     const loadMoreLoading = useSelector((state: RootState) => state.Reply.loadMoreLoading)
     const loadMoreError = useSelector((state: RootState) => state.Reply.loadMoreError)
     const [comment, setComment] = useState<string>("")
@@ -38,7 +40,7 @@ const Replies = (props: ReplyPropTypes) => {
                     flexDirection: "row",
                     padding: 10,
                     elevation: 10,
-                    alignItems: "center",
+                    //  alignItems: "center",
                     borderBottomWidth: 1,
                     borderColor: theme.secondary_text_color
                 }}>
@@ -50,6 +52,7 @@ const Replies = (props: ReplyPropTypes) => {
                     style={{
                         height: 30,
                         width: 30,
+                        alignItems: "flex-start",
                         borderRadius: 30,
                         marginRight: 20
                     }}
@@ -76,11 +79,23 @@ const Replies = (props: ReplyPropTypes) => {
                             }}>{timeDifference(comment.created_at)}</Text>
                         </View>
                     </View>
-                    <Text style={{color: theme.text_color}}>{comment.content}</Text>
+                    <Text style={{ color: theme.text_color }}>{comment.content}</Text>
                 </View>
 
             </View>
         )
+    }
+
+    const onComment = async() =>
+    {
+        if(!comment)
+        return null
+
+        dispath(commentPostAction({
+            content: comment,
+            postId: postId
+        }))
+        setComment("")
     }
 
     const getComments = async () => {
@@ -89,18 +104,23 @@ const Replies = (props: ReplyPropTypes) => {
         }))
     }
     useEffect(() => {
+        inputRef.current?.focus()
         getComments()
-    }, [postId])
+    }, [])
 
     return (
-        <View style={[styles.container,{backgroundColor: theme.background_color}]}>
+        <KeyboardAvoidingView 
+        behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
+        style={[styles.container, { backgroundColor: theme.secondary_background_color }]}>
             {/* list containing replies */}
+            {screeenLoading && <Loader/>}
             <View style={styles.header}>
-                <Text style={[styles.headerText,{color: theme.text_color}]}>Comments</Text>
+                <Text style={[styles.headerText, { color: theme.text_color }]}>Comments</Text>
             </View>
             <FlatList
                 refreshControl={
                     <RefreshControl
+                        tintColor={theme.text_color}
                         refreshing={loading}
                         onRefresh={() => getComments()}
                     />
@@ -116,34 +136,31 @@ const Replies = (props: ReplyPropTypes) => {
                     flex: 1
                 }}
                 style={{
-                    //flex:1,
+                    flex: 1,
                 }}
                 data={comments}
                 renderItem={({ item, index }) => commentRenderItem(item, index)}
                 keyExtractor={(item, index) => index.toString()}
                 onEndReached={() => dispath(getMoreCommentsAction({ postId }))}
             />
-            <View style={styles.commentContainer}>
+            <View style={[styles.commentContainer, { backgroundColor: theme.background_color }]}>
                 <Image
-                    source={User.profile_picture?{uri:User.profile_picture}:placeholder_image}
+                    source={User.profile_picture ? { uri: User.profile_picture } : placeholder_image}
                     style={styles.imageUser}
                 />
-                <View style={[styles.commentRowContainer,{backgroundColor: theme.secondary_background_color}]}>
+                <View style={[styles.commentRowContainer, { backgroundColor: theme.background_color }]}>
                     <TextInput
+                        ref = {ref=>inputRef.current = ref}
                         multiline
-                        numberOfLines={4}
                         value={comment}
                         onChangeText={(text) => setComment(text)}
                         placeholder={"add a comment ...."}
                         placeholderTextColor={"silver"}
-                        style={styles.inputComment}
+                        style={[styles.inputComment, { color: theme.text_color }]}
                     />
                     <TouchableOpacity
-                        onPress={() => dispath(commentPostAction({
-                            content: comment,
-                            postId: postId
-                        }))}
-                        style={[styles.btnAddComment,{backgroundColor:theme.primary_color}]}
+                        onPress={() => onComment()}
+                        style={[styles.btnAddComment, { backgroundColor: theme.primary_color }]}
                     >
                         <MaterialIcons
                             size={20}
@@ -152,20 +169,18 @@ const Replies = (props: ReplyPropTypes) => {
                         />
                     </TouchableOpacity>
                 </View>
-
-
             </View>
-        </View>
+        </KeyboardAvoidingView>
     )
 }
 export default Replies
 const styles = StyleSheet.create({
     container:
     {
-        flex: 1,
-        height: height,
-        width:width,
+        //   flex: 1,
         elevation: 20,
+        backgroundColor: "green",
+        height: height * 0.9
     },
     header:
     {
@@ -191,12 +206,15 @@ const styles = StyleSheet.create({
     commentContainer:
     {
         position: 'absolute',
-        top: "100%",
-        right: 10,
+        bottom: 100,
+      // top:"70%",
+
+       paddingVertical:10,
+        borderRadius: 10,
         justifyContent: 'center',
         flexDirection: 'row',
         alignItems: 'center',
-        width: width * 90 / 100,
+        alignSelf: 'center'
     },
     imageUser:
     {
@@ -207,19 +225,19 @@ const styles = StyleSheet.create({
     },
     commentRowContainer:
     {
-        padding: 5,
         borderRadius: 10,
-        width: "90%",
+        maxHeight:200,
         flexDirection: "row",
         alignItems: "center",
-        // justifyContent:"space-between",
-        backgroundColor: "#e5e5e5"
+        justifyContent: "space-between",
+
     },
     inputComment:
     {
         padding: 5,
-        width: "85%",
-        maxHeight: 100
+        width: "70%",
+        maxHeight: 200,
+
     },
     btnAddComment:
     {

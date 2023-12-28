@@ -1,94 +1,148 @@
-import React, { useCallback, useMemo, useRef } from "react";
-import { Text, Image, TouchableOpacity, Dimensions } from "react-native"
+import React from "react";
+import { Text, Image, TouchableOpacity, Dimensions, StyleSheet } from "react-native"
 import { View } from "react-native"
 import { placeholder_image } from "../../globals/asstes";
 import Entypo from "react-native-vector-icons/Entypo";
-import { Media, Thread } from "../../types/Post";
-import { getMediaImage, timeDifference } from "../../globals/utilities";
+import {  Thread } from "../../types/Post";
+import { timeDifference } from "../../globals/utilities";
 import GridViewer from "../feed/GridViewer";
 import UseTheme from "../../globals/UseTheme";
-const { height, width } = Dimensions.get("screen")
 type PostItemsProps =
     {
         post: Thread,
         onPressThreeDots:(postId:string)=>void
+       
     }
-const ProfilePost = (props: PostItemsProps) => {
+const PostItem = (props: PostItemsProps) => {
 
     const post = props.post
     const media = post.media
-    const {theme} = UseTheme()
+    const { theme } = UseTheme()
+
     return (
-        <View style={{
-            padding: 10,
-            backgroundColor:theme.background_color,
-            flexDirection: "row",
-            borderRadius: 15,
-            alignSelf: 'center',
-            margin: 10
-        }}>
-            <View style={{
-                flexDirection: 'row',
-            }}>
-                <View style={{
-                    marginRight: 20,
-                }}>
-                    <Image
-                        resizeMode="cover"
-                        source={post.user.profile_picture ? {
-                            uri: post.user.profile_picture
-                        } : placeholder_image}
-                        style={{
-                            height: 40,
-                            width: 40,
-                            borderRadius: 40
-                        }}
-                    />
+        <View style={[styles.container,{ backgroundColor: theme.background_color,}]}>
+            <View style={styles.rowContainer}>
+                <View style={styles.imageContainer}>
+                    <TouchableOpacity>
+                        <Image
+                            resizeMode="cover"
+                            source={post.user.profile_picture ? {
+                                uri: post.user.profile_picture
+                            } : placeholder_image}
+                            style={styles.userImage}
+                        />
+                    </TouchableOpacity>
                 </View>
+                <View style={styles.profileRode}/>
             </View>
-
-            <View style={{
-                //  alignItems: 'center',
-                width: "90%",
-            }}>
-                <View style={{
-                    flexDirection: "row",
-                    justifyContent: 'space-between'
-                }}>
-                    <Text style={{
-                        color: theme.text_color,
-                        fontSize: 18,
-                        fontWeight: "bold",
-                    }}>{post.user.fullname}</Text>
-                    <View style={{
-                        flexDirection: 'row',
-                        alignItems: 'center',
-                    }}>
-                        <Text style={{
-                            color: "silver",
-                            marginRight: 20,
-
-                        }}>{timeDifference(post.created_at)}</Text>
+            <View style={styles.rightContainer}>
+                <View style={styles.profileRowContainer}>
+                    <View>
+                        <Text style={[styles.txtUsername,{ color: theme.text_color,}]}>{post.user.username}</Text>
+                    </View>
+                    <View style={styles.rightProfileContainer}>
+                        <Text style={styles.txtCreatedAt}>{timeDifference(post.created_at)}</Text>
                         <Entypo
                             onPress={()=>props.onPressThreeDots(post._id)}
                             name="dots-three-horizontal"
                             size={18}
-                            color={"black"}
+                            color={theme.text_color}
                         />
                     </View>
                 </View>
                 <Text style={{
-                    color: theme.text_color
+                    color: theme.text_color,
+                    marginVertical:5
                 }}>{post.content}</Text>
-
                 <GridViewer
-                media={media}
+                    media={media}
                 />
-
+                {
+                    (post.replies > 0 || post.likes > 0)
+                    &&
+                    <View style={styles.rowLikeComments}>
+                        <Text style={[styles.textComments,{  color: theme.secondary_text_color}]}>{post.replies} comments</Text>
+                        <Text style={[styles.textLikes,{ color: theme.secondary_text_color}]}>{post.likes} Likes</Text>
+                    </View>
+                }
             </View>
         </View>
-
     )
-
 }
-export default ProfilePost
+export default PostItem
+const styles = StyleSheet.create({
+    container:
+    {
+        padding: 10,
+        flexDirection: "row",
+        borderRadius: 15,
+        alignSelf: 'center',
+        margin: 10,
+    },
+    rowContainer:
+    {
+        flexDirection: 'row',
+        justifyContent: "center"
+    },
+    imageContainer:
+    {
+        marginRight: 20,
+        alignItems: "center"
+    },
+    userImage:
+    {
+        height: 50,
+        width: 50,
+        borderRadius: 50
+    },
+    profileRode:
+    {
+        position: 'absolute',
+        top: 60,
+        bottom: 0,
+        width: 1,
+        backgroundColor: 'silver',
+    },
+    rightContainer:
+    {
+        width: "80%",
+    },
+    profileRowContainer:
+    {
+        flexDirection: "row",
+        justifyContent: 'space-between'
+    },
+    txtFullname:
+    {
+        fontSize: 18,
+        fontWeight: "bold",
+    },
+    txtUsername:
+    {
+        fontSize: 18,
+        fontWeight:'bold'
+    },
+    rightProfileContainer:
+    {
+        flexDirection: 'row',
+        alignItems: 'center',
+    },
+    txtCreatedAt:
+    {
+        color: "silver",
+        marginRight: 20
+    },
+    rowLikeComments:
+    {
+        flexDirection: 'row',
+    },
+    textComments:
+    {
+        fontSize: 13,
+        marginRight: 25
+    },
+    textLikes:
+    {
+        fontSize: 13,
+    }
+})

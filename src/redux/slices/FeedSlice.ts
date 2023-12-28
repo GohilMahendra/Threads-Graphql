@@ -30,9 +30,13 @@ const initialState: FeedStateType =
 
 export const FetchPostsAction = createAsyncThunk(
     "Feed/FetchPostsAction",
-    async (fakeArgs:string, { rejectWithValue }) => {
+    async ({ post_type }: { post_type: string }, { rejectWithValue }) => {
         try {
-            const response = await fetchPosts(3)
+            console.log(post_type)
+            const response = await fetchPosts({
+                pageSize: 3,
+                post_type: post_type
+            })
             const posts: Thread[] = []
             const theads: Thread[] = response.data
             theads.forEach((item, index) => {
@@ -67,7 +71,7 @@ export const FetchPostsAction = createAsyncThunk(
 
 export const FetchMorePostsAction = createAsyncThunk(
     "Feed/FetchMorePostsAction",
-    async (fakeArg: string = "", { rejectWithValue, getState }) => {
+    async ({ post_type }: { post_type: string }, { rejectWithValue, getState }) => {
         try {
             const state = getState() as RootState
             const lastOffset = state.Feed.lastOffset
@@ -77,7 +81,7 @@ export const FetchMorePostsAction = createAsyncThunk(
                     lastOffset: null
                 }
             }
-            const response = await fetchPosts(2, lastOffset)
+            const response = await fetchPosts({ pageSize: 3, post_type: post_type, lastOffset: lastOffset })
             const posts: Thread[] = []
             const theads: Thread[] = response.data
             theads.forEach((item, index) => {
@@ -141,39 +145,6 @@ export const unLikeAction = createAsyncThunk(
     }
 )
 
-export const createRepostAction = createAsyncThunk(
-    "Feed/createRepostAction",
-    async ({ postId, content }: { postId: string, content?: string }, { rejectWithValue }) => {
-        try {
-            const response = await createRepost(postId, content)
-            return response.data
-        }
-        catch (err) {
-            return rejectWithValue(JSON.stringify(err))
-        }
-
-    }
-)
-export const createPostAction = createAsyncThunk(
-    "Feed/createPostAction",
-    async ({ content, media }: { content?: string, media: UploadMedia[] }, { rejectWithValue }) => {
-        try {
-            const hashtags: string[] = []
-            const response = await createPost({
-                args: {
-                    content: content,
-                    hashtags: hashtags,
-                    media: media
-                }
-            })
-            return response.data
-        }
-        catch (err) {
-            return rejectWithValue(JSON.stringify(err))
-        }
-
-    }
-)
 export const createCommentAction = createAsyncThunk(
     "Feed/createCommentAction",
     async ({ postId, content }: { postId: string, content: string }, { rejectWithValue }) => {
@@ -232,7 +203,10 @@ export const FeedSlice = createSlice({
             state.LikeSuccess = true
             const refrence = [...state.Threads]
             const index = refrence.findIndex((item) => item._id == action.payload.postId)
-            refrence[index].isLiked = true
+            if (index) {
+                refrence[index].isLiked = true
+                refrence[index].likes++
+            }
             state.Threads = refrence
         })
         builder.addCase(LikeAction.rejected, (state, payload) => {
@@ -242,31 +216,10 @@ export const FeedSlice = createSlice({
             state.LikeSuccess = true
             const refrence = [...state.Threads]
             const index = refrence.findIndex((item) => item._id == action.payload.postId)
+            if(index)
             refrence[index].isLiked = false
+            // refrence[index].likes--
             state.Threads = refrence
-        })
-
-        builder.addCase(createPostAction.pending, (state) => {
-            state.loading = false
-            state.error = null
-        })
-        builder.addCase(createPostAction.fulfilled, (state, action: PayloadAction<string>) => {
-            state.loading = false
-        })
-        builder.addCase(createPostAction.rejected, (state, action) => {
-            state.loading = false
-            state.error = action.payload as string
-        })
-        builder.addCase(createRepostAction.pending, (state) => {
-            state.loading = false
-            state.error = null
-        })
-        builder.addCase(createRepostAction.fulfilled, (state, action: PayloadAction<string>) => {
-            state.loading = false
-        })
-        builder.addCase(createRepostAction.rejected, (state, action) => {
-            state.loading = false
-            state.error = action.payload as string
         })
     }
 })

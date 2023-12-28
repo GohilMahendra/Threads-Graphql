@@ -19,7 +19,7 @@ export type Thread =
 {
     _id: string,
     user: User,
-    content: String | undefined
+    content: string | undefined
     media: Media[],
     hashtags: string[],
     likes: number,

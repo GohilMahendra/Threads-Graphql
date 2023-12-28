@@ -4,12 +4,14 @@ import UserReducer from "./slices/UserSlice";
 import FeedReducer from "./slices/FeedSlice";
 import  SearchReducer  from "./slices/SearchSlice";
 import  ReplyReducer  from "./slices/ReplySlice";
+import  FavoriteReducer  from "./slices/FavoritesSlice";
 const store = configureStore({
     reducer:{
         User: UserReducer,
         Feed: FeedReducer,
         Search: SearchReducer,
-        Reply: ReplyReducer
+        Reply: ReplyReducer,
+        Favorite:FavoriteReducer
     }
 })
 

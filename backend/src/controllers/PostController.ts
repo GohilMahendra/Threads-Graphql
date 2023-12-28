@@ -3,12 +3,13 @@ import { v4 as uuidv4 } from "uuid";
 import Post from "../models/Post";
 import { getSignedUrl, uploadToS3 } from "../utilities/S3Utils";
 import { CustomRequest } from "../middlewares/jwtTokenAuth";
-import mongoose from "mongoose";
+import mongoose, { ObjectId, Schema } from "mongoose";
 import Like from "../models/Like";
 import Reply from "../models/Reply";
 import { UserDocument } from "../types/User";
 import { generateThumbnail } from "../utilities/Thumbnail";
 import { PostDocument } from "../types/Post";
+import Follower from "../models/Follower";
 const createPost = async (req: CustomRequest, res: Response) => {
     try {
         const userId = req.userId
@@ -59,8 +60,8 @@ const createPost = async (req: CustomRequest, res: Response) => {
             hashtags: hashtags,
         })
         if (is_repost) {
-            newPost.isRepost = is_repost,
-                newPost.Repost = postId
+            newPost.isRepost = is_repost
+            newPost.Repost = postId
         }
         await newPost.save()
         res.status(200).json({
@@ -81,26 +82,34 @@ const getPosts = async (req: CustomRequest, res: Response) => {
         const quary: any = {}
         const lastOffset = req.query.lastOffset as string
         const pageSizeParam = req.query.pageSize as string;
+        const post_type = req.query.post_type as string
         const pageSize = parseInt(pageSizeParam, 10) || 10;
         if (lastOffset) {
-           // quary._id = { $gt: new mongoose.Types.ObjectId(lastOffset) }
-            quary.isRepost = true
+            quary._id = { $gt: new mongoose.Types.ObjectId(lastOffset) }
         }
-        
-        const posts = await Post.find({isRepost:true})
-            .sort({ created_at: 1, _id: 1 })
+
+        if (post_type == "following") {
+            const followings = await Follower.find({ follower: userId })
+            const followingIds = followings.map((following) => following.following?._id)
+            quary.user = { $in: followingIds }
+        }
+        const posts = await Post.find(quary)
+            .sort({ created_at: -1, _id: 1 })
             .populate<{ user: UserDocument }>({
                 path: "user",
+                model: "User",
                 select: "-password -token -otp",
             }).
-            populate<{ Repost: PostDocument}>({
+            populate<{ Repost: PostDocument & { user: UserDocument } }>({
                 path: "Repost",
                 populate: {
                     path: "user",
                     select: "-password -token -otp",
                 },
             }).
-            limit(2).lean()
+            limit(pageSize).lean()
+
+        console.log(posts)
         let userPosts = posts
         const updatedUserPosts = await Promise.all(userPosts.map(async (post, index: number) => {
             const media = post.media;
@@ -108,8 +117,7 @@ const getPosts = async (req: CustomRequest, res: Response) => {
             if (user.profile_picture) {
                 user.profile_picture = await getSignedUrl(user.profile_picture);
             }
-            for(const mediaFile of media)
-            {
+            for (const mediaFile of media) {
                 mediaFile.media_url = await getSignedUrl(mediaFile.media_url);
                 if (mediaFile.thumbnail) {
                     mediaFile.thumbnail = await getSignedUrl(mediaFile.thumbnail);
@@ -118,21 +126,19 @@ const getPosts = async (req: CustomRequest, res: Response) => {
             const exist_liked = await Like.exists({ userId: userId, postId: post._id });
             const isLiked = exist_liked != null;
             post.isLiked = isLiked;
-          //  return post
+            //  return post
         }));
 
         await Promise.all(userPosts.map(async (post, index: number) => {
-            if(post.isRepost && post.Repost)
-            {
-                const user = post.Repost.user as UserDocument
+            if (post.isRepost && post.Repost) {
+                const user = post.Repost.user
                 const media = post.Repost.media
-                if(user.profile_picture){
+                if (user.profile_picture) {
                     const key = user.profile_picture
                     const uri = await getSignedUrl(key)
-                    user.profile_picture =uri
+                    user.profile_picture = uri
                 }
-                for(const mediaFile of media)
-                {
+                for (const mediaFile of media) {
                     mediaFile.media_url = await getSignedUrl(mediaFile.media_url);
                     if (mediaFile.thumbnail) {
                         mediaFile.thumbnail = await getSignedUrl(mediaFile.thumbnail);
@@ -140,11 +146,11 @@ const getPosts = async (req: CustomRequest, res: Response) => {
                 }
                 post.Repost.media = media
                 post.Repost.user = user
-                
+
             }
         }));
 
-       
+
         res.status(200).json({
             data: userPosts,
             meta: {
@@ -154,7 +160,6 @@ const getPosts = async (req: CustomRequest, res: Response) => {
         })
     }
     catch (err) {
-        console.log("errorr  ===>", JSON.stringify(err))
         res.status(500).json({
             message: "internal server Error"
         })
@@ -167,56 +172,80 @@ const getPostsByUser = async (req: CustomRequest, res: Response) => {
         const quary: any = {}
         const lastOffset = req.query.lastOffset as string
         const pageSizeParam = req.query.pageSize as string;
+        const post_type = req.query.post_type as string
         const pageSize = parseInt(pageSizeParam, 10) || 10;
+        quary.user = userId
         if (lastOffset) {
             quary._id = { $gt: new mongoose.Types.ObjectId(lastOffset) }
-            quary.userId = userId
         }
+        if (post_type === "Repost") {
+            quary.isRepost = true
+        }
+
         const posts = await Post.find(quary)
-            .sort({ created_at: 1, _id: 1 })
+            .sort({ created_at: -1, _id: 1 })
             .populate<{ user: UserDocument }>({
                 path: "user",
                 select: "-password -token -otp",
             }).
-            limit(pageSize)
+            populate<{ Repost: PostDocument& {user:UserDocument}}>({
+                path: "Repost",
+                populate: {
+                    path: "user",
+                    select: "-password -token -otp",
+                },
+            }).
+            limit(pageSize).lean()
         let userPosts = posts
-        const updatedUserPosts = await Promise.all(userPosts.map(async (post) => {
+        const updatedUserPosts = await Promise.all(userPosts.map(async (post, index: number) => {
             const media = post.media;
             const user = post.user;
             if (user.profile_picture) {
                 user.profile_picture = await getSignedUrl(user.profile_picture);
             }
-            for (let j = 0; j < media.length; j++) {
-                media[j].media_url = await getSignedUrl(media[j].media_url);
-
-                if (media[j].thumbnail) {
-                    media[j].thumbnail = await getSignedUrl(media[j].thumbnail);
+            for (const mediaFile of media) {
+                mediaFile.media_url = await getSignedUrl(mediaFile.media_url);
+                if (mediaFile.thumbnail) {
+                    mediaFile.thumbnail = await getSignedUrl(mediaFile.thumbnail);
                 }
             }
             const exist_liked = await Like.exists({ userId: userId, postId: post._id });
             const isLiked = exist_liked != null;
             post.isLiked = isLiked;
-            if (post.isRepost) {
-                await post.populate({
-                    path: "Repost",
-                    populate: {
-                        path: 'user',
-                        select: '-password -token -otp',
+
+        }));
+
+        await Promise.all(userPosts.map(async (post, index: number) => {
+            if (post.isRepost && post.Repost) {
+                const user = post.Repost.user
+                const media = post.Repost.media
+                if (user.profile_picture) {
+                    const key = user.profile_picture
+                    const uri = await getSignedUrl(key)
+                    user.profile_picture = uri
+                }
+                for (const mediaFile of media) {
+                    mediaFile.media_url = await getSignedUrl(mediaFile.media_url);
+                    if (mediaFile.thumbnail) {
+                        mediaFile.thumbnail = await getSignedUrl(mediaFile.thumbnail);
                     }
-                }) as mongoose.HydratedDocument<PostDocument>
+                }
+                post.Repost.media = media
+                post.Repost.user = user
+
             }
         }));
+
+
         res.status(200).json({
             data: userPosts,
             meta: {
                 pagesize: pageSize,
-
-            },
-            length: posts.length
+                lastOffset: (userPosts.length == pageSize) ? userPosts[userPosts.length - 1]._id : null
+            }
         })
     }
     catch (err) {
-        console.log("errorr  ===>", JSON.stringify(err))
         res.status(500).json({
             message: "internal server Error"
         })
@@ -273,42 +302,50 @@ const likePost = async (req: CustomRequest, res: Response) => {
 }
 
 const unLikePost = async (req: CustomRequest, res: Response) => {
+    const transaction = await mongoose.startSession()
     try {
-        const userId = req.userId
-        const postId = req.params.postId
-        if (!userId || !postId) {
-            return res.status(404).json({
-                message: "invalid params"
-            })
-        }
-        const post = await Post.findById(postId)
-        if (!post) {
-            return res.status(404).json({
-                message: "not found the post"
-            })
-        }
-        const exist_liked = await Like.exists({ userId: userId, postId: post._id })
-        const isLiked = exist_liked != null
-        if (!isLiked) {
-            return res.status(200).json({
-                message: "post is already un-liked"
-            })
-        }
-        if (post.likes > 0)
-            post.likes--
+        await transaction.withTransaction(async () => {
+            const userId = req.userId
+            const postId = req.params.postId
+            if (!userId || !postId) {
+                return res.status(404).json({
+                    message: "invalid params"
+                })
+            }
+            const post = await Post.findById(postId)
+            if (!post) {
+                return res.status(404).json({
+                    message: "not found the post"
+                })
+            }
+            const exist_liked = await Like.exists({ userId: userId, postId: postId })
+            console.log(exist_liked)
+            const isLiked = exist_liked != null
+            if (!isLiked) {
+                console.log("this part is called")
+                return res.status(200).json({
+                    message: "post is already un-liked"
+                })
+            }
+            if (post.likes > 0)
+                post.likes--
 
-        Like.deleteOne(exist_liked)
-        await post.save()
+            await Like.findOneAndDelete({ userId: userId, postId: postId })
+            await post.save()
 
-        res.status(200).json({
-            success: true,
-            message: "unLiked succesfully"
+            res.status(200).json({
+                success: true,
+                message: "unLiked succesfully"
+            })
         })
     }
     catch (err) {
         return res.status(500).json({
             message: err
         })
+    }
+    finally {
+        transaction.endSession()
     }
 }
 
@@ -331,7 +368,7 @@ const commentPost = async (req: CustomRequest, res: Response) => {
         }
         const newReply = new Reply({
             content: content,
-            postId: postId,
+            post: postId,
             user: userId
         })
         await newReply.save()
@@ -410,11 +447,54 @@ const deletePost = async (req: CustomRequest, res: Response) => {
                 message: "you are not allowed to do this action"
             })
         }
-        await Reply.deleteMany({ postId: postId });
+        await Reply.deleteMany({ post: postId });
         await Like.deleteMany({ postId: postId })
         await post.deleteOne()
         return res.status(200).json({
             message: "successfully delete the post"
+        })
+    }
+    catch (err) {
+        return res.status(500).json({
+            message: err
+        })
+    }
+}
+
+const getPostLikeUsers = async (req: CustomRequest, res: Response) => {
+    try {
+        const userId = req.userId
+        const postId = req.params.postId
+        const lastOffset = req.query.lastOffset as string
+        const pageSizeParam = req.query.pageSize as string;
+        const pageSize = parseInt(pageSizeParam, 10) || 10;
+        const quary: any = { postId: postId }
+        if (lastOffset) {
+            quary._id = { $gt: new mongoose.Types.ObjectId(lastOffset) }
+        }
+
+        if(!postId)
+        {
+            return res.status(400).json({
+                messgae:"missing post Id"
+            })
+        }
+
+        const likes = await Like.find({ postId: postId }).populate<{userId:UserDocument}>({
+            path: "userId",
+            select: "-password -token -otp"
+        }).limit(pageSize)
+
+        const users = likes.map(like=>like.userId)
+
+        await Promise.all(users.map(async(user)=>{
+            const isFollowing = Follower.exists({follower:userId,following: user._id})
+            if(isFollowing!=null)
+            user.isFollowed = true
+        }))
+
+        return res.status(200).json({
+            data: users
         })
     }
     catch (err) {

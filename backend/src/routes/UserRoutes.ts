@@ -15,4 +15,7 @@ router.patch("/users",verifyRequest,upload.single("profile_picture"),UserControl
 router.get("/users",verifyRequest,UserController.SearchUsers)
 router.get("/users/posts",verifyRequest,UserController.getUserPosts)
 router.get("/users/:userId",verifyRequest,UserController.getUserById)
+router.get("/liked_posts",verifyRequest,UserController.getLikedPosts)
+router.get("/replied_posts",verifyRequest,UserController.getRepliedPosts)
+router.delete("/replied_posts/:replyId",verifyRequest,UserController.deletePostReply)
 export default router;

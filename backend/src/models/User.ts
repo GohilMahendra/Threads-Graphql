@@ -47,7 +47,7 @@ const userSchema = new mongoose.Schema<UserDocument>({
         type:String,
     },
     isFollowed:{
-        type: mongoose.Schema.Types.Boolean,
+        type: Boolean,
         default: false
     }
 })

@@ -40,3 +40,10 @@ export type UpdateArgsType =
     bio?:string
 }
 
+export type FollowingUserResponse = 
+{
+    _id: string,
+    follower: string,
+    following: User
+}
+

@@ -1,5 +1,5 @@
 import React, { useRef, useState } from 'react'
-import { View, Text, SafeAreaView, Dimensions, TextInput, TouchableOpacity } from 'react-native'
+import { View, Text, SafeAreaView, Dimensions, TextInput, TouchableOpacity, StyleSheet } from 'react-native'
 import { NavigationProp, RouteProp, useNavigation, useRoute } from '@react-navigation/native';
 import { AuthStackType } from '../../navigations/AuthStack';
 import FontAwesome5Icon from 'react-native-vector-icons/FontAwesome5';
@@ -51,7 +51,7 @@ const OtpVerification = () => {
             if (otp.length != 6 || !regex.test(otp)) {
                 return
             }
-            console.log(email,otp)
+            console.log(email, otp)
 
             const result = await axios.post(`${BASE_URL}verify`, {
                 headers: { 'Content-Type': 'application/json' },
@@ -70,39 +70,19 @@ const OtpVerification = () => {
 
 
     return (
-        <SafeAreaView style={{
-            flex: 1,
-            //  alignItems:"center",
-        }}>
-            <View style={{
-                flexDirection: 'row',
-                justifyContent: 'space-between',
-                padding: 10
-            }}>
+        <SafeAreaView style={styles.container}>
+            <View style={styles.headerContainer}>
                 <FontAwesome5Icon
                     onPress={() => navigation.goBack()}
                     name='angle-left'
                     color={"black"}
                     size={20}
                 />
-                <Text style={{
-                    fontSize: 20,
-                    fontWeight: "bold",
-                    color: "black"
-                }}>otp verification</Text>
+                <Text style={styles.txtHeader}>otp verification</Text>
                 <View />
-
             </View>
-            <View style={{
-                flex: 1,
-                justifyContent: "center"
-            }}>
-                <View style={{
-                    flexDirection: 'row',
-                    padding: 20,
-                    width: "100%",
-                    justifyContent: 'space-between'
-                }}>
+            <View style={styles.otpContainer}>
+                <View style={styles.rowContainer}>
                     {
                         otpArrary.map((val, index) => (
                             <TextInput
@@ -114,47 +94,81 @@ const OtpVerification = () => {
                                 keyboardType="numeric"
                                 value={val}
                                 maxLength={1}
-                                style={{
-                                    fontSize: 18,
-                                    height: 50,
-
-                                    backgroundColor: "#E5E5E5",
-                                    alignSelf: "center",
-                                    textAlign: "center",
-                                    width: 50,
-                                    borderRadius: 15,
-                                    color: "black",
-                                    fontWeight: "bold",
-                                    borderWidth: 1
-                                }}
+                                style={styles.inputOtp}
                             />
                         ))
                     }
-
                 </View>
-
                 <TouchableOpacity
-                onPress={()=>verifyOtp()}
-                    style={{
-                        margin: 20,
-                        width: "90%",
-                        backgroundColor: "black",
-                        marginTop: 40,
-                        padding: 20,
-                        borderRadius: 15,
-                        alignItems: "center",
-                        justifyContent: "center",
-
-                    }}
+                    onPress={() => verifyOtp()}
+                    style={styles.btnVerify}
                 >
-                    <Text style={{
-                        fontSize: 20,
-                        color: "white",
-                        fontWeight: "bold"
-                    }}>Verify</Text>
+                    <Text style={styles.textVerify}>Verify</Text>
                 </TouchableOpacity>
             </View>
         </SafeAreaView>
     )
 }
 export default OtpVerification
+const styles = StyleSheet.create({
+    container:
+    {
+        flex: 1,
+        //  alignItems:"center",
+    },
+    headerContainer:
+    {
+        flexDirection: 'row',
+        justifyContent: 'space-between',
+        padding: 10
+    },
+    txtHeader:
+    {
+        fontSize: 20,
+        fontWeight: "bold",
+        color: "black"
+    },
+    otpContainer:
+    {
+        flex: 1,
+        justifyContent: "center"
+    },
+    rowContainer:
+    {
+        flexDirection: 'row',
+        padding: 20,
+        width: "100%",
+        justifyContent: 'space-between'
+    },
+    inputOtp:
+    {
+        fontSize: 18,
+        height: 50,
+        backgroundColor: "#E5E5E5",
+        alignSelf: "center",
+        textAlign: "center",
+        width: 50,
+        borderRadius: 15,
+        color: "black",
+        fontWeight: "bold",
+        borderWidth: 1
+    },
+    btnVerify:
+    {
+        margin: 20,
+        width: "90%",
+        backgroundColor: "black",
+        marginTop: 40,
+        padding: 20,
+        borderRadius: 15,
+        alignItems: "center",
+        justifyContent: "center",
+    },
+    textVerify:
+    {
+        fontSize: 20,
+        color: "white",
+        fontWeight: "bold"
+    }
+
+})

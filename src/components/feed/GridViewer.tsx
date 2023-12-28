@@ -13,9 +13,7 @@ type GridViewerPropTypes =
 const GridViewer = (props: GridViewerPropTypes) => {
 
     const images = props.media
-
     const [selectedMedia, setSelectedMedia] = useState<Media | null>(null)
-
     const onSelectMedia = (media: Media) => {
         setTimeout(() => {
             setSelectedMedia(media)
@@ -23,15 +21,59 @@ const GridViewer = (props: GridViewerPropTypes) => {
     }
     return (
         <View style={style.container}>
-            {
-                images.length == 1
-                &&
+            {images.length == 1 && <TouchableOpacity
+                onPress={() => onSelectMedia(images[0])}
+            >
+                <Image
+                    source={{ uri: getMediaImage(images[0]) }}
+                    style={style.image1x}
+                />
+                {
+                    images[0].media_type.includes("video")
+                    &&
+                    <FontAwesome5Icon
+                        name="play"
+                        color={"white"}
+                        size={20}
+                        style={style.playIcon}
+                    />
+                }
+            </TouchableOpacity>
+            }
+            {images.length == 2 && <View style={style.container2x}>
+                {
+                    images.map((image, index) => (
+                        <TouchableOpacity
+                            onPress={() => onSelectMedia(images[index])}
+                            key={image._id}>
+                            <Image
+                                resizeMode="contain"
+                                source={{ uri: getMediaImage(image) }}
+                                style={style.image2x}
+                            />
+                            {
+                                image.media_type.includes("video")
+                                &&
+                                <FontAwesome5Icon
+                                    name="play"
+                                    color={"white"}
+                                    size={20}
+                                    style={style.playIcon}
+                                />
+                            }
+                        </TouchableOpacity>
+                    ))
+                }
+            </View>
+            }
+            {images.length == 3 && <View style={style.container3x}>
                 <TouchableOpacity
                     onPress={() => onSelectMedia(images[0])}
-                >
+                    key={images[0]._id}
+                    style={style.btnimage3x1st}>
                     <Image
                         source={{ uri: getMediaImage(images[0]) }}
-                        style={style.image1x}
+                        style={style.image3x1st}
                     />
                     {
                         images[0].media_type.includes("video")
@@ -44,128 +86,64 @@ const GridViewer = (props: GridViewerPropTypes) => {
                         />
                     }
                 </TouchableOpacity>
-            }
-            {
-                images.length == 2
-                &&
-                <View style={style.container2x}>
-                    {
-                        images.map((image, index) => (
-                            <TouchableOpacity
-                                onPress={() => onSelectMedia(images[index])}
-                                key={image._id}>
-                                <Image
-                                    resizeMode="contain"
-                                    source={{ uri: getMediaImage(image) }}
-                                    style={style.image2x}
-                                />
-                                {
-                                    image.media_type.includes("video")
-                                    &&
-                                    <FontAwesome5Icon
-                                        name="play"
-                                        color={"white"}
-                                        size={20}
-                                        style={style.playIcon}
-                                    />
-                                }
-                            </TouchableOpacity>
-                        ))
-                    }
-                </View>
-            }
-            {
-                images.length == 3
-                &&
-                <View style={style.container3x}>
-                    <TouchableOpacity
-                        onPress={() => onSelectMedia(images[0])}
-                        key={images[0]._id}
-                        style={style.btnimage3x1st}>
-                        <Image
-                            source={{ uri: getMediaImage(images[0]) }}
-                            style={style.image3x1st}
-                        />
-                        {
-                            images[0].media_type.includes("video")
-                            &&
-                            <FontAwesome5Icon
-                                name="play"
-                                color={"white"}
-                                size={20}
-                                style={style.playIcon}
+                <View style={style.container3x2nd}>
+                    {images.map((image, index) => (
+                        index != 0 && <TouchableOpacity
+                            onPress={() => onSelectMedia(images[index])}
+                            key={image._id}>
+                            <Image
+                                source={{ uri: getMediaImage(image) }}
+                                style={style.image3xRest}
                             />
-                        }
-                    </TouchableOpacity>
-                    <View style={style.container3x2nd}>
-                        {images.map((image, index) => (
-                            index != 0 && <TouchableOpacity
-                                onPress={() => onSelectMedia(images[index])}
-                                key={image._id}>
-                                <Image
-                                    source={{ uri: getMediaImage(image) }}
-                                    style={style.image3xRest}
+                            {
+                                image.media_type.includes("video")
+                                &&
+                                <FontAwesome5Icon
+                                    name="play"
+                                    color={"white"}
+                                    size={20}
+                                    style={style.playIcon}
                                 />
-                                {
-                                    image.media_type.includes("video")
-                                    &&
-                                    <FontAwesome5Icon
-                                        name="play"
-                                        color={"white"}
-                                        size={20}
-                                        style={style.playIcon}
-                                    />
-                                }
-                            </TouchableOpacity>
-                        ))
-                        }
-                    </View>
-                </View>
-            }
-            {
-                images.length == 4
-                &&
-                <View style={style.container4x}>
-                    {
-                        images.map((image, index) => (
-                            <TouchableOpacity
-                                onPress={() => onSelectMedia(images[index])}
-                                key={image._id}>
-                                <Image
-                                    source={{ uri: getMediaImage(image) }}
-                                    style={style.image4x}
-                                />
-                                {
-                                    image.media_type.includes("video")
-                                    &&
-                                    <FontAwesome5Icon
-                                        name="play"
-                                        color={"white"}
-                                        size={20}
-                                        style={style.playIcon}
-                                    />
-                                }
-                            </TouchableOpacity>
-                        ))
+                            }
+                        </TouchableOpacity>
+                    ))
                     }
                 </View>
+            </View>
             }
-
+            {images.length == 4 && <View style={style.container4x}>
+                {
+                    images.map((image, index) => (
+                        <TouchableOpacity
+                            style={{ margin: 2, width: "48%" }}
+                            onPress={() => onSelectMedia(images[index])}
+                            key={image._id}>
+                            <Image
+                                source={{ uri: getMediaImage(image) }}
+                                style={style.image4x}
+                            />
+                            {
+                                image.media_type.includes("video")
+                                &&
+                                <FontAwesome5Icon
+                                    name="play"
+                                    color={"white"}
+                                    size={20}
+                                    style={style.playIcon}
+                                />
+                            }
+                        </TouchableOpacity>
+                    ))
+                }
+            </View>
+            }
             <Modal
                 visible={selectedMedia != null}
                 animationType="fade"
                 onRequestClose={() => setSelectedMedia(null)}
             >
-                {selectedMedia && <View style={{
-                    flex: 1,
-                    backgroundColor: "black"
-                }}>
-                    <View style={{
-                        position: "absolute",
-                        right: 20,
-                        top: 30,
-                        zIndex: 1000,
-                    }}>
+                {selectedMedia && <View style={style.previewContainer}>
+                    <View style={style.cancelContainer}>
                         <Fontisto
                             onPress={() => setSelectedMedia(null)}
                             name="close"
@@ -174,7 +152,7 @@ const GridViewer = (props: GridViewerPropTypes) => {
                         />
 
                     </View>
-                    {selectedMedia.media_type.includes("image") &&<Image
+                    {selectedMedia.media_type.includes("image") && <Image
                         source={{
                             uri: (selectedMedia.media_type.includes("image"))
                                 ? selectedMedia.media_url : selectedMedia.thumbnail
@@ -185,11 +163,9 @@ const GridViewer = (props: GridViewerPropTypes) => {
                         }}
                     />
                     }
-                    {
-                        selectedMedia.media_type.includes("video")&&
-                        <VideoPlayer
+                    {selectedMedia.media_type.includes("video") && <VideoPlayer
                         uri={selectedMedia.media_url}
-                        />
+                    />
                     }
                 </View>
                 }
@@ -241,7 +217,7 @@ const style = StyleSheet.create({
     },
     container3x2nd:
     {
-        width: "50%"
+        width: "48%"
     },
     image3xRest:
     {
@@ -259,7 +235,7 @@ const style = StyleSheet.create({
     {
         height: 100,
         borderRadius: 15,
-        width: "50%"
+        width: "100%"
     },
     playIcon:
     {
@@ -267,5 +243,17 @@ const style = StyleSheet.create({
         alignSelf: "center",
         position: "absolute",
         zIndex: 1000
+    },
+    previewContainer:
+    {
+        flex: 1,
+        backgroundColor: "black"
+    },
+    cancelContainer:
+    {
+        position: "absolute",
+        right: 20,
+        top: 30,
+        zIndex: 1000,
     }
 })

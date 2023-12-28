@@ -6,7 +6,7 @@ const ReplySchema =new mongoose.Schema({
         required: true,
         ref:"User"
     },
-    postId:{
+    post:{
         type: Schema.Types.ObjectId,
         required: true,
         ref:"Post"

@@ -9,7 +9,6 @@ export const timeDifference = (timestamp: string) => {
     const MINUTE = 60;
     const HOUR = 60 * MINUTE;
     const DAY = 24 * HOUR;
-    const WEEK = 7 * DAY;
     const MONTH = 30 * DAY;
     const YEAR = 365 * DAY;
 
@@ -21,7 +20,7 @@ export const timeDifference = (timestamp: string) => {
     } else if (seconds < DAY) {
         const hours = Math.floor(seconds / HOUR);
         return `${hours}h`;
-    } else if (seconds < WEEK) {
+    } else if (seconds < MONTH) {
         const days = Math.floor(seconds / DAY);
         return `${days}d`;
     } else if (seconds < YEAR) {
@@ -42,4 +41,9 @@ export const getMediaImage = (media: Media) => {
         return media.thumbnail
     else
         return media.media_url
+}
+export const extractTags = (contentText: string) => {
+    const words = contentText.split(" ")
+    const hastags = words.filter((item) => (item[0] == "#"))
+    return hastags
 }

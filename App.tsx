@@ -7,7 +7,9 @@
 import 'react-native-gesture-handler'
 import React from 'react';
 import {
+  Platform,
   SafeAreaView,
+  StatusBar,
   Text
 } from 'react-native';
 import RootStack from './src/navigations/RootStack';
@@ -19,11 +21,7 @@ const App = () =>
   return(
     <Provider store={store}>
       <ThemeProvider>
-        <SafeAreaView style={{
-        flex:1
-      }}>
         <RootStack/>
-        </SafeAreaView>
       </ThemeProvider>
     </Provider>
   )

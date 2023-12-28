@@ -13,7 +13,7 @@ const PostSchema = new mongoose.Schema({
     content: {
         type: String,
         default: "",
-        maxlength: 400,
+        maxlength: 500,
     },
     media: [{
         media_type: {

@@ -1,64 +1,73 @@
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import { NavigationProp, useNavigation,CompositeNavigationProp} from '@react-navigation/native';
+import { NavigationProp, useNavigation, CompositeNavigationProp, useTheme } from '@react-navigation/native';
 import React, { useEffect } from 'react'
-import { SafeAreaView, Text } from "react-native";
+import { SafeAreaView, StyleSheet, Text } from "react-native";
 import { RootStackType } from '../../navigations/RootStack';
 import { UserTabType } from '../../navigations/UserTab';
 import { useAppDispatch } from '../../redux/store';
 import { SignInAction } from '../../redux/slices/UserSlice';
+import { compositeRootUserTab } from '../../navigations/Types';
+import UseTheme from '../../globals/UseTheme';
+import { Image } from 'react-native';
+import { applogo } from '../../globals/asstes';
 
-const SplashScreen = () =>
-{
+const SplashScreen = () => {
     const dispatch = useAppDispatch()
-    type compositeAuthUser = CompositeNavigationProp<NavigationProp<RootStackType>,NavigationProp<UserTabType>>
-    const navigation = useNavigation<compositeAuthUser>()
-    const signIn = async() =>
-    {
-        try
-        {
+    const navigation = useNavigation<compositeRootUserTab>()
+    const { theme } = UseTheme()
+    const signIn = async () => {
+        try {
             const email = await AsyncStorage.getItem("email")
             const password = await AsyncStorage.getItem("password")
 
-            if(!email || !password)
-            {
+            if (!email || !password) {
                 navigation.navigate("AuthStack")
             }
-            else
-            {
-                const fullfilled = await dispatch(SignInAction({email,password}))
-                if(SignInAction.fulfilled.match(fullfilled))
-                {
+            else {
+                const fullfilled = await dispatch(SignInAction({ email, password }))
+                if (SignInAction.fulfilled.match(fullfilled)) {
                     navigation.reset({
                         index: 0,
                         routes: [{ name: "UserTab" }],
-                      });
+                    });
                 }
-                else
-                {
+                else {
                     navigation.navigate("AuthStack")
                 }
             }
         }
-        catch(err)
-        {
+        catch (err) {
             console.log(err)
         }
 
     }
-    useEffect(()=>{
+    useEffect(() => {
         setTimeout(() => {
             signIn()
         }, 2000);
-    },[])
-    return(
-        <SafeAreaView style={{
-            flex:1,
-            justifyContent:"center",
-            alignItems:"center"
-        }}>
-            <Text>SplashScreen</Text>
-            
+    }, [])
+    return (
+        <SafeAreaView style={[styles.container, { backgroundColor: theme.background_color }]}>
+            <Image
+                source={applogo}
+                tintColor={theme.text_color}
+                style={styles.imageLogo}
+            />
+
         </SafeAreaView>
     )
 }
 export default SplashScreen
+const styles = StyleSheet.create({
+    container:
+    {
+        flex: 1,
+        justifyContent: "center",
+        alignItems: "center",
+    },
+    imageLogo:
+    {
+        height: 100,
+        width: 100
+    }
+})

@@ -1,4 +1,5 @@
 export interface UserDocument extends Document {
+   _id:string,
     username: string;
     fullname: string;
     email: string;

@@ -24,10 +24,9 @@ export const createPost = async ({ args }: { args: CreatePostArgs }) => {
         const hashtags = args.hashtags
         const token = await getToken()
         let formData = new FormData()
-        if(content)
-        formData.append("content", content)
+        if (content)
+            formData.append("content", content)
 
-        formData.append("is_repost", false)
         if (hashtags && hashtags.length > 0) {
             hashtags.forEach((tag, index) => {
                 formData.append("hashtags", tag)
@@ -35,7 +34,7 @@ export const createPost = async ({ args }: { args: CreatePostArgs }) => {
         }
         if (media && media.length > 0) {
             media.forEach((tag, index) => {
-                formData.append("hashtags", tag)
+                formData.append("media", tag)
             })
         }
         const uploadPostResponse = await axios.post(BASE_URL + "posts",
@@ -46,26 +45,30 @@ export const createPost = async ({ args }: { args: CreatePostArgs }) => {
                     'token': token
                 }
             })
-        if (uploadPostResponse.status == 200)
+        if (uploadPostResponse.status == 200) {
+            console.log("post created succesfully")
             return uploadPostResponse.data
+        }
+
         else
             throw new Error(uploadPostResponse.data)
     }
     catch (err: any) {
+        console.log(err)
         throw new Error(err)
     }
 }
 
-export const createRepost = async (postId:string,content?:string,hashtags?:string[]) => {
+export const createRepost = async (postId: string, content?: string, hashtags?: string[]) => {
     try {
-        
+
         const token = await getToken()
         let formData = new FormData()
-        if(content)
-        formData.append("content", content)
+        if (content)
+            formData.append("content", content)
 
-        formData.append("is_repost", true)
-        formData.append("postId",postId)
+        formData.append("is_repost", "true")
+        formData.append("postId", postId)
         if (hashtags && hashtags.length > 0) {
             hashtags.forEach((tag, index) => {
                 formData.append("hashtags", tag)
@@ -79,8 +82,10 @@ export const createRepost = async (postId:string,content?:string,hashtags?:strin
                     'token': token
                 }
             })
-        if (uploadPostResponse.status == 200)
+        if (uploadPostResponse.status == 200) {
             return uploadPostResponse.data
+        }
+
         else
             throw new Error(uploadPostResponse.data)
     }
@@ -89,23 +94,28 @@ export const createRepost = async (postId:string,content?:string,hashtags?:strin
     }
 }
 
-
-export const fetchPosts = async (pageSize: number = 10, lastOffset?: string) => {
+export const fetchPosts = async ({
+    pageSize = 10,
+    lastOffset,
+    post_type,
+}: { pageSize: number, lastOffset?: string, post_type: string }) => {
     try {
         const token = await getToken()
 
-        let quary = ""
+        let query = `${BASE_URL}posts?pageSize=${pageSize}`;
 
         if (lastOffset) {
-            quary = `${BASE_URL}posts?pageSize=${pageSize}&lastOffset=${lastOffset}`
-        }
-        else {
-            quary = `${BASE_URL}posts?pageSize=${pageSize}`
+            query += `&lastOffset=${lastOffset}`;
         }
 
-        console.log(quary)
+        if (post_type === "following") {
+            console.log("following qyaru called")
+            query += `&post_type=following`;
 
-        const response = await axios.get(quary, {
+            console.log(query)
+        }
+
+        const response = await axios.get(query, {
             headers: {
                 "Content-Type": "application/json",
                 "token": token
@@ -125,20 +135,32 @@ export const fetchPosts = async (pageSize: number = 10, lastOffset?: string) => 
     }
 }
 
-export const fetchPostsByUser = async (userId:string,pageSize: number = 10, lastOffset?: string) => {
+export const fetchPostsByUser = async ({
+    userId,
+    pageSize = 10,
+    lastOffset,
+    post_type
+}: {
+    userId: string,
+    pageSize: number
+    lastOffset?: string,
+    post_type: string
+}) => {
     try {
         const token = await getToken()
 
-        let quary = ""
+        let query = `${BASE_URL}posts/${userId}?pageSize=${pageSize}`;
 
         if (lastOffset) {
-            quary = `${BASE_URL}posts/${userId}?pageSize=${pageSize}&lastOffset=${lastOffset}`
-        }
-        else {
-            quary = `${BASE_URL}posts/${userId}?pageSize=${pageSize}`
+            query += `&lastOffset=${lastOffset}`;
         }
 
-        const response = await axios.get(quary, {
+        if (post_type === "Repost") {
+            query += `&post_type=Repost`;
+        }
+
+        console.log(query)
+        const response = await axios.get(query, {
             headers: {
                 "Content-Type": "application/json",
                 "token": token
@@ -216,7 +238,7 @@ export const commentPost = async (postId: string, content: string) => {
         })
 
         if (response.status == 200) {
-            return response.data.message
+            return response.data
         } else {
             throw new Error(response.data)
         }

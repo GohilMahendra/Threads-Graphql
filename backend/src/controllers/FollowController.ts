@@ -8,8 +8,10 @@ import { getSignedUrl } from "../utilities/S3Utils";
 
 const followUser = async(req:CustomRequest,res:Response) =>
 {
+    const transaction = await mongoose.startSession()
     try
     {
+       await transaction.withTransaction(async()=>{
         const currentUserId = req.userId; 
         const followedUserId = req.params.userId; 
     
@@ -45,15 +47,16 @@ const followUser = async(req:CustomRequest,res:Response) =>
         return res.status(200).json({
           message: 'User followed successfully',
         });
-
-    
+       })
     }
     catch(err)
     {
         return res
     }
+    finally{
+        transaction.endSession()
+    }
 }
-
 const getUserFollowings = async(req:CustomRequest,res:Response) =>
 {
     try
@@ -157,8 +160,10 @@ const getCurrentUserFollowing = async(req:CustomRequest,res:Response) =>
 }
 const unFollowUser = async(req:CustomRequest,res:Response) =>
 {
+    const transaction = await mongoose.startSession()
     try
     {
+       await transaction.withTransaction(async()=>{
         const currentUserId = req.userId; 
         const followedUserId = req.params.userId; 
     
@@ -190,12 +195,14 @@ const unFollowUser = async(req:CustomRequest,res:Response) =>
         return res.status(200).json({
           message: 'unfollowed successfully',
         });
-
-    
+       })
     }
     catch(err)
     {
         return res
+    }
+    finally{
+        transaction.endSession()
     }
 }
 

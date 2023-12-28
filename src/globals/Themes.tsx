@@ -3,6 +3,7 @@ import { black, light_silver, mate_black, secondary_grey, silver_background, smo
 export type ThemeMode  = "light" | "dark" 
 export type Theme = {
     primary_color:string,
+    secondary_color: string,
     secondary_text_color: string,
     background_color: string,
     secondary_background_color: string,
@@ -19,16 +20,18 @@ export const DarkTheme: Theme =
      primary_color:twitter_blue,
      secondary_background_color: "#3f3f3f",
      text_color: white,
-     secondary_text_color: "grey"
+     secondary_text_color: "grey",
+     secondary_color: "#3f3f3f"
 }
 
 export const lightTheme: Theme = 
 {
     background_color: white,
-    placeholder_color: secondary_grey,
+    placeholder_color: "grey",
     mode:"light",
     primary_color:black,
-    secondary_background_color: light_silver,
+    secondary_background_color: white,
     text_color: black,
-    secondary_text_color: "grey"
+    secondary_text_color: "grey",
+    secondary_color:light_silver
 }

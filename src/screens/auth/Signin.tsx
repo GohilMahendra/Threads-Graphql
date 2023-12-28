@@ -1,124 +1,127 @@
 import React, { useState } from 'react'
-import { View, Text, SafeAreaView, Image, Dimensions,TextInput, TouchableOpacity, Switch, Pressable } from 'react-native'
-import { NavigationProp,CompositeNavigationProp, useNavigation } from '@react-navigation/native';
-import { AuthStackType } from '../../navigations/AuthStack';
+import { View, Text, SafeAreaView, Image, Dimensions, TextInput, TouchableOpacity, Pressable, StyleSheet } from 'react-native'
+import { useNavigation } from '@react-navigation/native';
 import UseTheme from '../../globals/UseTheme';
-import { loginUser } from '../../apis/UserAPI';
-import { RootStackType } from '../../navigations/RootStack';
-import { UserResponse } from '../../types/User';
-import { useAppDispatch } from '../../redux/store';
+import { RootState, useAppDispatch } from '../../redux/store';
 import { SignInAction } from '../../redux/slices/UserSlice';
-import { UserTabType } from '../../navigations/UserTab';
-const { height, width} = Dimensions.get("window")
-const SignIn = () =>
-{
-    type composeTeAuthTab = CompositeNavigationProp<NavigationProp<AuthStackType>,NavigationProp<RootStackType>>
-    const [email,setEmail] = useState("")
-    const [password,setPassword] = useState("")
-    const [active,setActive] = useState(false)
-    const {theme} = UseTheme()
-    const navigation = useNavigation<composeTeAuthTab>()
+import { useSelector } from 'react-redux';
+import Loader from '../../components/global/Loader';
+import { composeteAuthRootStack } from '../../navigations/Types';
+import { applogo } from '../../globals/asstes';
+const { height, width } = Dimensions.get("window")
+const SignIn = () => {
+    const [email, setEmail] = useState("")
+    const [password, setPassword] = useState("")
+    const loading = useSelector((state: RootState) => state.User.loading)
+    const { theme } = UseTheme()
+    const navigation = useNavigation<composeteAuthRootStack>()
     const dispatch = useAppDispatch()
-    const signInUser = async() =>
-    {
-      const responseStaus = await dispatch(SignInAction({
-        email: email,
-        password:password
-       }))
+    const signInUser = async () => {
+        const responseStaus = await dispatch(SignInAction({
+            email: email,
+            password: password
+        }))
 
-       console.log(responseStaus)
-       if(SignInAction.fulfilled.match(responseStaus))
-       {
-        navigation.navigate("UserTab")
-       }
+        console.log(responseStaus)
+        if (SignInAction.fulfilled.match(responseStaus)) {
+            navigation.navigate("UserTab")
+        }
     }
-    return(
-        <SafeAreaView style={{
-            flex:1,
-            justifyContent:"center",
-            alignItems:"center",
-            padding:20,
-            backgroundColor: theme.background_color
-        }}>
-            <View style={{
-                flexDirection:"row",
-                padding:15,
-                backgroundColor: theme.secondary_background_color,
-                width:width*90/100,
-                borderRadius:10,
-                marginVertical:20
-            }}>
+    return (
+        <SafeAreaView style={[styles.container, { backgroundColor: theme.background_color }]}>
+            {loading && <Loader />}
+            <Image
+                source={applogo}
+                tintColor={theme.text_color}
+                style={styles.imageLogo}
+            />
+            <View style={[styles.inputContainer, { backgroundColor: theme.secondary_color, }]}>
                 <TextInput
-                autoCapitalize={"none"}
-                value={email}
-                onChangeText={text=>setEmail(text)}
-                placeholderTextColor={theme.placeholder_color}
-                placeholder={"email ..."}
-                style={{
-                    flex:1,
-                    padding:5,
-                }}
+                    autoCapitalize={"none"}
+                    value={email}
+                    onChangeText={text => setEmail(text)}
+                    placeholderTextColor={theme.placeholder_color}
+                    placeholder={"email ..."}
+                    style={[styles.input, { color: theme.text_color }]}
                 />
             </View>
-            <View style={{
-                flexDirection:"row",
-                padding:15,
-                backgroundColor: theme.secondary_background_color,
-                width:width*90/100,
-                borderRadius:10,
-                marginVertical:10
-            }}>
+            <View style={[styles.inputContainer, { backgroundColor: theme.secondary_color, }]} >
                 <TextInput
-                value={password}
-                onChangeText={text=>setPassword(text)}
-                placeholderTextColor={theme.placeholder_color}
-                placeholder={"password ..."}
-                style={{
-                    flex:1,
-                    padding:5,
-                    color: theme.text_color
-                }}
+                    secureTextEntry
+                    textContentType='password'
+                    value={password}
+                    onChangeText={text => setPassword(text)}
+                    placeholderTextColor={theme.placeholder_color}
+                    placeholder={"password ..."}
+                    style={[styles.input, { color: theme.text_color }]}
                 />
             </View>
-
             <TouchableOpacity
-            onPress={()=>signInUser()}
-            style={{
-                width: width*90/100,
-                padding:20,
-                backgroundColor: theme.primary_color,
-                borderRadius:10,
-                justifyContent:"center",
-                alignItems:"center",
-                marginVertical:20
-            }}
+                onPress={() => signInUser()}
+                style={[styles.btnSignIn, { backgroundColor: theme.primary_color, }]}
             >
-                <Text style={{
-                    fontSize:18,
-                    color: "white",
-                    fontWeight:"bold"
-                }}>
-                    Sign In
-                </Text>
+                <Text style={styles.textSignIn}>Sign In</Text>
             </TouchableOpacity>
-
-            <View style={{
-                flexDirection:'row'
-            }}>
-                <Text style={{color: theme.text_color}}>Dont have any account ? </Text>
-                <Pressable
-                onPress={()=>navigation.navigate("SignUp")}
-                >
+            <View style={styles.rowContainer}>
+                <Text style={{ color: theme.text_color }}>Dont have any account ? </Text>
+                <Pressable onPress={() => navigation.navigate("SignUp")}>
                     <Text
-                    style={{
-                        textDecorationLine:"underline",
-                        color: theme.text_color
-                    }}
+                        style={[styles.txtRegister, { color: theme.text_color }]}
                     >Regsiter Here</Text>
                 </Pressable>
             </View>
-
         </SafeAreaView>
     )
 }
 export default SignIn
+const styles = StyleSheet.create({
+    container:
+    {
+        flex: 1,
+        justifyContent: "center",
+        alignItems: "center",
+        padding: 20,
+    },
+    imageLogo:
+    {
+        height: 50,
+        width: 50,
+        marginVertical: 10
+    },
+    inputContainer:
+    {
+        flexDirection: "row",
+        padding: 15,
+        width: width * 90 / 100,
+        borderRadius: 10,
+        marginVertical: 20
+    },
+    input:
+    {
+        flex: 1,
+        padding: 5,
+    },
+    btnSignIn:
+    {
+        width: width * 90 / 100,
+        padding: 20,
+        borderRadius: 10,
+        justifyContent: "center",
+        alignItems: "center",
+        marginVertical: 20
+    },
+    textSignIn:
+    {
+        fontSize: 18,
+        color: "white",
+        fontWeight: "bold"
+    },
+    rowContainer:
+    {
+        flexDirection: 'row'
+    },
+    txtRegister:
+    {
+        textDecorationLine: "underline"
+    }
+})

@@ -13,6 +13,7 @@ import { UserDocument } from "../types/User";
 import Like from "../models/Like";
 import { PostDocument } from "../types/Post";
 import Follower from "../models/Follower";
+import Reply from "../models/Reply";
 interface UpdateUserRequestBody {
     fullname?: string;
     bio?: string;
@@ -170,21 +171,18 @@ const getUserById = async (req: CustomRequest, res: Response) => {
     try {
         const userId = req.userId
         const profileId = req.params.userId
-        const user = await User.findOne({_id:profileId}).select("-otp -password -token")
+        const user = await User.findOne({ _id: profileId }).select("-otp -password -token")
 
-        if(!user)
-        {
+        if (!user) {
             return res.status(404).json({
-                message:"user not found!"
+                message: "user not found!"
             })
         }
-        if(user.profile_picture)
-        {
+        if (user.profile_picture) {
             user.profile_picture = await getSignedUrl(user.profile_picture)
         }
-        const isFollowedBy = await Follower.findOne({follower:userId,following:profileId})
-        if(isFollowedBy)
-        {
+        const isFollowedBy = await Follower.findOne({ follower: userId, following: profileId })
+        if (isFollowedBy) {
             user.isFollowed = true
         }
         return res.status(200).json({
@@ -334,15 +332,16 @@ const getUserPosts = async (req: CustomRequest, res: Response) => {
         const pageSizeParam = req.query.pageSize as string;
         const pageSize = parseInt(pageSizeParam, 10) || 10;
         const post_type = req.query.post_type
+        quary.user = userId
         if (lastOffset) {
             quary._id = { $gt: new mongoose.Types.ObjectId(lastOffset) }
-            quary.userId = userId
+
         }
         if (post_type == "Repost") {
             quary.isRepost = true
         }
         const posts = await Post.find(quary)
-            .sort({ created_at: 1, _id: 1 })
+            .sort({ created_at: -1, _id: 1 })
             .populate<{ user: UserDocument }>({
                 path: "user",
                 select: "-password -token -otp",
@@ -356,48 +355,136 @@ const getUserPosts = async (req: CustomRequest, res: Response) => {
             limit(pageSize)
 
         let userPosts = posts
-        const updatedUserPosts = await Promise.all(userPosts.map(async (post) => {
+        const updatedUserPosts = await Promise.all(userPosts.map(async (post, index: number) => {
             const media = post.media;
             const user = post.user;
             if (user.profile_picture) {
                 user.profile_picture = await getSignedUrl(user.profile_picture);
             }
-
-            for (let j = 0; j < media.length; j++) {
-                media[j].media_url = await getSignedUrl(media[j].media_url);
-
-                if (media[j].thumbnail) {
-                    media[j].thumbnail = await getSignedUrl(media[j].thumbnail);
+            for (const mediaFile of media) {
+                mediaFile.media_url = await getSignedUrl(mediaFile.media_url);
+                if (mediaFile.thumbnail) {
+                    mediaFile.thumbnail = await getSignedUrl(mediaFile.thumbnail);
                 }
             }
-
             const exist_liked = await Like.exists({ userId: userId, postId: post._id });
             const isLiked = exist_liked != null;
             post.isLiked = isLiked;
+            //  return post
+        }));
 
+        await Promise.all(userPosts.map(async (post, index: number) => {
             if (post.isRepost && post.Repost) {
-                const media = post.Repost.media;
-                const user = (post.Repost.user as UserDocument);
+                const user = post.Repost.user as UserDocument
+                const media = post.Repost.media
                 if (user.profile_picture) {
-                    user.profile_picture = await getSignedUrl(user.profile_picture);
+                    const key = user.profile_picture
+                    const uri = await getSignedUrl(key)
+                    user.profile_picture = uri
                 }
-
-                for (let j = 0; j < media.length; j++) {
-                    media[j].media_url = await getSignedUrl(media[j].media_url);
-
-                    if (media[j].thumbnail) {
-                        media[j].thumbnail = await getSignedUrl(media[j].thumbnail || "");
+                for (const mediaFile of media) {
+                    mediaFile.media_url = await getSignedUrl(mediaFile.media_url);
+                    if (mediaFile.thumbnail) {
+                        mediaFile.thumbnail = await getSignedUrl(mediaFile.thumbnail);
                     }
                 }
+                post.Repost.media = media
+                post.Repost.user = user
+
             }
         }));
+
         res.status(200).json({
             data: userPosts,
             meta: {
                 pagesize: pageSize,
+                lastOffset: userPosts.length == pageSize ?
+                    userPosts[userPosts.length - 1]._id : null
 
-            },
-            length: posts.length
+            }
+        })
+    }
+    catch (err) {
+        res.status(500).json({
+            message: "internal server Error"
+        })
+    }
+}
+const getLikedPosts = async (req: CustomRequest, res: Response) => {
+    try {
+        const userId = req.userId
+        const quary: any = {}
+        const lastOffset = req.query.lastOffset as string
+        const pageSizeParam = req.query.pageSize as string;
+        const pageSize = parseInt(pageSizeParam, 10) || 10;
+
+        const likedPosts = await Like.find({ userId: userId }).sort({ created_at: -1 });
+        const likedPostIds: mongoose.Types.ObjectId[] = likedPosts.map(post => post.postId);
+
+        quary._id = lastOffset
+            ? { $in: likedPostIds }
+            : { $in: likedPostIds };
+        const posts = await Post.find({ _id: { $in: likedPostIds } })
+            .sort({ _id: 1 })
+            .populate<{ user: UserDocument }>({
+                path: "user",
+                select: "-password -token -otp",
+            }).
+            populate<{ Repost: PostDocument }>({
+                path: "Repost",
+                populate: {
+                    path: "user",
+                    select: "-password -token -otp",
+                },
+            }).
+            limit(pageSize).lean()
+
+        console.log(posts)
+        let userPosts = posts
+        const updatedUserPosts = await Promise.all(userPosts.map(async (post, index: number) => {
+            const media = post.media;
+            const user = post.user;
+            if (user.profile_picture) {
+                user.profile_picture = await getSignedUrl(user.profile_picture);
+            }
+            for (const mediaFile of media) {
+                mediaFile.media_url = await getSignedUrl(mediaFile.media_url);
+                if (mediaFile.thumbnail) {
+                    mediaFile.thumbnail = await getSignedUrl(mediaFile.thumbnail);
+                }
+            }
+            post.isLiked = true;
+            //  return post
+        }));
+
+        await Promise.all(userPosts.map(async (post, index: number) => {
+            if (post.isRepost && post.Repost) {
+                const user = post.Repost.user as UserDocument
+                const media = post.Repost.media
+                if (user.profile_picture) {
+                    const key = user.profile_picture
+                    const uri = await getSignedUrl(key)
+                    user.profile_picture = uri
+                }
+                for (const mediaFile of media) {
+                    mediaFile.media_url = await getSignedUrl(mediaFile.media_url);
+                    if (mediaFile.thumbnail) {
+                        mediaFile.thumbnail = await getSignedUrl(mediaFile.thumbnail);
+                    }
+                }
+                post.Repost.media = media
+                post.Repost.user = user
+
+            }
+        }));
+
+
+        res.status(200).json({
+            data: userPosts,
+            meta: {
+                pagesize: pageSize,
+                lastOffset: (userPosts.length == pageSize) ? userPosts[userPosts.length - 1]._id : null
+            }
         })
     }
     catch (err) {
@@ -408,4 +495,158 @@ const getUserPosts = async (req: CustomRequest, res: Response) => {
     }
 }
 
-export default { signInUser, getUserPosts, signUpUser, verifyEmail, updateUser, SearchUsers,getUserById }
+const getRepliedPosts = async (req: CustomRequest, res: Response) => {
+    try {
+        const userId = req.userId
+        const quary: any = {}
+        const lastOffset = req.query.lastOffset as string
+        const pageSizeParam = req.query.pageSize as string;
+        const pageSize = parseInt(pageSizeParam, 10) || 10;
+
+        quary.user = userId
+
+        if (lastOffset) {
+            quary._id = { $lt: new mongoose.Types.ObjectId(lastOffset) }
+        }
+
+        const commentPosts = await Reply.find(quary).
+            sort({ created_at: -1, _id: 1 })
+            .populate<{ user: UserDocument }>({
+                path: 'user',
+                select: '-password -token -otp', // Optionally exclude certain fields
+            })
+            .populate<{ post: PostDocument & { user: UserDocument, Repost: PostDocument & { user: UserDocument } } }>({
+                path: 'post',
+                populate: [
+                    {
+                        path: 'user',
+                        select: '-password -token -otp',
+                    },
+                    {
+                        path: 'Repost',
+                        populate: {
+                            path: 'user',
+                            select: '-password -token -otp',
+                        },
+                    },
+                ],
+            })
+            .limit(pageSize)
+        let userPosts = commentPosts
+        const updatedUserPosts = await Promise.all(userPosts.map(async (commentPost, index: number) => {
+
+            const commentUser = commentPost.user
+            if (commentUser.profile_picture) {
+                commentUser.profile_picture = await getSignedUrl(commentUser.profile_picture);
+            }
+            const media = commentPost.post.media
+            const user = commentPost.post.user;
+            if (user.profile_picture) {
+                user.profile_picture = await getSignedUrl(user.profile_picture);
+            }
+            for (const mediaFile of media) {
+                mediaFile.media_url = await getSignedUrl(mediaFile.media_url);
+                if (mediaFile.thumbnail) {
+                    mediaFile.thumbnail = await getSignedUrl(mediaFile.thumbnail);
+                }
+            }
+            commentPost.user = commentUser
+            commentPost.post.media = media
+            commentPost.post.user = user
+        }));
+
+        await Promise.all(userPosts.map(async (commentPost, index: number) => {
+            if (commentPost.post.isRepost && commentPost.post.Repost) {
+                const user = commentPost.post.Repost.user
+                const media = commentPost.post.Repost.media
+                if (user.profile_picture) {
+                    const key = user.profile_picture
+                    const uri = await getSignedUrl(key)
+                    user.profile_picture = uri
+                }
+                for (const mediaFile of media) {
+                    mediaFile.media_url = await getSignedUrl(mediaFile.media_url);
+                    if (mediaFile.thumbnail) {
+                        mediaFile.thumbnail = await getSignedUrl(mediaFile.thumbnail);
+                    }
+                }
+                commentPost.post.Repost.media = media
+                commentPost.post.Repost.user = user
+
+            }
+        }));
+
+
+        res.status(200).json({
+            data: commentPosts,
+            meta: {
+                pagesize: pageSize,
+                lastOffset: commentPosts.length == pageSize ?
+                    commentPosts[commentPosts.length - 1]._id : null
+            }
+        })
+    }
+    catch (err) {
+        console.log("errorr  ===>", JSON.stringify(err))
+        res.status(500).json({
+            message: "internal server Error"
+        })
+    }
+}
+
+const deletePostReply = async (req: CustomRequest, res: Response) => {
+    const transacttion = await mongoose.startSession()
+    try {
+        await transacttion.withTransaction(async () => {
+            const userId = req.userId
+            const replyId = req.params.replyId
+
+            if (!userId || !replyId) {
+                return res.status(401).json({
+                    message: "invalid params"
+                })
+            }
+
+            const reply = await Reply.findById(replyId.toString());
+            if (!reply) {
+                return res.status(404).json({
+                    message: "not found the current reply"
+                })
+            }
+            if (!reply?.user.equals(new mongoose.Types.ObjectId(userId))) {
+                return res.status(401).json({
+                    message: "you are not allowed to do this action"
+                })
+            }
+            await reply.deleteOne({ _id: reply._id })
+
+            await Post.findByIdAndUpdate(userId, {
+                $inc: { replies: -1 }
+            });
+
+            res.status(200).json({
+                message: "deleted reply succesfully"
+            })
+        })
+    }
+    catch (err) {
+        return res.status(500).json({
+            message: err
+        })
+    }
+    finally {
+        transacttion.endSession()
+    }
+}
+export default {
+    signInUser,
+    getUserPosts,
+    signUpUser,
+    verifyEmail,
+    updateUser,
+    SearchUsers,
+    getUserById,
+    getLikedPosts,
+    getRepliedPosts,
+    deletePostReply
+}

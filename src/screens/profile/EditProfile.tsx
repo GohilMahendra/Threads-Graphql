@@ -1,5 +1,5 @@
 import { View, Text, SafeAreaView, TextInput, Image, StyleSheet, TouchableOpacity, Dimensions, Platform } from 'react-native'
-import React, { useMemo, useRef, useState } from 'react'
+import React, { useState } from 'react'
 import { placeholder_image } from '../../globals/asstes'
 import { useSelector } from 'react-redux'
 import { RootState, useAppDispatch } from '../../redux/store'
@@ -10,7 +10,6 @@ import {
     launchImageLibrary
 } from "react-native-image-picker"
 import { UpdateAction } from '../../redux/slices/UserSlice'
-import { updateUser } from '../../apis/UserAPI'
 import UseTheme from '../../globals/UseTheme'
 const { height, width } = Dimensions.get("screen")
 const EditProfile = () => {
@@ -27,7 +26,7 @@ const EditProfile = () => {
     const image = user.profile_picture
     const name = user.fullname
     const user_bio = user.bio
-    const {theme} = UseTheme()
+    const { theme } = UseTheme()
     const [ProfilePicture, setProfilePicture] = useState<MediaType>({
         uri: image || "",
         name: "",
@@ -59,121 +58,71 @@ const EditProfile = () => {
         }
     }
 
-    const updateProfile =async () =>
-    {
+    const updateProfile = async () => {
         disptach(UpdateAction({
-            bio:bio,
+            bio: bio,
             fullname: fullname,
             profile_picture: ProfilePicture
         }))
     }
 
     return (
-        <SafeAreaView style={{
-            flex: 1,
+        <SafeAreaView style={[styles.container, {
             backgroundColor: theme.background_color
-        }}>
-            <View style={{
-                flex: 1
-            }}>
-                <View style={{
-                    padding: 20,
-                    alignItems: 'center',
-                    flexDirection: 'row',
-                    justifyContent: 'space-between',
-                    borderBottomWidth: 1,
-                    borderBlockColor: "silver"
-                }}>
-                    <View style={{
-                        flexDirection: 'row',
-                        alignItems: 'center'
-                    }}>
+        }]}>
+            <View style={styles.innerContainer}>
+                <View style={styles.headerContainer}>
+                    <View style={styles.headerInnerContainer}>
                         <AntDesign
                             onPress={() => navigation.goBack()}
                             name='close'
                             size={20}
                             color={theme.text_color}
                         />
-                        <Text style={{
-                            fontSize: 18,
-                            marginLeft: 30,
-                            color: theme.text_color
-                        }}>Edit Profile</Text>
+                        <Text style={[styles.txtHeader, { color: theme.text_color }]}>Edit Profile</Text>
                     </View>
-                    <TouchableOpacity 
-                    onPress={()=>updateProfile()}
+                    <TouchableOpacity
+                        onPress={() => updateProfile()}
                     >
                         <Text style={{
                             fontSize: 18,
-                            color:(user.profile_picture == ProfilePicture.uri && 
-                                user.fullname == fullname && user.bio == bio)?"silver":"black"
+                            color: (user.profile_picture == ProfilePicture.uri &&
+                                user.fullname == fullname && user.bio == bio) ? "silver" : "black"
                         }}>Done</Text>
                     </TouchableOpacity>
                 </View>
-                <View style={{
-                    flex: 1,
-                    padding: 20,
-                    justifyContent: 'center'
-                }}>
+                <View style={styles.editContainer}>
                     <TouchableOpacity
                         onPress={() => openImagePicker()}
-                        style={{
-                            alignItems: "center",
-                            alignSelf: "center"
-                        }}>
+                        style={styles.btnImage}>
                         <Image
                             source={ProfilePicture.uri ? { uri: ProfilePicture.uri } : placeholder_image}
-                            style={{
-                                height: 70,
-                                width: 70,
-                                borderRadius: 70
-                            }}
+                            style={styles.imageUser}
                         />
                     </TouchableOpacity>
-                    <View style={{
-                        flexDirection: "row",
-                        padding: 15,
+                    <View style={[styles.nameContainer, {
                         backgroundColor: theme.secondary_background_color,
-                        width: width * 90 / 100,
-                        borderRadius: 10,
-                        marginVertical: 20
-                    }}>
+                    }]}>
                         <TextInput
                             autoCapitalize={"none"}
                             value={fullname}
                             onChangeText={text => setFullName(text)}
                             placeholderTextColor={theme.placeholder_color}
                             placeholder={"full name ..."}
-                            style={{
-                                flex: 1,
-                                padding: 5,
-                                color: theme.text_color
-                            }}
+                            style={[styles.inputFullname, { color: theme.text_color }]}
                         />
                     </View>
-                    <View style={{
-                        flexDirection: "row",
-                        padding: 15,
-                        backgroundColor: theme.secondary_background_color,
-                        width: width * 90 / 100,
-                        borderRadius: 10,
-                        marginVertical: 10
-                    }}>
+                    <View style={[styles.bioContainer, { backgroundColor: theme.secondary_background_color, }]}>
                         <TextInput
                             value={bio}
                             multiline={true}
-
                             numberOfLines={5}
                             onChangeText={text => setBio(text)}
                             placeholderTextColor={theme.placeholder_color}
                             placeholder={"bio ..."}
-                            style={{
-                                flex: 1,
+                            style={[styles.inputBio, {
                                 color: theme.text_color,
-                                textAlignVertical: "top",
-                                padding: 5,
-                                height: 150
-                            }}
+                            }]}
                         />
                     </View>
                 </View>
@@ -182,3 +131,77 @@ const EditProfile = () => {
     )
 }
 export default EditProfile
+const styles = StyleSheet.create({
+    container:
+    {
+        flex: 1
+    },
+    innerContainer:
+    {
+        flex: 1
+    },
+    headerContainer:
+    {
+        padding: 20,
+        alignItems: 'center',
+        flexDirection: 'row',
+        justifyContent: 'space-between',
+        borderBottomWidth: 1,
+        borderBlockColor: "silver"
+    },
+    headerInnerContainer:
+    {
+        flexDirection: 'row',
+        alignItems: 'center'
+    },
+    txtHeader:
+    {
+        fontSize: 18,
+        marginLeft: 30,
+    },
+    editContainer:
+    {
+        flex: 1,
+        padding: 20,
+        justifyContent: 'center'
+    },
+    btnImage:
+    {
+        alignItems: "center",
+        alignSelf: "center"
+    },
+    imageUser:
+    {
+        height: 70,
+        width: 70,
+        borderRadius: 70
+    },
+    nameContainer:
+    {
+        flexDirection: "row",
+        padding: 15,
+        width: width * 90 / 100,
+        borderRadius: 10,
+        marginVertical: 20
+    },
+    inputFullname:
+    {
+        flex: 1,
+        padding: 5,
+    },
+    bioContainer:
+    {
+        flexDirection: "row",
+        padding: 15,
+        width: width * 90 / 100,
+        borderRadius: 10,
+        marginVertical: 10
+    },
+    inputBio:
+    {
+        flex: 1,
+        textAlignVertical: "top",
+        padding: 5,
+        height: 150
+    }
+})

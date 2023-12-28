@@ -1,74 +1,50 @@
 import {
     View, Text, Image, TextInput,
-    SafeAreaView, TouchableOpacity, Dimensions
+    SafeAreaView, TouchableOpacity, Dimensions, KeyboardAvoidingView, Platform, StyleSheet
 } from 'react-native'
 import React, { useEffect, useState } from 'react'
-import FontAwesome5Icon from 'react-native-vector-icons/FontAwesome5'
+import FontAwesome from 'react-native-vector-icons/FontAwesome'
+import MaterialIcons from 'react-native-vector-icons/MaterialIcons'
+import AntDesign from 'react-native-vector-icons/AntDesign'
 import { placeholder_image } from '../../globals/asstes'
 import { launchImageLibrary } from "react-native-image-picker";
-import axios from 'axios';
-import { BASE_URL } from '../../globals/constants';
 import { useSelector } from 'react-redux';
-import { RootState } from '../../redux/store';
-import AsyncStorage from '@react-native-async-storage/async-storage';
-const { height, width } = Dimensions.get("screen")
+import { RootState, useAppDispatch } from '../../redux/store';
+import UseTheme from '../../globals/UseTheme';
+import Loader from '../../components/global/Loader';
+import { NavigationProp, useNavigation } from '@react-navigation/native';
+import { RootStackType } from '../../navigations/RootStack';
+import { createPostAction } from '../../redux/slices/UserSlice';
+import { UploadMedia } from '../../types/Post';
+import { CHARACTER_LIMIT } from '../../globals/constants';
 
-type assetType = {
-    name: string,
-    uri: string,
-    type: String
-}
 const CreatePost = () => {
 
+    const navigation = useNavigation<NavigationProp<RootStackType, "CreatePost">>()
     const [content, setContent] = useState<string>("")
-    const [media, setMedia] = useState<assetType[]>([])
+    const [media, setMedia] = useState<UploadMedia[]>([])
     const user = useSelector((state: RootState) => state.User.user)
+    const loading = useSelector((state: RootState) => state.User.loading)
+    const { theme } = UseTheme()
+    const dispatch = useAppDispatch()
     const removeItem = (path: string) => {
-        const filtred_Item: assetType[] = media.filter((item) => item.uri != path)
+        const filtred_Item: UploadMedia[] = media.filter((item) => item.uri != path)
         setMedia(filtred_Item)
     }
-
-    const extractTags = (contentText: string) => {
-        const words = contentText.split(" ")
-        const hastags = words.filter((item) => (item[0] == "#"))
-        return hastags
-    }
-
-    const getToken = async () => {
-        const token = await AsyncStorage.getItem("token")
-        return token
-    }
-
     const createPost = async () => {
         if (!content && media.length == 0)
             return
 
         try {
-            const hastags = extractTags(content)
-            const token = await getToken()
-            let formData = new FormData()
-            formData.append("content", content)
-            formData.append("is_repost", false)
-            if (hastags.length > 0) {
-                hastags.forEach((tag, index) => {
-                    formData.append("hashtags", tag)
-                })
+            const fullfield = await dispatch(createPostAction({
+                media: media,
+                content: content
+            }))
+
+            if (createPostAction.fulfilled.match(fullfield)) {
+                navigation.goBack()
             }
-            if (media.length > 0) {
-                media.forEach((file, index) => {
-                    formData.append(`media`, file)
-                })
-            }
-            console.log(JSON.stringify(formData))
-            const upload_post = await axios.post(BASE_URL + "posts",
-                formData,
-                {
-                    headers: {
-                        'Content-Type': 'multipart/form-data',
-                        'token': token
-                    }
-                }
-            )
+
         }
         catch (err) {
             console.log(JSON.stringify(err))
@@ -83,9 +59,9 @@ const CreatePost = () => {
 
         if (!response.didCancel) {
             if (response.assets) {
-                const assets: assetType[] = []
+                const assets: UploadMedia[] = []
                 response.assets.forEach((item) => {
-                    const media: assetType = {
+                    const media: UploadMedia = {
                         type: item.type ?? "",
                         name: item.fileName ?? "",
                         uri: item.uri ?? ""
@@ -102,125 +78,197 @@ const CreatePost = () => {
             console.log(media)
     }, [media])
     return (
-        <SafeAreaView style={{
-            flex: 1,
-        }}>
-            <View style={{
-                flex: 1,
-                padding: 10
-            }}>
+        <SafeAreaView style={[styles.container, { backgroundColor: theme.secondary_background_color }]}>
+            {loading && <Loader />}
+            <KeyboardAvoidingView
+                behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
+                style={styles.containerAvoidingView}>
                 {/* header starts*/}
-                <View style={{
-                    flexDirection: 'row',
-                    alignItems: "center",
-                    justifyContent: "space-between"
-                }}>
-                    <FontAwesome5Icon
-                        name='angle-left'
+                <View style={styles.headerContainer}>
+                    <AntDesign
+                        onPress={() => navigation.goBack()}
+                        name='close'
                         size={20}
-                        color={"black"}
+                        color={theme.text_color}
                     />
+                    <Text style={[styles.txtHeader, { color: theme.text_color }]}>Create Threads</Text>
                     <TouchableOpacity
                         onPress={() => createPost()}
-                        style={{
-                            paddingVertical: 10,
-                            paddingHorizontal: 20,
-                            backgroundColor: "black",
-                            justifyContent: "center",
-                            alignItems: "center",
-                            borderRadius: 15,
-                        }}>
-                        <Text style={{
-                            color: "white",
-
-                        }}>Post</Text>
+                        style={[styles.btnPost, { backgroundColor: theme.primary_color, }]}>
+                        <Text style={styles.txtPost}>Post</Text>
                     </TouchableOpacity>
                 </View>
                 {/* header ends */}
-
-                <View style={{
-                    flexDirection: 'row',
-                    marginVertical: 20
-                }}>
+                <View style={styles.contentContainer}>
                     <Image
-                        source={placeholder_image}
-                        style={{
-                            height: 40,
-                            width: 40,
-                            borderRadius: 40,
-                            marginRight: 10
-                        }}
+                        resizeMode='cover'
+                        source={user.profile_picture ? { uri: user.profile_picture } : placeholder_image}
+                        style={styles.imgUser}
                     />
-                    <View style={{
-                        width: "80%"
-                    }}>
-                        <View style={{
-                            padding: 15,
-                            borderRadius: 15,
-                            backgroundColor: "#fff",
-                            height: 150,
-                        }}>
+                    <View style={styles.rightContainer}>
+                        <View style={styles.inputContainer}>
                             <TextInput
                                 value={content}
                                 onChangeText={(text: string) => setContent(text)}
-                                placeholder={"Whats going here ..."}
-                                placeholderTextColor={"grey"}
+                                placeholder={"What's on your mind?"}
+                                placeholderTextColor={theme.placeholder_color}
                                 multiline={true}
-                                numberOfLines={5}
-                                style={{
-                                    textAlignVertical: "top"
-                                }}
+                                maxLength={CHARACTER_LIMIT}
+                                style={[styles.input, { color: theme.text_color, }]}
+                            />
+                            <AntDesign
+                                onPress={() => setContent("")}
+                                name='close'
+                                size={15}
+                                color={theme.text_color}
                             />
                         </View>
-
-                        <View style={{
-                            flexDirection: 'row',
-                            marginTop: 20
-                        }}>
+                        <View style={styles.mediaContainer}>
                             {
                                 media.length == 0
                                     ?
-                                    <FontAwesome5Icon
+                                    <MaterialIcons
                                         onPress={() => openImagePicker()}
-                                        name='image'
-                                        size={20}
-                                        color={"black"}
+                                        name='photo-library'
+                                        size={25}
+                                        color={theme.text_color}
                                     />
                                     :
                                     media.map((item) => (
                                         <View
-                                            style={{
-                                                marginRight: 10
-                                            }}
+                                            style={styles.imageContainer}
                                             key={item.uri}>
                                             <Image
                                                 source={{ uri: item.uri }}
-                                                style={{
-                                                    height: 70,
-                                                    width: 70,
-                                                    borderRadius: 15
-                                                }}
+                                                style={styles.imageThumb}
                                             />
-                                            <FontAwesome5Icon
-                                                onPress={() => removeItem(item.uri)}
-                                                name='times'
+                                            <TouchableOpacity
+                                                style={[styles.closeContainer, {
+                                                    backgroundColor: theme.primary_color, padding: 2,
+                                                }]}
+                                            >
+                                                <AntDesign
+                                                    onPress={() => removeItem(item.uri)}
+                                                    name='close'
+                                                    size={15}
+                                                    color={"white"}
+                                                />
+                                            </TouchableOpacity>
+                                            {item.type.includes("video") && <FontAwesome
+                                                style={styles.iconPlay}
+                                                name='play'
+                                                color={"white"}
                                                 size={15}
-                                                color={"black"}
-                                                style={{
-                                                    position: "absolute",
-                                                    right: -2,
-                                                    top: -5
-                                                }}
                                             />
+                                            }
                                         </View>
-                                    ))
+                                    )
+                                    )
                             }
                         </View>
                     </View>
                 </View>
-            </View>
+            </KeyboardAvoidingView>
         </SafeAreaView>
     )
 }
 
 export default CreatePost
+const styles = StyleSheet.create({
+    container:
+    {
+        flex: 1,
+        borderTopRightRadius: 20,
+        borderTopLeftRadius: 20,
+    },
+    containerAvoidingView:
+    {
+        flex: 1,
+        padding: 10
+    },
+    headerContainer:
+    {
+        flexDirection: 'row',
+        alignItems: "center",
+        justifyContent: "space-between",
+    },
+    txtHeader:
+    {
+        fontSize: 15,
+        textAlign: 'center'
+    },
+    btnPost:
+    {
+        paddingVertical: 10,
+        paddingHorizontal: 20,
+        justifyContent: "center",
+        alignItems: "center",
+        borderRadius: 15,
+    },
+    txtPost:
+    {
+        color: "white",
+        fontWeight: "bold"
+    },
+    contentContainer:
+    {
+        flexDirection: 'row',
+        marginVertical: 20,
+        alignItems: 'flex-start'
+    },
+    imgUser:
+    {
+        height: 40,
+        width: 40,
+        borderRadius: 40,
+        marginRight: 10
+    },
+    rightContainer:
+    {
+        width: "80%",
+    },
+    inputContainer:
+    {
+        padding: 15,
+        borderRadius: 15,
+        flexDirection: 'row',
+        alignItems: 'flex-start',
+    },
+    input:
+    {
+        textAlignVertical: "top",
+        maxHeight: 200,
+        flex: 1,
+        marginRight: 20
+    },
+    mediaContainer:
+    {
+        flexDirection: 'row',
+        marginTop: 20,
+        flexWrap: 'wrap'
+    },
+    imageContainer:
+    {
+        marginBottom: 10,
+        marginRight: 10
+    },
+    imageThumb:
+    {
+        height: 70,
+        width: 70,
+        borderRadius: 15
+    },
+    closeContainer:
+    {
+        position: "absolute",
+        right: -2,
+        borderRadius: 10,
+        top: -5
+    },
+    iconPlay:
+    {
+        position: 'absolute',
+        top: "40%",
+        alignSelf: 'center'
+    }
+})

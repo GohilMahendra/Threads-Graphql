@@ -2,7 +2,6 @@ import { createNativeStackNavigator } from '@react-navigation/native-stack'
 import React from 'react'
 import SignIn from '../screens/auth/Signin'
 import SignUp from '../screens/auth/SignUp'
-import SplashScreen from '../screens/auth/SplashScreen'
 import OtpVerification from '../screens/auth/OtpVerification'
 
 export type AuthStackType = 
@@ -14,8 +13,6 @@ export type AuthStackType =
         email: string
      },
 }
-
-
 const AuthStackNavigator = createNativeStackNavigator<AuthStackType>()
 const AuthStack = () =>
 {
