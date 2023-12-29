@@ -33,7 +33,6 @@ const OtpVerification = () => {
     }
 
     const previousFocus = (key: any, index: number) => {
-        console.log(key)
         if (key != 'Backspace' || index == 0) {
             return false
         }

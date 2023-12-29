@@ -151,7 +151,6 @@ export const FavoriteSlice = createSlice({
             state.screeenLoading = false
             if (action.payload.postType == "post") {
                 const index = state.posts.findIndex(post => post._id == action.payload.postId)
-                console.log(index)
                 if (index != -1)
                     state.posts[index].isLiked = false
             }

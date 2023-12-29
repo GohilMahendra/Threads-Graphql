@@ -48,7 +48,6 @@ const Favorites = () => {
     replyThreeDotsBottomSheetRef.current?.present()
   }
   const replyIconPress = (postId: string) => {
-    console.log("reply")
     setPostId(postId)
     replyBottomSheetRef.current?.present()
   }

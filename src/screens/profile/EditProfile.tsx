@@ -51,7 +51,6 @@ const EditProfile = () => {
                 if (Platform.OS === "ios" && fileUri.startsWith("file://")) {
                     fileUri = fileUri.substring(7); // Remove "file://" prefix
                 }
-                console.log(fileUri)
                 setProfilePicture({
                     name: response.assets[0].fileName || "",
                     type: response.assets[0].type || "",

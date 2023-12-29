@@ -46,15 +46,11 @@ const Home = () => {
 
   const onPressQouteRepost = async () => {
     repostSheetModalRef.current?.close()
-    console.log(postId, "postId")
     const Post = posts.find(post => post._id == postId)
     let Thread = Post
     if (Post?.Repost && Post.isRepost) {
       Thread = Post.Repost
     }
-
-    console.log(Post, "post")
-
     if (Thread)
       navigation.navigate("QoutePost", {
         Thread: Thread

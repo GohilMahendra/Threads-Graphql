@@ -72,11 +72,6 @@ const CreatePost = () => {
             }
         }
     }
-
-    useEffect(() => {
-        if (media.length > 0)
-            console.log(media)
-    }, [media])
     return (
         <SafeAreaView style={[styles.container, { backgroundColor: theme.secondary_background_color }]}>
             {loading && <Loader />}

@@ -32,7 +32,6 @@ export const FetchPostsAction = createAsyncThunk(
     "Feed/FetchPostsAction",
     async ({ post_type }: { post_type: string }, { rejectWithValue }) => {
         try {
-            console.log(post_type)
             const response = await fetchPosts({
                 pageSize: 3,
                 post_type: post_type
@@ -124,7 +123,6 @@ export const LikeAction = createAsyncThunk(
             }
         }
         catch (err) {
-            console.log(err)
             return rejectWithValue(JSON.stringify(err))
         }
     }
@@ -173,7 +171,6 @@ export const FeedSlice = createSlice({
         builder.addCase(FetchPostsAction.fulfilled, (state, action: PayloadAction<FetchPostsPayload<Thread>>) => {
             state.loading = false
             state.Threads = action.payload.data,
-                console.log(action.payload.lastOffset, "getting last offset in first request")
             state.lastOffset = action.payload.lastOffset
         })
         builder.addCase(FetchPostsAction.rejected, (state, action) => {
@@ -187,7 +184,6 @@ export const FeedSlice = createSlice({
         })
         builder.addCase(FetchMorePostsAction.fulfilled, (state, action: PayloadAction<FetchPostsPayload<Thread>>) => {
             state.loadMoreLoading = false
-            console.log(action.payload.lastOffset, "last offset found second time retrival")
             state.Threads.push(...action.payload.data)
             state.lastOffset = action.payload.lastOffset
         })

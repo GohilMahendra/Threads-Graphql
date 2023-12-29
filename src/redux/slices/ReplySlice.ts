@@ -44,8 +44,6 @@ export const getCommentsAction = createAsyncThunk(
     async ({ postId }: { postId: string }, { rejectWithValue }) => {
         try {
             const response = await fetchComments(postId, PAGE_SIZE)
-            console.log(response.meta.lastOffset)
-            console.log(response)
             return {
                 data: response.data,
                 lastOffset: response.meta.lastOffset

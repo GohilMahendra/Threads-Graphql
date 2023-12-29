@@ -198,7 +198,6 @@ export const FetchMoreUserPostsAction = createAsyncThunk(
                 lastOffset: lastOffset,
                 post_type: post_type
             })
-            console.log(response,"from more fetcg")
             const posts: Thread[] = []
             const theads: Thread[] = response.data
             theads.forEach((item, index) => {

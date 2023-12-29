@@ -161,7 +161,6 @@ const Profile = () => {
             keyExtractor={(item, index) => index.toString()}
             renderItem={({ item, index }) => renderPosts(item, index)}
             onEndReachedThreshold={0.3}
-            // onEndReached={()=>console.log("end reached")}
             onEndReached={() => loadMorePosts()}
           />
         </ScrollView>

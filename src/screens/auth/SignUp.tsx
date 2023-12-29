@@ -12,7 +12,7 @@ import { RootState } from '../../redux/store';
 import Loader from '../../components/global/Loader';
 const { height, width } = Dimensions.get("screen")
 const SignUp = () => {
-    const loading = useSelector((state:RootState)=>state.User.loading)
+    const loading = useSelector((state: RootState) => state.User.loading)
     const [email, setEmail] = useState("")
     const [password, setPassword] = useState("")
     const [rePassword, setRePassword] = useState("")
@@ -21,28 +21,22 @@ const SignUp = () => {
     const navigation = useNavigation<NavigationProp<AuthStackType, "SignIn">>()
     const { theme } = UseTheme()
     const SignUp = async () => {
-        try {
-
-            const email_lowercase = email.toLowerCase()
-            const username_lowercase = userName.toLowerCase()
-            const fullname_lowercase = fullName.toLowerCase()
-            const response = await signUpUser({
-                email: email_lowercase,
-                password: password,
-                fullname: fullname_lowercase,
-                username: username_lowercase
-            })
-            navigation.navigate("OtpVerification", {
-                email: email_lowercase
-            })
-        }
-        catch (err) {
-            console.log(JSON.stringify(err))
-        }
+        const email_lowercase = email.toLowerCase()
+        const username_lowercase = userName.toLowerCase()
+        const fullname_lowercase = fullName.toLowerCase()
+        const response = await signUpUser({
+            email: email_lowercase,
+            password: password,
+            fullname: fullname_lowercase,
+            username: username_lowercase
+        })
+        navigation.navigate("OtpVerification", {
+            email: email_lowercase
+        })
     }
     return (
         <SafeAreaView style={[styles.container, { backgroundColor: theme.background_color }]}>
-            {loading && <Loader/>}
+            {loading && <Loader />}
             <ScrollView
                 contentContainerStyle={styles.containerView}
                 style={styles.scrollContainer}>
