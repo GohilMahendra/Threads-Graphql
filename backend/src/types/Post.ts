@@ -8,6 +8,7 @@ export interface Media {
 }
 
 export interface PostDocument extends Document {
+    _id:string,
     user: PopulatedDoc<UserDocument>;
     content: string;
     media: Media[];

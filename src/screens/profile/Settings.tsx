@@ -13,10 +13,11 @@ const Settings = () => {
     const navigation = useNavigation<ProfileRootComposite>()
     const [darkTheme,setDarkTheme] = useState(theme.mode == "dark")
 
-    const changeTheme = () =>
+    const changeTheme = async() =>
     {
+        setTheme(darkTheme?"light":"dark")
         setDarkTheme(!darkTheme)
-        setTheme()
+        await AsyncStorage.setItem("theme",theme.mode)
     }
     const handleSignOut = () => {
         Alert.alert(

@@ -62,7 +62,6 @@ const getUserFollowings = async(req:CustomRequest,res:Response) =>
     try
     {
         const followingId = req.params.userId
-        console.log(followingId)
         if(!followingId)
         {
             return res.status(401).json({

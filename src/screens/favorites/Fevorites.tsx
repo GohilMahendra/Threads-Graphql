@@ -21,6 +21,7 @@ import FontAwesome from 'react-native-vector-icons/FontAwesome'
 import FontAwesome5Icon from 'react-native-vector-icons/FontAwesome5'
 import { useNavigation } from '@react-navigation/native'
 import { FavoriteRootComposite } from '../../navigations/Types'
+import { white } from '../../globals/Colors'
 const Favorites = () => {
   const { theme } = UseTheme()
   const navigation = useNavigation<FavoriteRootComposite>()
@@ -30,6 +31,7 @@ const Favorites = () => {
   const suggestedUsers = useSelector((state: RootState) => state.Favorite.suggestedUsers)
   const screenLoading = useSelector((state: RootState) => state.Favorite.screeenLoading)
   const posts = useSelector((state: RootState) => state.Favorite.posts)
+  const lastOffset =  useSelector((state: RootState) => state.Favorite.lastOffset)
   const [replyId, setReplyId] = useState<string>("")
   const [postId, setPostId] = useState<string>("")
   const repliedPosts = useSelector((state: RootState) => state.Favorite.repliedPosts)
@@ -146,81 +148,65 @@ const Favorites = () => {
       getFollowingUsers()
   }, [selectedOption])
   return (
-    <GestureHandlerRootView style={{ flex: 1 }}>
+    <GestureHandlerRootView style={styles.gestureContainer}>
       <SafeAreaView style={{
         flex: 1,
         backgroundColor: theme.background_color
       }}>
         {screenLoading && <Loader />}
-        <View style={{
-          flexDirection: 'row',
-          padding: 20
-        }}>
+        <View style={styles.optionRowContainer}>
           <ScrollView
             horizontal
             showsHorizontalScrollIndicator={false}
           >
             <TouchableOpacity
               onPress={() => setSelectedOption("All")}
-              style={{
-                paddingVertical: 10,
-                borderRadius: 15,
-                marginRight: 20,
-                borderColor: theme.text_color,
-                borderWidth: 1,
-                paddingHorizontal: 20,
+              style={[styles.btnSelectionOption, {
+                borderColor: theme.placeholder_color,
+                borderWidth: (selectedOption == "All") ? 0 : 1,
                 backgroundColor: selectedOption == "All" ? theme.primary_color : theme.background_color,
-              }}>
+              }]}>
               <Text style={{
-                fontWeight:"bold",
-                color:selectedOption == "All" ? theme.background_color : theme.text_color
+                fontWeight: "bold",
+                color: selectedOption == "All" ? white : theme.text_color
               }}>All</Text>
             </TouchableOpacity>
             <TouchableOpacity
               onPress={() => setSelectedOption("followings")}
-              style={{
-                paddingVertical: 10,
-                borderRadius: 15,
-                borderColor: theme.text_color,
-                borderWidth: 1,
-                marginRight: 20,
-                paddingHorizontal: 20,
+              style={[styles.btnSelectionOption, {
+                borderColor: theme.placeholder_color,
+                borderWidth: (selectedOption == "followings") ? 0 : 1,
                 backgroundColor: selectedOption == "followings" ? theme.primary_color : theme.background_color,
-              }}>
+              }]}>
               <Text style={{
-                fontWeight:"bold",
-                color:selectedOption == "followings" ? theme.background_color : theme.text_color}}>Followings</Text>
+                fontWeight: "bold",
+                color: selectedOption == "followings" ? white : theme.text_color
+              }}>Followings</Text>
             </TouchableOpacity>
             <TouchableOpacity
               onPress={() => setSelectedOption("Replies")}
-              style={{
-                paddingVertical: 10,
-                borderRadius: 15,
-                marginRight: 20,
-                paddingHorizontal: 20,
+              style={[styles.btnSelectionOption, {
+                borderColor: theme.placeholder_color,
+                borderWidth: (selectedOption == "Replies") ? 0 : 1,
                 backgroundColor: selectedOption == "Replies" ? theme.primary_color : theme.background_color,
-                borderColor: theme.text_color,
-                borderWidth: 1,
-              }}>
+              }]}>
               <Text style={{
-                fontWeight:"bold",
-                color:selectedOption == "Replies" ? theme.background_color : theme.text_color}}>Replies</Text>
+                fontWeight: "bold",
+                color: selectedOption == "Replies" ?white : theme.text_color
+              }}>Replies</Text>
             </TouchableOpacity>
             <TouchableOpacity
               onPress={() => setSelectedOption("Likes")}
-              style={{
-                paddingVertical: 10,
-                borderRadius: 15,
-                marginRight: 20,
-                paddingHorizontal: 20,
+              style={[styles.btnSelectionOption, {
+                borderColor: theme.placeholder_color,
+                borderWidth: (selectedOption == "Likes") ? 0 : 1,
                 backgroundColor: selectedOption == "Likes" ? theme.primary_color : theme.background_color,
-                borderColor: theme.text_color,
-                borderWidth: 1,
-              }}>
-              <Text 
-              style={{
-                fontWeight:"bold",
-                color:selectedOption == "Likes" ? theme.background_color : theme.text_color}}>Liked</Text>
+              }]}>
+              <Text
+                style={{
+                  fontWeight: "bold",
+                  color: selectedOption == "Likes" ? white : theme.text_color
+                }}>Liked</Text>
             </TouchableOpacity>
           </ScrollView>
         </View>
@@ -230,13 +216,12 @@ const Favorites = () => {
             refreshControl={<RefreshControl
               tintColor={theme.text_color}
               refreshing={loading}
-            // onRefresh={() => getFollowingUsers()}
             />}
             ListEmptyComponent={() => (
               <View style={{ flex: 1, justifyContent: "center", alignItems: "center" }}>
                 <Text style={{
                   color: theme.text_color
-                }}>Nothing to show here</Text>
+                }}>suggestions are coming Soon !!</Text>
               </View>
             )}
             style={{ flex: 1 }}
@@ -252,7 +237,8 @@ const Favorites = () => {
             onRefresh={() => getFollowingUsers()}
           />}
           data={users}
-          onEndReached={()=>dispatch(getMoreUserFollowingAction(""))}
+          onEndReachedThreshold={0.3}
+          onEndReached={() =>lastOffset && dispatch(getMoreUserFollowingAction(""))}
           keyExtractor={item => item._id}
           renderItem={({ item, index }) => renderUsers(item, index)}
         />
@@ -265,7 +251,8 @@ const Favorites = () => {
               refreshing={loading}
               onRefresh={() => getLikedPosts()}
             />}
-            onEndReached={()=>dispatch(getMoreLikedPostsActions(""))}
+            onEndReachedThreshold={0.3}
+            onEndReached={() =>lastOffset && dispatch(getMoreLikedPostsActions(""))}
             data={posts}
             keyExtractor={item => item._id}
             renderItem={({ item, index }) => renderPosts(item, index)}
@@ -292,7 +279,8 @@ const Favorites = () => {
                 <Text>No replies created by you</Text>
               </View>
             }
-            onEndReached={() => getMoreRepliesPosts()}
+            onEndReachedThreshold={0.3}
+            onEndReached={() =>lastOffset && getMoreRepliesPosts()}
             data={repliedPosts}
             keyExtractor={item => item._id}
             renderItem={({ item, index }) => renderReplies(item, index)}
@@ -306,6 +294,10 @@ const Favorites = () => {
             backdropComponent={(props) => (
               <BottomSheetBackdrop {...props} disappearsOnIndex={-1} appearsOnIndex={0} />
             )}
+            handleStyle={[styles.handleRepost, {
+              backgroundColor: theme.secondary_background_color,
+              borderColor: theme.text_color
+            }]}
             handleIndicatorStyle={{ borderColor: theme.text_color, borderWidth: 2 }}
           >
             <View
@@ -376,6 +368,10 @@ const Favorites = () => {
             backdropComponent={(props) => (
               <BottomSheetBackdrop {...props} disappearsOnIndex={-1} appearsOnIndex={0} />
             )}
+            handleStyle={[styles.handleRepost, {
+              backgroundColor: theme.secondary_background_color,
+              borderColor: theme.text_color
+            }]}
             handleIndicatorStyle={{ borderColor: theme.text_color, borderWidth: 2 }}
           >
             <Replies
@@ -474,5 +470,21 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     borderRadius: 15,
     width: "100%"
+  },
+  btnSelectionOption:
+  {
+    paddingVertical: 10,
+    borderRadius: 10,
+    marginRight: 20,
+    paddingHorizontal: 20,
+  },
+  optionRowContainer:
+  {
+    flexDirection: 'row',
+    padding: 20
+  },
+  gestureContainer:
+  {
+    flex: 1
   }
 })

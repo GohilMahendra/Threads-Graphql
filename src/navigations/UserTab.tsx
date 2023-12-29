@@ -21,11 +21,11 @@ export type UserTabType =
     }
 const UserTab = () => {
     const UserTabNavigator = createBottomTabNavigator<UserTabType>()
-    const navigation = useNavigation<NavigationProp<RootStackType,"UserTab">>()
+    const navigation = useNavigation<NavigationProp<RootStackType, "UserTab">>()
     const { theme } = UseTheme()
     return (
-    
-         <UserTabNavigator.Navigator
+
+        <UserTabNavigator.Navigator
             initialRouteName={"HomeStack"}
             screenOptions={{
                 headerShown: false,
@@ -68,29 +68,29 @@ const UserTab = () => {
                 options={{
                     tabBarIcon: ({ color, focused, size }) => (
                         <Ionicons
-                        name={(focused)?"create":'create-outline'}
-                        size={30}
-                        color={focused ? theme.text_color : theme.secondary_text_color}
-                    />
+                            name={(focused) ? "create" : 'create-outline'}
+                            size={30}
+                            color={focused ? theme.text_color : theme.secondary_text_color}
+                        />
                     ),
                 }}
                 listeners={
-                    ()=>({
-                        tabPress:(e)=>{
-                           e.preventDefault()
-                           navigation.navigate("CreatePost")
+                    () => ({
+                        tabPress: (e) => {
+                            e.preventDefault()
+                            navigation.navigate("CreatePost")
                         }
                     })
                 }
             />
-            
+
             <UserTabNavigator.Screen
                 name="Likes"
                 component={FavoriteStack}
                 options={{
                     tabBarIcon: ({ color, focused, size }) => (
                         <AntDesign
-                            name={(focused)?"heart":"hearto"}
+                            name={(focused) ? "heart" : "hearto"}
                             size={25}
                             color={focused ? theme.text_color : theme.secondary_text_color}
                         />
@@ -105,14 +105,14 @@ const UserTab = () => {
                         <FontAwesome5
                             name={"user"}
                             size={25}
-                            solid={focused?true:false}
+                            solid={focused ? true : false}
                             color={focused ? theme.text_color : theme.secondary_text_color}
                         />
                     )
                 }}
             />
         </UserTabNavigator.Navigator>
-       
+
     )
 }
 export default UserTab

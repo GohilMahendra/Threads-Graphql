@@ -14,7 +14,7 @@ import { applogo } from '../../globals/asstes';
 const SplashScreen = () => {
     const dispatch = useAppDispatch()
     const navigation = useNavigation<compositeRootUserTab>()
-    const { theme } = UseTheme()
+    const { theme ,setTheme} = UseTheme()
     const signIn = async () => {
         try {
             const email = await AsyncStorage.getItem("email")
@@ -41,7 +41,14 @@ const SplashScreen = () => {
         }
 
     }
+    const checkTheme = async() =>
+    {
+        const mode = await AsyncStorage.getItem("theme") as "dark" | "light"
+        if(mode)
+        setTheme(mode)
+    }
     useEffect(() => {
+        checkTheme()
         setTimeout(() => {
             signIn()
         }, 2000);

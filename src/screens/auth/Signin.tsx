@@ -13,6 +13,7 @@ const SignIn = () => {
     const [email, setEmail] = useState("")
     const [password, setPassword] = useState("")
     const loading = useSelector((state: RootState) => state.User.loading)
+    const error = useSelector((state: RootState) => state.User.error)
     const { theme } = UseTheme()
     const navigation = useNavigation<composeteAuthRootStack>()
     const dispatch = useAppDispatch()
@@ -22,7 +23,6 @@ const SignIn = () => {
             password: password
         }))
 
-        console.log(responseStaus)
         if (SignInAction.fulfilled.match(responseStaus)) {
             navigation.navigate("UserTab")
         }
@@ -35,8 +35,14 @@ const SignIn = () => {
                 tintColor={theme.text_color}
                 style={styles.imageLogo}
             />
+            {error && <Text style={{
+                color:"red",
+                fontSize:18,
+                fontWeight:"bold"
+            }}>{error}</Text>}
             <View style={[styles.inputContainer, { backgroundColor: theme.secondary_color, }]}>
                 <TextInput
+                    secureTextEntry={false}
                     autoCapitalize={"none"}
                     value={email}
                     onChangeText={text => setEmail(text)}

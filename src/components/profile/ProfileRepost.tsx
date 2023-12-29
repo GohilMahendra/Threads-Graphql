@@ -129,7 +129,7 @@ const styles = StyleSheet.create({
     txtCreatedAt:
     {
         color: "silver",
-        marginRight: 20
+        marginRight: 10
     },
     postContainer:
     {

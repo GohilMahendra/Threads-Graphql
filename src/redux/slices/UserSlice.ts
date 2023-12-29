@@ -1,12 +1,13 @@
 import { PayloadAction, createAsyncThunk, createSlice } from "@reduxjs/toolkit"
 import { SignUpArgsType, UpdateArgsType, User, UserResponse } from "../../types/User";
-import { deleteUserPost, fetchUserPosts, loginUser, signUpUser, updateUser } from "../../apis/UserAPI";
+import { deleteUserPost, fetchUserPosts, loginUser, signUpUser, updateUser, verifyOtp } from "../../apis/UserAPI";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { Thread, UploadMedia } from "../../types/Post";
 import { RootState } from "../store";
 import { FetchPostsPayload } from "../types/global";
 import { createPost, createRepost } from "../../apis/FeedAPI";
 import { extractTags } from "../../globals/utilities";
+import { PAGE_SIZE } from "../../globals/constants";
 type UserStateType =
     {
         user: User,
@@ -15,7 +16,8 @@ type UserStateType =
         error: null | string,
         morePostsLoading: boolean,
         morePostsError: null | string,
-        lastOffset: string | null
+        lastOffset: string | null,
+        screenLoading: boolean
     }
 
 const initalUser: User =
@@ -39,7 +41,8 @@ const initialState: UserStateType =
     Posts: [],
     lastOffset: null,
     morePostsError: null,
-    morePostsLoading: false
+    morePostsLoading: false,
+    screenLoading: false
 }
 
 export const SignInAction = createAsyncThunk(
@@ -86,20 +89,32 @@ export const UpdateAction = createAsyncThunk(
     async (args: UpdateArgsType, { rejectWithValue }) => {
         try {
             const response = await updateUser(args)
-            return response.message
+            const user = response.user as User
+            return {
+                user: user
+            }
         }
         catch (err) {
             return rejectWithValue(JSON.stringify(err))
         }
     })
+export const verifyOtpUserAction = createAsyncThunk(
+    "user/verifyOtpUserAction",
+    async ({ otp, email }: { otp: string, email: string }, { rejectWithValue }) => {
+        try {
+            const response = await verifyOtp(email, otp)
+            return response.message as string
+        }
+        catch (err) {
+            return rejectWithValue(JSON.stringify(err))
+        }
+    })
+
 export const createRepostAction = createAsyncThunk(
     "Feed/createRepostAction",
     async ({ postId, content }: { postId: string, content?: string }, { rejectWithValue }) => {
         try {
-            let  hashtags: string[] = []
-            if(content)
-            hashtags= extractTags(content)
-            const response = await createRepost(postId, content,hashtags)
+            const response = await createRepost(postId, content)
             return response.data
         }
         catch (err) {
@@ -112,15 +127,9 @@ export const createPostAction = createAsyncThunk(
     "Feed/createPostAction",
     async ({ content, media }: { content?: string, media: UploadMedia[] }, { rejectWithValue }) => {
         try {
-            let  hashtags: string[] = []
-
-            if(content)
-            hashtags= extractTags(content)
-
             const response = await createPost({
                 args: {
                     content: content,
-                    hashtags: hashtags,
                     media: media
                 }
             })
@@ -135,11 +144,11 @@ export const createPostAction = createAsyncThunk(
 
 export const FetchUserPostsAction = createAsyncThunk(
     "User/FetchPostsAction",
-    async ({post_type}:{post_type:string}, { rejectWithValue }) => {
+    async ({ post_type }: { post_type: string }, { rejectWithValue }) => {
         try {
             const response = await fetchUserPosts({
-                pageSize:3,
-                post_type:post_type
+                pageSize: 3,
+                post_type: post_type
             })
             const posts: Thread[] = []
             const theads: Thread[] = response.data
@@ -161,8 +170,6 @@ export const FetchUserPostsAction = createAsyncThunk(
                 }
                 posts.push(post)
             })
-
-            console.log(response.me,"offset first")
             return {
                 data: posts,
                 lastOffset: response.meta.lastOffset
@@ -176,7 +183,7 @@ export const FetchUserPostsAction = createAsyncThunk(
 
 export const FetchMoreUserPostsAction = createAsyncThunk(
     "User/FetchMorePostsAction",
-    async ({post_type}:{post_type:string}, { rejectWithValue, getState }) => {
+    async ({ post_type }: { post_type: string }, { rejectWithValue, getState }) => {
         try {
             const state = getState() as RootState
             const lastOffset = state.Feed.lastOffset
@@ -187,10 +194,11 @@ export const FetchMoreUserPostsAction = createAsyncThunk(
                 }
             }
             const response = await fetchUserPosts({
-                pageSize:3,
+                pageSize: PAGE_SIZE,
                 lastOffset: lastOffset,
-                post_type:post_type
+                post_type: post_type
             })
+            console.log(response,"from more fetcg")
             const posts: Thread[] = []
             const theads: Thread[] = response.data
             theads.forEach((item, index) => {
@@ -221,8 +229,7 @@ export const FetchMoreUserPostsAction = createAsyncThunk(
         catch (err) {
             return rejectWithValue(JSON.stringify(err))
         }
-})
-
+    })
 
 export const DeletePostAction = createAsyncThunk(
     "User/DeletePostAction",
@@ -237,7 +244,7 @@ export const DeletePostAction = createAsyncThunk(
         catch (err) {
             return rejectWithValue(JSON.stringify(err))
         }
-})
+    })
 
 export const UserSlice = createSlice({
     name: "User",
@@ -262,12 +269,10 @@ export const UserSlice = createSlice({
             state.loading = false
             state.error = action.payload as string
         })
-
         builder.addCase(SignUpAction.pending, state => {
             state.loading = true
             state.error = null
         })
-
         builder.addCase(SignUpAction.fulfilled, (state, action: PayloadAction<User>) => {
             state.loading = false
             state.user = action.payload
@@ -276,7 +281,6 @@ export const UserSlice = createSlice({
             state.loading = false
             state.error = action.payload as string
         })
-
         builder.addCase(FetchUserPostsAction.pending, (state) => {
             state.loading = true
             state.Posts = []
@@ -291,14 +295,13 @@ export const UserSlice = createSlice({
             state.loading = false
             state.error = action.payload as string
         })
-
         builder.addCase(FetchMoreUserPostsAction.pending, (state) => {
             state.morePostsLoading = true
             state.morePostsError = null
         })
         builder.addCase(FetchMoreUserPostsAction.fulfilled, (state, action: PayloadAction<FetchPostsPayload<Thread>>) => {
             state.morePostsLoading = false
-           // state.Posts.push(...action.payload.data)
+             state.Posts.push(...action.payload.data)
             state.lastOffset = action.payload.lastOffset
         })
         builder.addCase(FetchMoreUserPostsAction.rejected, (state, action) => {
@@ -307,19 +310,19 @@ export const UserSlice = createSlice({
         })
 
         builder.addCase(DeletePostAction.pending, state => {
-            state.loading = true,
-                state.error = null
+            state.screenLoading = true
+            state.error = null
         })
         builder.addCase(DeletePostAction.fulfilled, (state, action: PayloadAction<{ postId: string }>) => {
-            state.loading = false
+            state.screenLoading = false
             const index = state.Posts.findIndex(post => post._id === action.payload.postId);
             if (index !== -1) {
                 state.Posts.splice(index, 1);
             }
         })
         builder.addCase(DeletePostAction.rejected, (state, action) => {
-            state.loading = false,
-                state.error = action.payload as string
+            state.screenLoading = false
+            state.error = action.payload as string
         })
         builder.addCase(createPostAction.pending, (state) => {
             state.loading = true
@@ -340,6 +343,29 @@ export const UserSlice = createSlice({
             state.loading = false
         })
         builder.addCase(createRepostAction.rejected, (state, action) => {
+            state.loading = false
+            state.error = action.payload as string
+        })
+        builder.addCase(verifyOtpUserAction.pending, (state) => {
+            state.loading = true
+            state.error = null
+        })
+        builder.addCase(verifyOtpUserAction.fulfilled, (state, action) => {
+            state.loading = false
+        })
+        builder.addCase(verifyOtpUserAction.rejected, (state, action) => {
+            state.loading = false
+            state.error = action.payload as string
+        })
+        builder.addCase(UpdateAction.pending, (state) => {
+            state.loading = true
+            state.error = null
+        })
+        builder.addCase(UpdateAction.fulfilled, (state, action) => {
+            state.loading = false
+            state.user = action.payload.user
+        })
+        builder.addCase(UpdateAction.rejected, (state, action) => {
             state.loading = false
             state.error = action.payload as string
         })

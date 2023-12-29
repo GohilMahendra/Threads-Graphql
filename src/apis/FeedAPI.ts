@@ -13,25 +13,19 @@ const getToken = async () => {
 type CreatePostArgs =
     {
         media?: UploadMedia[],
-        content?: string,
-        hashtags?: string[]
+        content?: string
     }
 
 export const createPost = async ({ args }: { args: CreatePostArgs }) => {
     try {
         const content = args.content
         const media = args.media
-        const hashtags = args.hashtags
+
         const token = await getToken()
         let formData = new FormData()
         if (content)
             formData.append("content", content)
 
-        if (hashtags && hashtags.length > 0) {
-            hashtags.forEach((tag, index) => {
-                formData.append("hashtags", tag)
-            })
-        }
         if (media && media.length > 0) {
             media.forEach((tag, index) => {
                 formData.append("media", tag)
@@ -54,12 +48,11 @@ export const createPost = async ({ args }: { args: CreatePostArgs }) => {
             throw new Error(uploadPostResponse.data)
     }
     catch (err: any) {
-        console.log(err)
-        throw new Error(err)
+        throw new Error(err?.response?.data)
     }
 }
 
-export const createRepost = async (postId: string, content?: string, hashtags?: string[]) => {
+export const createRepost = async (postId: string, content?: string) => {
     try {
 
         const token = await getToken()
@@ -69,11 +62,7 @@ export const createRepost = async (postId: string, content?: string, hashtags?: 
 
         formData.append("is_repost", "true")
         formData.append("postId", postId)
-        if (hashtags && hashtags.length > 0) {
-            hashtags.forEach((tag, index) => {
-                formData.append("hashtags", tag)
-            })
-        }
+        
         const uploadPostResponse = await axios.post(BASE_URL + "posts",
             formData,
             {
@@ -90,7 +79,7 @@ export const createRepost = async (postId: string, content?: string, hashtags?: 
             throw new Error(uploadPostResponse.data)
     }
     catch (err: any) {
-        throw new Error(err)
+        throw new Error(err?.response?.data)
     }
 }
 
@@ -125,13 +114,11 @@ export const fetchPosts = async ({
             return response.data
         }
         else {
-            // console.log(response.data)
-            throw Error(JSON.stringify(response.data))
+            throw new Error(response.data)
         }
     }
-    catch (err) {
-        console.log(err)
-        throw Error(JSON.stringify(err))
+    catch (err: any) {
+        throw new Error(err?.response?.data)
     }
 }
 
@@ -159,7 +146,6 @@ export const fetchPostsByUser = async ({
             query += `&post_type=Repost`;
         }
 
-        console.log(query)
         const response = await axios.get(query, {
             headers: {
                 "Content-Type": "application/json",
@@ -170,17 +156,13 @@ export const fetchPostsByUser = async ({
             return response.data
         }
         else {
-            // console.log(response.data)
-            throw Error(JSON.stringify(response.data))
+            throw new Error(response.data)
         }
     }
-    catch (err) {
-        console.log(err)
-        throw Error(JSON.stringify(err))
+    catch (err: any) {
+        throw new Error(err?.response?.data)
     }
 }
-
-
 export const likePost = async (postId: string) => {
     try {
         const token = await getToken()
@@ -195,11 +177,11 @@ export const likePost = async (postId: string) => {
             return response.data
         }
         else {
-            throw Error(JSON.stringify(response.data))
+            throw new Error(response.data)
         }
     }
-    catch (err) {
-        throw Error(JSON.stringify(err))
+    catch (err: any) {
+        throw new Error(err?.response?.data)
     }
 }
 
@@ -217,11 +199,11 @@ export const unLikePost = async (postId: string) => {
             return response.data
         }
         else {
-            throw Error(JSON.stringify(response.data))
+            throw new Error(response.data)
         }
     }
-    catch (err) {
-        throw Error(JSON.stringify(err))
+    catch (err: any) {
+        throw new Error(err?.response?.data)
     }
 }
 
@@ -244,7 +226,7 @@ export const commentPost = async (postId: string, content: string) => {
         }
     }
     catch (err: any) {
-        throw new Error(err)
+        throw new Error(err?.response?.data)
     }
 }
 
@@ -273,6 +255,6 @@ export const fetchComments = async (postId: string, pagesize: number = 10, offse
             throw new Error(response.data)
     }
     catch (err: any) {
-        throw new Error(err)
+        throw new Error(err?.response?.data)
     }
 }

@@ -203,7 +203,7 @@ export const FeedSlice = createSlice({
             state.LikeSuccess = true
             const refrence = [...state.Threads]
             const index = refrence.findIndex((item) => item._id == action.payload.postId)
-            if (index) {
+            if (index != -1) {
                 refrence[index].isLiked = true
                 refrence[index].likes++
             }
@@ -216,9 +216,10 @@ export const FeedSlice = createSlice({
             state.LikeSuccess = true
             const refrence = [...state.Threads]
             const index = refrence.findIndex((item) => item._id == action.payload.postId)
-            if(index)
-            refrence[index].isLiked = false
-            // refrence[index].likes--
+            if (index != -1) {
+                refrence[index].isLiked = false
+                refrence[index].likes--
+            }
             state.Threads = refrence
         })
     }

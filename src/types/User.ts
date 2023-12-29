@@ -19,7 +19,6 @@ export type UserResponse = User &
     token: string
 }
 
-
 export type SignUpArgsType = 
 {
     email: string,

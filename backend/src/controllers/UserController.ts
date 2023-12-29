@@ -14,6 +14,8 @@ import Like from "../models/Like";
 import { PostDocument } from "../types/Post";
 import Follower from "../models/Follower";
 import Reply from "../models/Reply";
+import { populate } from "dotenv";
+import { path } from "@ffprobe-installer/ffprobe";
 interface UpdateUserRequestBody {
     fullname?: string;
     bio?: string;
@@ -147,11 +149,13 @@ const updateUser = async (req: CustomRequest, res: Response) => {
         }
 
         const result = await User.updateOne({ _id: userId }, { $set: updateUser });
-        const user = await User.findById(userId).select("-password -top -token")
         if (result.modifiedCount > 0) {
+            const updatedUser = await User.findById(userId).select("-password -top -token")
+            if(updatedUser?.profile_picture)
+            updatedUser.profile_picture = await getSignedUrl(updatedUser?.profile_picture)
             res.status(200).json({
                 success: true,
-                user: user
+                user: updatedUser
                 , message: "successfully updated user"
             });
         } else {
@@ -224,16 +228,16 @@ const sendVerificationEmail = async (email: string, otp: string) => {
     })
 
     const mailOptions = {
-        from: "Threds app",
+        from: "Threads app",
         to: email,
         subject: "email verificaiton",
-        text: `here is the otp for varification ${otp} `
+        text: `here is the otp for verification ${otp} `
     }
     try {
         await transporter.sendMail(mailOptions)
     }
-    catch (err) {
-        console.log(JSON.stringify(err))
+    catch (err:any) {
+      throw new Error(err)
     }
 }
 
@@ -334,7 +338,7 @@ const getUserPosts = async (req: CustomRequest, res: Response) => {
         const post_type = req.query.post_type
         quary.user = userId
         if (lastOffset) {
-            quary._id = { $gt: new mongoose.Types.ObjectId(lastOffset) }
+            quary._id = { $lt: new mongoose.Types.ObjectId(lastOffset) }
 
         }
         if (post_type == "Repost") {
@@ -345,7 +349,7 @@ const getUserPosts = async (req: CustomRequest, res: Response) => {
             .populate<{ user: UserDocument }>({
                 path: "user",
                 select: "-password -token -otp",
-            }).populate<{ Repost: PostDocument, user: UserDocument }>({
+            }).populate<{ Repost: PostDocument & {user:UserDocument}}>({
                 path: "Repost",
                 populate: {
                     path: "user",
@@ -367,7 +371,7 @@ const getUserPosts = async (req: CustomRequest, res: Response) => {
                     mediaFile.thumbnail = await getSignedUrl(mediaFile.thumbnail);
                 }
             }
-            const exist_liked = await Like.exists({ userId: userId, postId: post._id });
+            const exist_liked = await Like.exists({ user: userId, post: post._id });
             const isLiked = exist_liked != null;
             post.isLiked = isLiked;
             //  return post
@@ -375,7 +379,7 @@ const getUserPosts = async (req: CustomRequest, res: Response) => {
 
         await Promise.all(userPosts.map(async (post, index: number) => {
             if (post.isRepost && post.Repost) {
-                const user = post.Repost.user as UserDocument
+                const user = post.Repost.user
                 const media = post.Repost.media
                 if (user.profile_picture) {
                     const key = user.profile_picture
@@ -418,29 +422,37 @@ const getLikedPosts = async (req: CustomRequest, res: Response) => {
         const pageSizeParam = req.query.pageSize as string;
         const pageSize = parseInt(pageSizeParam, 10) || 10;
 
-        const likedPosts = await Like.find({ userId: userId }).sort({ created_at: -1 });
-        const likedPostIds: mongoose.Types.ObjectId[] = likedPosts.map(post => post.postId);
+        quary.user = userId
 
-        quary._id = lastOffset
-            ? { $in: likedPostIds }
-            : { $in: likedPostIds };
-        const posts = await Post.find({ _id: { $in: likedPostIds } })
-            .sort({ _id: 1 })
+        if (lastOffset) {
+            quary._id = { $lt: new mongoose.Types.ObjectId(lastOffset) }
+        }
+
+        const likedPosts = await Like.find(quary).
+            sort({ created_at: -1, _id: 1 })
             .populate<{ user: UserDocument }>({
-                path: "user",
-                select: "-password -token -otp",
-            }).
-            populate<{ Repost: PostDocument }>({
-                path: "Repost",
-                populate: {
-                    path: "user",
-                    select: "-password -token -otp",
-                },
-            }).
-            limit(pageSize).lean()
+                path: 'user',
+                select: '-password -token -otp'
+            })
+            .populate<{ post: PostDocument & { user: UserDocument, Repost: PostDocument & { user: UserDocument } } }>({
+                path: 'post',
+                populate: [
+                    {
+                        path: 'user',
+                        select: '-password -token -otp',
+                    },
+                    {
+                        path: 'Repost',
+                        populate: {
+                            path: 'user',
+                            select: '-password -token -otp',
+                        },
+                    },
+                ],
+            })
+            .limit(pageSize)
 
-        console.log(posts)
-        let userPosts = posts
+        let userPosts = likedPosts.map(likePost=>likePost.post)
         const updatedUserPosts = await Promise.all(userPosts.map(async (post, index: number) => {
             const media = post.media;
             const user = post.user;
@@ -454,7 +466,6 @@ const getLikedPosts = async (req: CustomRequest, res: Response) => {
                 }
             }
             post.isLiked = true;
-            //  return post
         }));
 
         await Promise.all(userPosts.map(async (post, index: number) => {

@@ -44,7 +44,6 @@ const UserProfile = () => {
     const userId = route.params.userId
     const [posts, setPosts] = useState<Thread[]>([])
     const detailViewHeight = useRef<number>(0)
-    const [stickyHeader, setStickyHeader] = useState<boolean>(false)
     const [lastOffset, setLastOffset] = useState<string | null>(null)
     const navigation = useNavigation<compositeUserProfileRootNavigation>()
     const [selectedSection, setSelectedSection] = useState<"Threads" | "Reposts">("Threads")
@@ -133,9 +132,8 @@ const UserProfile = () => {
     }
     const getMorePosts = async () => {
         try {
-            if (!lastOffset)
-            {
-                console.log("last offset",lastOffset)
+            if (!lastOffset) {
+                console.log("last offset", lastOffset)
                 return null
             }
             setMoreLoading(true)
@@ -189,11 +187,11 @@ const UserProfile = () => {
         try {
             if (user.isFollowed) {
                 const response = await unFollowUser(userId)
-                setUser(prevUser => ({ ...prevUser, isFollowed: false }));
+                setUser(prevUser => ({ ...prevUser, isFollowed: false,followers:prevUser.followers-1 }));
             }
             else {
                 const response = await followUser(userId)
-                setUser(prevUser => ({ ...prevUser, isFollowed: true }));
+                setUser(prevUser => ({ ...prevUser, isFollowed: true,followers:prevUser.followers+1 }));
             }
         }
         catch (err) {
@@ -243,18 +241,9 @@ const UserProfile = () => {
                 {screenLoading && <Loader />}
                 <ScrollView
                     nestedScrollEnabled
+                    stickyHeaderHiddenOnScroll
+                    stickyHeaderIndices={[2]}
                     scrollEventThrottle={10}
-                    stickyHeaderIndices={stickyHeader ? [0] : []}
-                    onScroll={(e) => {
-                        if (e.nativeEvent.contentOffset.y > detailViewHeight.current) {
-                            if (!stickyHeader)
-                                setStickyHeader(true)
-                        }
-                        if (e.nativeEvent.contentOffset.y < detailViewHeight.current) {
-                            if (stickyHeader)
-                                setStickyHeader(false)
-                        }
-                    }}
                     refreshControl={
                         <RefreshControl
                             tintColor={theme.text_color}
@@ -264,28 +253,11 @@ const UserProfile = () => {
                     }
                     style={styles.scrollContainer}>
 
-                    {stickyHeader &&
-                        <View style={[styles.stickyContainer, {
-                            borderColor: theme.text_color,
-                            backgroundColor: theme.background_color,
-                        }]}>
-                            <View style={styles.stickyRowContainer}>
-                                <Image
-                                    source={user.profile_picture ? { uri: user.profile_picture } : placeholder_image}
-                                    style={styles.imageSticky}
-                                />
-                                <Text style={[styles.txtStickyFullname, {
-                                    color: theme.text_color,
-                                }]}>{user.fullname}</Text>
-                                <View />
-                            </View>
-                        </View>
-                    }
                     <View style={styles.headerContainer}>
-                        <FontAwesome5Icon
+                        <FontAwesome
                             onPress={() => navigation.goBack()}
                             name='angle-left'
-                            size={20}
+                            size={25}
                             color={theme.text_color}
                         />
                     </View>
@@ -320,46 +292,48 @@ const UserProfile = () => {
                             }]}>
                             <Text style={[styles.txtFollow, {
                                 color: user.isFollowed ? theme.text_color : theme.background_color
-                            }]}>{user.isFollowed ? "Follwing" : "Follow"}</Text>
+                            }]}>{user.isFollowed ? "Following" : "Follow"}</Text>
                         </TouchableOpacity>
                     </View>
-                    <View style={styles.optionContainer}>
-                        <TouchableOpacity
-                            onPress={() => onChangeField("Threads")}
-                            style={[styles.btnThreads, {
-                                borderBottomWidth: (selectedSection == "Threads") ? 1 : 0,
-                                borderColor: theme.text_color
-                            }]}
-                        >
-                            <Text style={{
-                                fontSize: 15,
-                                color: theme.text_color
-                            }}>Threads</Text>
-                        </TouchableOpacity>
-                        <TouchableOpacity
-                            onPress={() => onChangeField("Reposts")}
-                            style={[styles.btnReposts, {
-                                borderBottomWidth: (selectedSection == "Reposts") ? 1 : 0,
-                                borderColor: theme.text_color
-                            }]}
-                        >
-                            <Text style={{
-                                fontSize: 15,
-                                color: theme.text_color
-                            }}>Reposts</Text>
-                        </TouchableOpacity>
+                    <View style={{backgroundColor: theme.background_color}}>
+                        <View style={styles.optionContainer}>
+                            <TouchableOpacity
+                                onPress={() => onChangeField("Threads")}
+                                style={[styles.btnThreads, {
+                                    borderBottomWidth: (selectedSection == "Threads") ? 1 : 0,
+                                    borderColor: theme.text_color
+                                }]}
+                            >
+                                <Text style={{
+                                    fontSize: 15,
+                                    color: theme.text_color
+                                }}>Threads</Text>
+                            </TouchableOpacity>
+                            <TouchableOpacity
+                                onPress={() => onChangeField("Reposts")}
+                                style={[styles.btnReposts, {
+                                    borderBottomWidth: (selectedSection == "Reposts") ? 1 : 0,
+                                    borderColor: theme.text_color
+                                }]}
+                            >
+                                <Text style={{
+                                    fontSize: 15,
+                                    color: theme.text_color
+                                }}>Reposts</Text>
+                            </TouchableOpacity>
 
+                        </View>
                     </View>
                     <View>
                         <FlatList
                             data={posts}
-                            keyExtractor={item=>item._id}
-                            ListFooterComponent={()=> 
-                            moreLoading && <ActivityIndicator
-                            color={theme.text_color}
-                            size={"small"}
-                            animating
-                            />
+                            keyExtractor={item => item._id}
+                            ListFooterComponent={() =>
+                                moreLoading && <ActivityIndicator
+                                    color={theme.text_color}
+                                    size={"small"}
+                                    animating
+                                />
                             }
                             renderItem={({ item, index }) => renderPosts(item, index)}
                             onEndReached={() => getMorePosts()

@@ -19,6 +19,6 @@ export const searchUsers = async (term: string) => {
         }
     }
     catch (err: any) {
-        throw new Error(err)
+        throw new Error(err?.response?.data)
     }
 }

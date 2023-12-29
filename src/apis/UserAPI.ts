@@ -1,11 +1,8 @@
-import axios, { AxiosRequestConfig } from "axios";
+import axios from "axios";
 import { BASE_URL } from "../globals/constants";
-import { SignUpArgsType } from "../types/User";
-import AsyncStorage from "@react-native-async-storage/async-storage";
-const getToken = async () => {
-    const token = await AsyncStorage.getItem("token")
-    return token
-}
+import { SignUpArgsType, UpdateArgsType } from "../types/User";
+import { getToken } from "../globals/utilities";
+
 export const loginUser = async (email: string, password: string) => {
     try {
         email = email.toLowerCase()
@@ -15,11 +12,13 @@ export const loginUser = async (email: string, password: string) => {
             { headers: { 'Content-Type': 'application/json' } }
         );
 
-        console.log(response)
-        return response.data;
+        if(response.status == 200)
+        return response.data
+        else
+        throw new Error(response.data)
     }
     catch (error: any) {
-        throw "Error " + JSON.stringify(error)
+        throw new Error(error?.response?.data)
     }
 
 }
@@ -32,24 +31,32 @@ export const signUpUser = async (args: SignUpArgsType) => {
             { ...args },
             { headers: { 'Content-Type': 'application/json' } }
         )
-        console.log(response)
+        if(response.status == 200)
         return response.data
+        else
+        throw new Error(response.data)
     }
     catch (error: any) {
-        console.log(error)
-        throw error?.response?.data;
+        throw new Error(error?.response?.data)
     }
 }
 
-export const updateUser = async (args: any) => {
+export const updateUser = async (args: UpdateArgsType) => {
     try {
         const token = await getToken()
+
+        const formData = new FormData()
+        if (args.fullname)
+            formData.append("fullname", args.fullname)
+
+        if (args.bio)
+            formData.append("bio", args.bio)
+
+        if (args.profile_picture)
+            formData.append("profile_picture", args.profile_picture)
+
         const response = await axios.patch(BASE_URL + "users",
-            {
-                fullname: args.fullname,
-                profile_picture: args.profile_picture,
-                bio: args.bio
-            },
+            formData,
             {
                 headers: {
                     "Content-Type": "multipart/form-data",
@@ -62,12 +69,34 @@ export const updateUser = async (args: any) => {
             return response.data
         }
         else {
-            throw Error(JSON.stringify(response.data))
+           return response.data
         }
     }
     catch (err: any) {
-        console.log(JSON.stringify(err))
+       throw new Error(err?.response?.data)
 
+    }
+}
+
+export const verifyOtp = async (email: string, otp: string) => {
+    try {
+        const query = `${BASE_URL}verify`
+        const response = await axios.post(query, {
+            otp: otp,
+            email: email
+        }, {
+            headers: {
+                "Content-Type": "application/json"
+            }
+        })
+
+        if (response.status == 200)
+            return response.data
+        else
+            throw new Error(response.data)
+    }
+    catch (err: any) {
+        throw new Error(err?.response?.data)
     }
 }
 
@@ -98,13 +127,12 @@ export const fetchUserPosts = async ({
             return response.data
         }
         else {
-            // console.log(response.data)
-            throw Error(JSON.stringify(response.data))
+        
+            throw new Error(response.data)
         }
     }
-    catch (err) {
-        console.log(err)
-        throw Error(JSON.stringify(err))
+    catch (err:any) {
+        throw new Error(err?.response?.data)
     }
 }
 
@@ -122,13 +150,11 @@ export const deleteUserPost = async (postId: string) => {
             return response.data
         }
         else {
-            // console.log(response.data)
-            throw Error(JSON.stringify(response.data))
+            throw new Error(response.data)
         }
     }
-    catch (err) {
-        console.log(err)
-        throw Error(JSON.stringify(err))
+    catch (err:any) {
+        throw new Error(err?.response?.data)
     }
 }
 
@@ -150,46 +176,41 @@ export const fetchUserById = async (userId: string) => {
         }
     }
     catch (err: any) {
-        throw new Error(err)
+        throw new Error(err?.response?.data)
     }
 }
 
-export const getCurrentFollowings = async(pageSize:number=10,lastOffset?:string) =>
-{   
-    try
-    {
+export const getCurrentFollowings = async (pageSize: number = 10, lastOffset?: string) => {
+    try {
         let quary = `${BASE_URL}followers?pageSize=${pageSize}`
 
-        // if(lastOffset)
-        // {
-        //     quary = `${quary}&lastOffset=${lastOffset}`
-        // }
+        if(lastOffset)
+        {
+            quary = `${quary}&lastOffset=${lastOffset}`
+        }
         const token = await getToken()
-        const response = await axios.get(quary,{
-            headers:{
-                "Content-Type":"application/json",
+        const response = await axios.get(quary, {
+            headers: {
+                "Content-Type": "application/json",
                 token: token
             }
         })
 
-        if(response.status == 200)
-        return response.data
+        if (response.status == 200)
+            return response.data
         else
-        throw new Error(response.data)
+            throw new Error(response.data)
     }
-    catch(err:any)
-    {
-        throw new Error(err)
+    catch (err: any) {
+        throw new Error(err?.response?.data)
     }
 
 }
-export const followUser = async(userId:string) =>
-{   
-    try
-    {
+export const followUser = async (userId: string) => {
+    try {
         const token = await getToken()
         const quary = `${BASE_URL}followers/${userId}`
-        const response = await axios.post(quary,{},
+        const response = await axios.post(quary, {},
             {
                 headers: {
                     "Content-Type": "multipart/form-data",
@@ -197,21 +218,18 @@ export const followUser = async(userId:string) =>
                 },
             }
         )
-        if(response.status == 200)
-        return response.data
+        if (response.status == 200)
+            return response.data
         else
-        throw new Error(response.data)
+            throw new Error(response.data)
     }
-    catch(err:any)
-    {
-        throw new Error(err)
+    catch (err: any) {
+        throw new Error(err?.response?.data)
     }
 
 }
-export const unFollowUser = async(userId:string) =>
-{   
-    try
-    {
+export const unFollowUser = async (userId: string) => {
+    try {
         const token = await getToken()
         const quary = `${BASE_URL}followers/${userId}`
         const response = await axios.delete(quary,
@@ -222,14 +240,13 @@ export const unFollowUser = async(userId:string) =>
                 },
             }
         )
-        if(response.status == 200)
-        return response.data
+        if (response.status == 200)
+            return response.data
         else
-        throw new Error(response.data)
+            throw new Error(response.data)
     }
-    catch(err:any)
-    {
-        throw new Error(err)
+    catch (err: any) {
+        throw new Error(err?.response?.data)
     }
 
 }
@@ -237,7 +254,7 @@ export const unFollowUser = async(userId:string) =>
 export const fetchUserLikedPosts = async ({
     pageSize = 10,
     lastOffset,
-}: { pageSize: number, lastOffset?: string}) => {
+}: { pageSize: number, lastOffset?: string }) => {
     try {
         const token = await getToken()
 
@@ -256,20 +273,18 @@ export const fetchUserLikedPosts = async ({
             return response.data
         }
         else {
-            // console.log(response.data)
-            throw Error(JSON.stringify(response.data))
+            throw new Error(response.data)
         }
     }
-    catch (err) {
-        console.log(err)
-        throw Error(JSON.stringify(err))
+    catch (err:any) {
+        throw new Error(err?.response?.data)
     }
 }
 
 export const fetchUserRepliedPosts = async ({
     pageSize = 10,
     lastOffset,
-}: { pageSize: number, lastOffset?: string}) => {
+}: { pageSize: number, lastOffset?: string }) => {
     try {
         const token = await getToken()
 
@@ -288,20 +303,16 @@ export const fetchUserRepliedPosts = async ({
             return response.data
         }
         else {
-            // console.log(response.data)
-            throw Error(JSON.stringify(response.data))
+            throw new Error(response.data)
         }
     }
-    catch (err) {
-        console.log(err)
-        throw Error(JSON.stringify(err))
+    catch (err:any) {
+        throw new Error(err?.response?.data)
     }
 }
 
-export const deleteReply = async(replyId:string) =>
-{   
-    try
-    {
+export const deleteReply = async (replyId: string) => {
+    try {
         const token = await getToken()
         const quary = `${BASE_URL}replied_posts/${replyId}`
         const response = await axios.delete(quary,
@@ -312,14 +323,13 @@ export const deleteReply = async(replyId:string) =>
                 },
             }
         )
-        if(response.status == 200)
-        return response.data
+        if (response.status == 200)
+            return response.data
         else
-        throw new Error(response.data)
+            throw new Error(response.data)
     }
-    catch(err:any)
-    {
-        throw new Error(err)
+    catch (err: any) {
+        throw new Error(err?.response?.data)
     }
 
 }

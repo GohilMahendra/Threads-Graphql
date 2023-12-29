@@ -11,6 +11,8 @@ import {
 } from "react-native-image-picker"
 import { UpdateAction } from '../../redux/slices/UserSlice'
 import UseTheme from '../../globals/UseTheme'
+import Loader from '../../components/global/Loader'
+import { ScrollView } from 'react-native'
 const { height, width } = Dimensions.get("screen")
 const EditProfile = () => {
 
@@ -23,6 +25,7 @@ const EditProfile = () => {
         }
 
     const user = useSelector((state: RootState) => state.User.user)
+    const loading = useSelector((state: RootState) => state.User.loading)
     const image = user.profile_picture
     const name = user.fullname
     const user_bio = user.bio
@@ -70,7 +73,10 @@ const EditProfile = () => {
         <SafeAreaView style={[styles.container, {
             backgroundColor: theme.background_color
         }]}>
-            <View style={styles.innerContainer}>
+            {loading && <Loader/>}
+            <ScrollView 
+            contentContainerStyle={{flex:1}}
+            style={styles.innerContainer}>
                 <View style={styles.headerContainer}>
                     <View style={styles.headerInnerContainer}>
                         <AntDesign
@@ -87,7 +93,7 @@ const EditProfile = () => {
                         <Text style={{
                             fontSize: 18,
                             color: (user.profile_picture == ProfilePicture.uri &&
-                                user.fullname == fullname && user.bio == bio) ? "silver" : "black"
+                                user.fullname == fullname && user.bio == bio) ? "silver" : theme.text_color
                         }}>Done</Text>
                     </TouchableOpacity>
                 </View>
@@ -101,7 +107,8 @@ const EditProfile = () => {
                         />
                     </TouchableOpacity>
                     <View style={[styles.nameContainer, {
-                        backgroundColor: theme.secondary_background_color,
+                        backgroundColor: theme.secondary_background_color
+                        ,borderWidth:0.5
                     }]}>
                         <TextInput
                             autoCapitalize={"none"}
@@ -109,10 +116,10 @@ const EditProfile = () => {
                             onChangeText={text => setFullName(text)}
                             placeholderTextColor={theme.placeholder_color}
                             placeholder={"full name ..."}
-                            style={[styles.inputFullname, { color: theme.text_color }]}
+                            style={[styles.inputFullname, { color: theme.text_color}]}
                         />
                     </View>
-                    <View style={[styles.bioContainer, { backgroundColor: theme.secondary_background_color, }]}>
+                    <View style={[styles.bioContainer, { backgroundColor: theme.secondary_background_color, borderWidth:0.5}]}>
                         <TextInput
                             value={bio}
                             multiline={true}
@@ -126,7 +133,7 @@ const EditProfile = () => {
                         />
                     </View>
                 </View>
-            </View>
+            </ScrollView>
         </SafeAreaView>
     )
 }

@@ -10,11 +10,11 @@ import { UserDocument } from "../types/User";
 import { generateThumbnail } from "../utilities/Thumbnail";
 import { PostDocument } from "../types/Post";
 import Follower from "../models/Follower";
+import { extractHashtags } from "../utilities/Content";
 const createPost = async (req: CustomRequest, res: Response) => {
     try {
         const userId = req.userId
         const content = req.body.content
-        const hashtags = req.body.hashtags
         const is_repost = req.body.is_repost
         const postId = req.body.postId
 
@@ -29,6 +29,12 @@ const createPost = async (req: CustomRequest, res: Response) => {
                 message: "no content provided for post"
             })
         }
+        let hashTags:string[] = []
+        if(content)
+        {
+            hashTags = extractHashtags(content)
+        }
+
         type mediaType = {
             media_type: string,
             media_url: string,
@@ -57,7 +63,7 @@ const createPost = async (req: CustomRequest, res: Response) => {
             content: content,
             media: files,
             user: userId,
-            hashtags: hashtags,
+            hashtags: hashTags,
         })
         if (is_repost) {
             newPost.isRepost = is_repost
@@ -69,7 +75,6 @@ const createPost = async (req: CustomRequest, res: Response) => {
         })
     }
     catch (err) {
-        console.log(JSON.stringify(err))
         return res.status(500).json({
             message: "internal server error"
         })
@@ -108,8 +113,6 @@ const getPosts = async (req: CustomRequest, res: Response) => {
                 },
             }).
             limit(pageSize).lean()
-
-        console.log(posts)
         let userPosts = posts
         const updatedUserPosts = await Promise.all(userPosts.map(async (post, index: number) => {
             const media = post.media;
@@ -123,7 +126,7 @@ const getPosts = async (req: CustomRequest, res: Response) => {
                     mediaFile.thumbnail = await getSignedUrl(mediaFile.thumbnail);
                 }
             }
-            const exist_liked = await Like.exists({ userId: userId, postId: post._id });
+            const exist_liked = await Like.exists({ user: userId, post: post._id });
             const isLiked = exist_liked != null;
             post.isLiked = isLiked;
             //  return post
@@ -209,7 +212,7 @@ const getPostsByUser = async (req: CustomRequest, res: Response) => {
                     mediaFile.thumbnail = await getSignedUrl(mediaFile.thumbnail);
                 }
             }
-            const exist_liked = await Like.exists({ userId: userId, postId: post._id });
+            const exist_liked = await Like.exists({ user: userId, post: post._id });
             const isLiked = exist_liked != null;
             post.isLiked = isLiked;
 
@@ -265,13 +268,12 @@ const likePost = async (req: CustomRequest, res: Response) => {
                 })
             }
             const post = await Post.findById(postId)
-            console.log(post)
             if (!post) {
                 return res.status(404).json({
                     message: "not found the post"
                 })
             }
-            const existingLike = await Like.findOne({ userId: userId, postId });
+            const existingLike = await Like.findOne({ user: userId, post:postId });
             if (existingLike) {
                 return res.status(200).json({
                     message: "post is already liked by current user"
@@ -280,8 +282,8 @@ const likePost = async (req: CustomRequest, res: Response) => {
 
             post.likes++
             const newLike = new Like({
-                postId: postId,
-                userId: userId
+                post: postId,
+                user: userId
             })
             await newLike.save()
             await post.save()
@@ -318,11 +320,9 @@ const unLikePost = async (req: CustomRequest, res: Response) => {
                     message: "not found the post"
                 })
             }
-            const exist_liked = await Like.exists({ userId: userId, postId: postId })
-            console.log(exist_liked)
+            const exist_liked = await Like.exists({ user: userId, post: postId })
             const isLiked = exist_liked != null
             if (!isLiked) {
-                console.log("this part is called")
                 return res.status(200).json({
                     message: "post is already un-liked"
                 })
@@ -330,7 +330,7 @@ const unLikePost = async (req: CustomRequest, res: Response) => {
             if (post.likes > 0)
                 post.likes--
 
-            await Like.findOneAndDelete({ userId: userId, postId: postId })
+            await Like.findOneAndDelete({ user: userId, post: postId })
             await post.save()
 
             res.status(200).json({
@@ -448,7 +448,7 @@ const deletePost = async (req: CustomRequest, res: Response) => {
             })
         }
         await Reply.deleteMany({ post: postId });
-        await Like.deleteMany({ postId: postId })
+        await Like.deleteMany({ post: postId })
         await post.deleteOne()
         return res.status(200).json({
             message: "successfully delete the post"

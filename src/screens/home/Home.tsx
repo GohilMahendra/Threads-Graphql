@@ -21,6 +21,7 @@ const Home = () => {
   const { theme } = UseTheme()
   const posts = useSelector((state: RootState) => state.Feed.Threads)
   const loading = useSelector((state: RootState) => state.Feed.loading)
+  const lastOffset = useSelector((state: RootState) => state.Feed.lastOffset)
   const loadMoreloading = useSelector((state: RootState) => state.Feed.loadMoreLoading)
   const dispatch = useAppDispatch()
   const bottomSheetModalRef = useRef<BottomSheetModal>(null);
@@ -108,10 +109,10 @@ const Home = () => {
     }))
   }, [selectedField])
   return (
-    <GestureHandlerRootView style={styles.gestureContainer}>
       <SafeAreaView
         style={styles.container}
       >
+        <GestureHandlerRootView style={styles.gestureContainer}>
         <View style={[styles.contentContainer, { backgroundColor: theme.background_color }]}>
           <View style={[styles.selectionContainer]}>
             <TouchableOpacity
@@ -150,7 +151,7 @@ const Home = () => {
             data={posts}
             showsVerticalScrollIndicator={false}
             keyExtractor={(item, index) => index.toString()}
-            onEndReached={() => fetcchMorePosts()}
+            onEndReached={() =>lastOffset && fetcchMorePosts()}
             renderItem={({ item, index }) => renderPosts(item, index)}
             style={{
               flex: 1
@@ -215,16 +216,17 @@ const Home = () => {
               </View>
             </BottomSheetModal>
           </BottomSheetModalProvider>
-        </View>
+        </View>  
+        </GestureHandlerRootView>
       </SafeAreaView>
-    </GestureHandlerRootView>
+  
   )
 }
 export default Home
 const styles = StyleSheet.create({
   gestureContainer:
   {
-    flex: 1
+    flex: 1,
   },
   container:
   {
@@ -251,7 +253,8 @@ const styles = StyleSheet.create({
   },
   textForyou:
   {
-    fontSize: 15
+    fontSize: 15,
+    fontWeight:"bold"
   },
   btnFollowing:
   {
@@ -263,7 +266,8 @@ const styles = StyleSheet.create({
   },
   textFollowing:
   {
-    fontSize: 15
+    fontSize: 15,
+    fontWeight:"bold"
   },
   sheetComment:
   {

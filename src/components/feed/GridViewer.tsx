@@ -183,7 +183,8 @@ const style = StyleSheet.create({
     },
     image1x:
     {
-        height: 200,
+        // height: 200,
+        aspectRatio: 1,
         borderRadius: 15,
         width: "100%"
     },
@@ -205,6 +206,7 @@ const style = StyleSheet.create({
     },
     btnimage3x1st:
     {
+        aspectRatio: 1,
         width: "50%",
         margin: 2
     },

@@ -7,8 +7,12 @@ import { NavigationProp, useNavigation } from '@react-navigation/native';
 import { AuthStackType } from '../../navigations/AuthStack';
 import { signUpUser } from '../../apis/UserAPI';
 import UseTheme from '../../globals/UseTheme';
+import { useSelector } from 'react-redux';
+import { RootState } from '../../redux/store';
+import Loader from '../../components/global/Loader';
 const { height, width } = Dimensions.get("screen")
 const SignUp = () => {
+    const loading = useSelector((state:RootState)=>state.User.loading)
     const [email, setEmail] = useState("")
     const [password, setPassword] = useState("")
     const [rePassword, setRePassword] = useState("")
@@ -38,6 +42,7 @@ const SignUp = () => {
     }
     return (
         <SafeAreaView style={[styles.container, { backgroundColor: theme.background_color }]}>
+            {loading && <Loader/>}
             <ScrollView
                 contentContainerStyle={styles.containerView}
                 style={styles.scrollContainer}>

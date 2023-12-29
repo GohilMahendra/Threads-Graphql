@@ -1,6 +1,6 @@
 
 import React, { useEffect, useRef, useState } from "react";
-import { Dimensions, View, TextInput, Image, FlatList, TouchableOpacity, RefreshControl, KeyboardAvoidingView, Platform } from "react-native";
+import { Dimensions, View, TextInput, Image, FlatList, TouchableOpacity, RefreshControl, KeyboardAvoidingView, Platform, ActivityIndicator } from "react-native";
 import { timeDifference } from "../../globals/utilities";
 import { Comment } from "../../types/Comment";
 import { placeholder_image } from "../../globals/asstes";
@@ -12,6 +12,7 @@ import { commentPostAction, getCommentsAction, getMoreCommentsAction } from "../
 import { StyleSheet } from "react-native";
 import UseTheme from "../../globals/UseTheme";
 import Loader from "../global/Loader";
+import ReplyViewItem from "./ReplyViewItem";
 const { height, width } = Dimensions.get("screen")
 
 type ReplyPropTypes =
@@ -22,7 +23,7 @@ const Replies = (props: ReplyPropTypes) => {
 
     const { postId } = props
     const comments = useSelector((state: RootState) => state.Reply.comments)
-    const inputRef = useRef<TextInput|null>(null)
+    const inputRef = useRef<TextInput | null>(null)
     const loading = useSelector((state: RootState) => state.Reply.loading)
     const screeenLoading = useSelector((state: RootState) => state.Reply.screeenLoading)
     const error = useSelector((state: RootState) => state.Reply.error)
@@ -32,64 +33,9 @@ const Replies = (props: ReplyPropTypes) => {
     const { theme } = UseTheme()
     const User = useSelector((state: RootState) => state.User.user)
     const dispath = useAppDispatch()
-    const commentRenderItem = (comment: Comment, index: number) => {
-        return (
-            <View
-                key={comment._id}
-                style={{
-                    flexDirection: "row",
-                    padding: 10,
-                    elevation: 10,
-                    //  alignItems: "center",
-                    borderBottomWidth: 1,
-                    borderColor: theme.secondary_text_color
-                }}>
-                <Image
-                    source={comment.user.profile_picture ?
-                        { uri: comment.user.profile_picture } :
-                        placeholder_image
-                    }
-                    style={{
-                        height: 30,
-                        width: 30,
-                        alignItems: "flex-start",
-                        borderRadius: 30,
-                        marginRight: 20
-                    }}
-                />
-                <View style={{
-                    width: "80%",
-                }}>
-                    <View style={{
-                        flexDirection: 'row',
-                        width: "100%",
-                        alignItems: 'center',
-                        justifyContent: 'space-between'
-                    }}>
-                        <Text style={{
-                            fontSize: 15,
-                            fontWeight: "500",
-                            color: theme.text_color
-                        }}>{comment.user.fullname}</Text>
-                        <View style={{
-                            flexDirection: 'row'
-                        }}>
-                            <Text style={{
-                                color: "silver"
-                            }}>{timeDifference(comment.created_at)}</Text>
-                        </View>
-                    </View>
-                    <Text style={{ color: theme.text_color }}>{comment.content}</Text>
-                </View>
-
-            </View>
-        )
-    }
-
-    const onComment = async() =>
-    {
-        if(!comment)
-        return null
+    const onComment = async () => {
+        if (!comment)
+            return null
 
         dispath(commentPostAction({
             content: comment,
@@ -103,17 +49,25 @@ const Replies = (props: ReplyPropTypes) => {
             postId
         }))
     }
+    const commentRenderItem = (comment: Comment, index: number) => {
+        return (
+           <ReplyViewItem
+           comment={comment}
+           onPress={(userId)=>console.log(userId)}
+           />
+        )
+    }
     useEffect(() => {
         inputRef.current?.focus()
         getComments()
     }, [])
 
     return (
-        <KeyboardAvoidingView 
-        behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
-        style={[styles.container, { backgroundColor: theme.secondary_background_color }]}>
+        <KeyboardAvoidingView
+            behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
+            style={[styles.container, { backgroundColor: theme.secondary_background_color }]}>
             {/* list containing replies */}
-            {screeenLoading && <Loader/>}
+            {screeenLoading && <Loader />}
             <View style={styles.header}>
                 <Text style={[styles.headerText, { color: theme.text_color }]}>Comments</Text>
             </View>
@@ -138,6 +92,14 @@ const Replies = (props: ReplyPropTypes) => {
                 style={{
                     flex: 1,
                 }}
+                ListFooterComponent={() =>
+                    loadMoreLoading &&
+                    <ActivityIndicator
+                        animating
+                        color={theme.text_color}
+                        size={"small"}
+                    />
+                }
                 data={comments}
                 renderItem={({ item, index }) => commentRenderItem(item, index)}
                 keyExtractor={(item, index) => index.toString()}
@@ -150,7 +112,7 @@ const Replies = (props: ReplyPropTypes) => {
                 />
                 <View style={[styles.commentRowContainer, { backgroundColor: theme.background_color }]}>
                     <TextInput
-                        ref = {ref=>inputRef.current = ref}
+                        ref={ref => inputRef.current = ref}
                         multiline
                         value={comment}
                         onChangeText={(text) => setComment(text)}
@@ -207,9 +169,9 @@ const styles = StyleSheet.create({
     {
         position: 'absolute',
         bottom: 100,
-      // top:"70%",
+        // top:"70%",
 
-       paddingVertical:10,
+        paddingVertical: 10,
         borderRadius: 10,
         justifyContent: 'center',
         flexDirection: 'row',
@@ -226,7 +188,7 @@ const styles = StyleSheet.create({
     commentRowContainer:
     {
         borderRadius: 10,
-        maxHeight:200,
+        maxHeight: 200,
         flexDirection: "row",
         alignItems: "center",
         justifyContent: "space-between",

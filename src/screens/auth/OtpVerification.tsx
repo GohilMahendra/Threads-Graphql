@@ -1,15 +1,18 @@
 import React, { useRef, useState } from 'react'
 import { View, Text, SafeAreaView, Dimensions, TextInput, TouchableOpacity, StyleSheet } from 'react-native'
-import { NavigationProp, RouteProp, useNavigation, useRoute } from '@react-navigation/native';
+import { NavigationProp, RouteProp, CommonActions, useNavigation, useRoute } from '@react-navigation/native';
 import { AuthStackType } from '../../navigations/AuthStack';
-import FontAwesome5Icon from 'react-native-vector-icons/FontAwesome5';
+import FontAwesome from 'react-native-vector-icons/FontAwesome';
 import axios from 'axios';
 import { BASE_URL } from '../../globals/constants';
+import { useAppDispatch } from '../../redux/store';
+import { verifyOtpUserAction } from '../../redux/slices/UserSlice';
 const OtpVerification = () => {
     const [otp, setOtp] = useState<string>("")
     const [otpArrary, setOtpArray] = useState(["", "", "", "", "", ""])
     const route = useRoute<RouteProp<AuthStackType, "OtpVerification">>()
     const email = "mpgohilse@gmail.com"
+    const dispatch = useAppDispatch()
     const otpRef = useRef<any[]>([])
     const navigation = useNavigation<NavigationProp<AuthStackType, "OtpVerification">>()
     const changeOTP = (value: string, index: number) => {
@@ -46,25 +49,18 @@ const OtpVerification = () => {
     }
 
     const verifyOtp = async () => {
-        try {
-            const regex = /^[0-9]+$/;
-            if (otp.length != 6 || !regex.test(otp)) {
-                return
-            }
-            console.log(email, otp)
-
-            const result = await axios.post(`${BASE_URL}verify`, {
-                headers: { 'Content-Type': 'application/json' },
-                body: {
-                    email: email,
-                    otp: otp
-                }
+        const fullfilled = await dispatch(verifyOtpUserAction({
+            email: email,
+            otp: otp
+        }))
+        if(verifyOtpUserAction.fulfilled.match(fullfilled))
+        {
+            navigation.dispatch({
+                ...CommonActions.reset({
+                    index: 0,
+                    routes: [{ name: 'AuthStack' }],
+                }),
             })
-            console.log(result.data)
-            navigation.navigate("SignIn")
-        }
-        catch (err) {
-            console.log(JSON.stringify(err))
         }
     }
 
@@ -72,13 +68,13 @@ const OtpVerification = () => {
     return (
         <SafeAreaView style={styles.container}>
             <View style={styles.headerContainer}>
-                <FontAwesome5Icon
+                <FontAwesome
                     onPress={() => navigation.goBack()}
                     name='angle-left'
                     color={"black"}
-                    size={20}
+                    size={25}
                 />
-                <Text style={styles.txtHeader}>otp verification</Text>
+                <Text style={styles.txtHeader}>OTP Verification</Text>
                 <View />
             </View>
             <View style={styles.otpContainer}>
@@ -119,6 +115,7 @@ const styles = StyleSheet.create({
     headerContainer:
     {
         flexDirection: 'row',
+        alignItems:"center",
         justifyContent: 'space-between',
         padding: 10
     },

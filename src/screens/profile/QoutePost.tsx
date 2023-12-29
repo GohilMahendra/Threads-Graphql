@@ -3,7 +3,7 @@ import {
     SafeAreaView, TouchableOpacity, Dimensions, KeyboardAvoidingView, Platform, ScrollView, StyleSheet
 } from 'react-native'
 import React, { useState } from 'react'
-import FontAwesome5Icon from 'react-native-vector-icons/FontAwesome5'
+import FontAwesome from 'react-native-vector-icons/FontAwesome'
 import AntDesign from 'react-native-vector-icons/AntDesign'
 import { placeholder_image } from '../../globals/asstes'
 import { useSelector } from 'react-redux';
@@ -32,6 +32,9 @@ const QoutePost = () => {
             postId: postId,
             content: content
         }))
+        if (createRepostAction.fulfilled.match(fullfilled)) {
+            navigation.goBack()
+        }
     }
     return (
         <SafeAreaView style={[styles.container, {
@@ -43,9 +46,9 @@ const QoutePost = () => {
                 style={styles.avoidingView}>
                 {/* header starts*/}
                 <View style={styles.headerContainer}>
-                    <FontAwesome5Icon
+                    <AntDesign
                         onPress={() => navigation.goBack()}
-                        name='angle-left'
+                        name='close'
                         size={20}
                         color={theme.text_color}
                     />
