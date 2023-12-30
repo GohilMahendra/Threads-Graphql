@@ -27,7 +27,7 @@ const followUser = async(req:CustomRequest,res:Response) =>
           });
         }
      
-        const isCurrentFollowedAleady =await Follower.findOne({follower:currentUserId},{following:followedUserId})
+        const isCurrentFollowedAleady =await Follower.findOne({follower:currentUserId,following:followedUserId})
 
         if(isCurrentFollowedAleady)
         {
@@ -37,7 +37,7 @@ const followUser = async(req:CustomRequest,res:Response) =>
         }
 
         await User.findByIdAndUpdate(currentUserId, { $inc: { following: 1 } });
-        await User.findByIdAndUpdate(followedUserId, { $inc: { following: 1 } });
+        await User.findByIdAndUpdate(followedUserId, { $inc: { followers: 1 } });
     
         const newFollower = new Follower({
             follower: currentUserId,
@@ -178,7 +178,7 @@ const unFollowUser = async(req:CustomRequest,res:Response) =>
           });
         }
      
-        const isCurrentFollowedAleady =await Follower.findOne({follower:currentUserId},{following:followedUserId})
+        const isCurrentFollowedAleady =await Follower.findOne({follower:currentUserId,following:followedUserId})
 
         if(!isCurrentFollowedAleady)
         {

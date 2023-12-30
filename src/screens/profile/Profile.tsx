@@ -15,6 +15,7 @@ import { GestureHandlerRootView } from 'react-native-gesture-handler'
 import UseTheme from '../../globals/UseTheme'
 import ProfileRepost from '../../components/profile/ProfileRepost'
 import Loader from '../../components/global/Loader'
+import { scaledFont } from '../../globals/utilities'
 const { height, width } = Dimensions.get("window")
 const Profile = () => {
 
@@ -91,14 +92,14 @@ const Profile = () => {
             <AntDesign
               //onPress={() => navigation.navigate("Settings")}
               name='instagram'
-              size={25}
+              size={scaledFont(25)}
               color={theme.text_color}
               style={{ marginRight: 10 }}
             />
             <AntDesign
               onPress={() => navigation.navigate("Settings")}
               name='bars'
-              size={25}
+              size={scaledFont(25)}
               color={theme.text_color}
             />
           </View>
@@ -107,7 +108,8 @@ const Profile = () => {
               <View>
                 <Text style={[styles.txtFullname, { color: theme.text_color }]}>{user.fullname}</Text>
                 <Text style={{
-                  color: theme.text_color
+                  color: theme.text_color,
+                  fontSize:scaledFont(15)
                 }}>{user.username}</Text>
               </View>
               <Image
@@ -115,8 +117,8 @@ const Profile = () => {
                 style={styles.imgProfile}
               />
             </View>
-            <Text style={{ color: theme.text_color }} ellipsizeMode="tail" numberOfLines={10}>{user.bio}</Text>
-            <Text style={{ color: theme.text_color, marginTop: 20 }}>{user.followers} Followers</Text>
+            <Text style={{ color: theme.text_color,fontSize:scaledFont(13) }} ellipsizeMode="tail" numberOfLines={10}>{user.bio}</Text>
+            <Text style={{ color: theme.secondary_text_color, marginTop: 20,fontSize:scaledFont(12) }}>{user.followers} Followers</Text>
           </View>
           <View style={[styles.selectionSticky, {
             backgroundColor: theme.background_color
@@ -130,7 +132,7 @@ const Profile = () => {
                 }]}
               >
                 <Text style={{
-                  fontSize: 15,
+                  fontSize: scaledFont(15),
                   color: theme.text_color
                 }}>Threads</Text>
               </TouchableOpacity>
@@ -142,7 +144,7 @@ const Profile = () => {
                 }]}
               >
                 <Text style={{
-                  fontSize: 15,
+                  fontSize: scaledFont(15),
                   color: theme.text_color
                 }}>Reposts</Text>
               </TouchableOpacity>
@@ -218,14 +220,14 @@ const styles = StyleSheet.create({
   },
   txtFullname:
   {
-    fontSize: 20,
+    fontSize: scaledFont(20),
     fontWeight: "bold",
   },
   imgProfile:
   {
-    height: 70,
-    width: 70,
-    borderRadius: 70
+    height: scaledFont(70),
+    width: scaledFont(70),
+    borderRadius: scaledFont(70)
   },
   selectionRowContainer:
   {
@@ -282,7 +284,7 @@ const styles = StyleSheet.create({
   txtDelete:
   {
     color: "red",
-    fontSize: 15,
+    fontSize: scaledFont(15),
     fontWeight: "bold"
   },
   sheetHandle:

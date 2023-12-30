@@ -7,6 +7,7 @@ import axios from 'axios';
 import { BASE_URL } from '../../globals/constants';
 import { useAppDispatch } from '../../redux/store';
 import { verifyOtpUserAction } from '../../redux/slices/UserSlice';
+import { scaledFont } from '../../globals/utilities';
 const OtpVerification = () => {
     const [otp, setOtp] = useState<string>("")
     const [otpArrary, setOtpArray] = useState(["", "", "", "", "", ""])
@@ -71,7 +72,7 @@ const OtpVerification = () => {
                     onPress={() => navigation.goBack()}
                     name='angle-left'
                     color={"black"}
-                    size={25}
+                    size={scaledFont(25)}
                 />
                 <Text style={styles.txtHeader}>OTP Verification</Text>
                 <View />
@@ -120,7 +121,7 @@ const styles = StyleSheet.create({
     },
     txtHeader:
     {
-        fontSize: 20,
+        fontSize: scaledFont(20),
         fontWeight: "bold",
         color: "black"
     },
@@ -138,12 +139,12 @@ const styles = StyleSheet.create({
     },
     inputOtp:
     {
-        fontSize: 18,
-        height: 50,
+        fontSize: scaledFont(18),
+        height: scaledFont(50),
         backgroundColor: "#E5E5E5",
         alignSelf: "center",
         textAlign: "center",
-        width: 50,
+        width: scaledFont(50),
         borderRadius: 15,
         color: "black",
         fontWeight: "bold",

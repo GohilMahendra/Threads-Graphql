@@ -18,7 +18,7 @@ const PostViewItem = (props: PostItemsProps) => {
     const { theme } = UseTheme()
 
     return (
-        <View style={[styles.container, { backgroundColor: theme.secondary_color, }]}>
+        <View style={[styles.container,{borderColor: theme.secondary_text_color }]}>
             <View style={styles.rowContaniner}>
                 <View style={styles.profileContainer}>
                     <View
@@ -81,6 +81,8 @@ const styles = StyleSheet.create({
         borderRadius: 15,
         alignSelf: 'center',
         margin: 10,
+        borderWidth:0.3,
+
     },
     rowContaniner:
     {

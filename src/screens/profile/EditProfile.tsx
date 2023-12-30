@@ -13,6 +13,7 @@ import { UpdateAction } from '../../redux/slices/UserSlice'
 import UseTheme from '../../globals/UseTheme'
 import Loader from '../../components/global/Loader'
 import { ScrollView } from 'react-native'
+import { scaledFont } from '../../globals/utilities'
 const { height, width } = Dimensions.get("screen")
 const EditProfile = () => {
 
@@ -81,7 +82,7 @@ const EditProfile = () => {
                         <AntDesign
                             onPress={() => navigation.goBack()}
                             name='close'
-                            size={20}
+                            size={scaledFont(20)}
                             color={theme.text_color}
                         />
                         <Text style={[styles.txtHeader, { color: theme.text_color }]}>Edit Profile</Text>
@@ -90,7 +91,7 @@ const EditProfile = () => {
                         onPress={() => updateProfile()}
                     >
                         <Text style={{
-                            fontSize: 18,
+                            fontSize: scaledFont(18),
                             color: (user.profile_picture == ProfilePicture.uri &&
                                 user.fullname == fullname && user.bio == bio) ? "silver" : theme.text_color
                         }}>Done</Text>
@@ -162,7 +163,7 @@ const styles = StyleSheet.create({
     },
     txtHeader:
     {
-        fontSize: 18,
+        fontSize: scaledFont(18),
         marginLeft: 30,
     },
     editContainer:
@@ -178,9 +179,9 @@ const styles = StyleSheet.create({
     },
     imageUser:
     {
-        height: 70,
-        width: 70,
-        borderRadius: 70
+        height: scaledFont(70),
+        width: scaledFont(70),
+        borderRadius: scaledFont(70)
     },
     nameContainer:
     {
@@ -207,7 +208,7 @@ const styles = StyleSheet.create({
     {
         flex: 1,
         textAlignVertical: "top",
-        padding: 5,
-        height: 150
+        padding: scaledFont(5),
+        height: scaledFont(150)
     }
 })

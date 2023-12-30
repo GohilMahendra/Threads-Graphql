@@ -5,6 +5,7 @@ import { placeholder_image } from "../../globals/asstes";
 import UseTheme from "../../globals/UseTheme";
 import { useAppDispatch } from "../../redux/store";
 import { followUserAction, unFollowUserAction } from "../../redux/actions/FavoriteActions";
+import { scaledFont } from "../../globals/utilities";
 type UserItemProps =
   {
     user: User,
@@ -68,19 +69,19 @@ const styles = StyleSheet.create({
   },
   imageUser:
   {
-    height: 40,
+    height: scaledFont(40),
     backgroundColor: "transparent",
-    width: 40,
+    width: scaledFont(40),
     marginRight: 20,
-    borderRadius: 40
+    borderRadius: scaledFont(40)
   },
   txtFullname:
   {
-    fontSize: 18,
+    fontSize: scaledFont(18),
   },
   txtUsername:
   {
-    fontSize: 15
+    fontSize: scaledFont(15)
   },
   btnFollow:
   {

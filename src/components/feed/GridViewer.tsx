@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import { View, Image, TouchableOpacity, StyleSheet, Modal } from "react-native";
-import { getMediaImage } from "../../globals/utilities";
+import { getMediaImage, scaledFont } from "../../globals/utilities";
 import { Media } from "../../types/Post";
 import Fontisto from "react-native-vector-icons/Fontisto";
 import FontAwesome5Icon from "react-native-vector-icons/FontAwesome5";
@@ -200,7 +200,7 @@ const style = StyleSheet.create({
     },
     image2x:
     {
-        height: 200,
+        height: scaledFont(200),
         borderRadius: 15,
         width: "100%",
     },
@@ -217,7 +217,7 @@ const style = StyleSheet.create({
     },
     image3x1st:
     {
-        height: 200,
+        height: scaledFont(200),
         borderRadius: 15,
         margin: 2,
         width: "100%"
@@ -228,7 +228,7 @@ const style = StyleSheet.create({
     },
     image3xRest:
     {
-        height: 100,
+        height: scaledFont(100),
         margin: 2,
         borderRadius: 15,
         width: "100%"
@@ -240,7 +240,7 @@ const style = StyleSheet.create({
     },
     image4x:
     {
-        height: 100,
+        height: scaledFont(100),
         borderRadius: 15,
         width: "100%"
     },

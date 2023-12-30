@@ -8,6 +8,7 @@ import { useSelector } from 'react-redux';
 import Loader from '../../components/global/Loader';
 import { composeteAuthRootStack } from '../../navigations/Types';
 import { applogo } from '../../globals/asstes';
+import { scaledFont } from '../../globals/utilities';
 const { height, width } = Dimensions.get("window")
 const SignIn = () => {
     const [email, setEmail] = useState("")
@@ -37,7 +38,7 @@ const SignIn = () => {
             />
             {error && <Text style={{
                 color:"red",
-                fontSize:18,
+                fontSize:scaledFont(18),
                 fontWeight:"bold"
             }}>{error}</Text>}
             <View style={[styles.inputContainer, { backgroundColor: theme.secondary_color, }]}>
@@ -90,8 +91,8 @@ const styles = StyleSheet.create({
     },
     imageLogo:
     {
-        height: 50,
-        width: 50,
+        height: scaledFont(50),
+        width: scaledFont(50),
         marginVertical: 10
     },
     inputContainer:
@@ -118,7 +119,7 @@ const styles = StyleSheet.create({
     },
     textSignIn:
     {
-        fontSize: 18,
+        fontSize: scaledFont(18),
         color: "white",
         fontWeight: "bold"
     },

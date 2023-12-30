@@ -2,14 +2,13 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import { NavigationProp, useNavigation, CompositeNavigationProp, useTheme } from '@react-navigation/native';
 import React, { useEffect } from 'react'
 import { SafeAreaView, StyleSheet, Text } from "react-native";
-import { RootStackType } from '../../navigations/RootStack';
-import { UserTabType } from '../../navigations/UserTab';
 import { useAppDispatch } from '../../redux/store';
 import { SignInAction } from '../../redux/slices/UserSlice';
 import { compositeRootUserTab } from '../../navigations/Types';
 import UseTheme from '../../globals/UseTheme';
 import { Image } from 'react-native';
 import { applogo } from '../../globals/asstes';
+import { scaledFont } from '../../globals/utilities';
 
 const SplashScreen = () => {
     const dispatch = useAppDispatch()
@@ -74,7 +73,7 @@ const styles = StyleSheet.create({
     },
     imageLogo:
     {
-        height: 100,
-        width: 100
+        height: scaledFont(100),
+        width: scaledFont(100)
     }
 })

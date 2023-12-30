@@ -1,7 +1,7 @@
 
 import React, { useEffect, useRef, useState } from "react";
 import { Dimensions, View, TextInput, Image, FlatList, TouchableOpacity, RefreshControl, KeyboardAvoidingView, Platform, ActivityIndicator } from "react-native";
-import { timeDifference } from "../../globals/utilities";
+import { scaledFont, timeDifference } from "../../globals/utilities";
 import { Comment } from "../../types/Comment";
 import { placeholder_image } from "../../globals/asstes";
 import { Text } from "react-native";
@@ -82,7 +82,8 @@ const Replies = (props: ReplyPropTypes) => {
                 ListEmptyComponent={() => !loading && comments.length == 0 ?
                     <View style={styles.emptyContainer}>
                         <Text style={{
-                            color: theme.text_color
+                            color: theme.text_color,
+                            fontSize: scaledFont(15)
                         }}>No comments to show !</Text>
                     </View> : null
                 }
@@ -155,7 +156,7 @@ const styles = StyleSheet.create({
     },
     headerText:
     {
-        fontSize: 18,
+        fontSize: scaledFont(18),
         color: "black",
         fontWeight: 'bold'
     },
@@ -180,14 +181,14 @@ const styles = StyleSheet.create({
     },
     imageUser:
     {
-        height: 30,
-        width: 30,
-        borderRadius: 30,
+        height: scaledFont(30),
+        width: scaledFont(30),
+        borderRadius: scaledFont(30),
         marginRight: 20
     },
     commentRowContainer:
     {
-        borderRadius: 10,
+        borderRadius: scaledFont(30),
         maxHeight: 200,
         flexDirection: "row",
         alignItems: "center",
@@ -199,12 +200,13 @@ const styles = StyleSheet.create({
         padding: 5,
         width: "70%",
         maxHeight: 200,
+        fontSize: scaledFont(12)
 
     },
     btnAddComment:
     {
-        height: 40,
-        width: 40,
+        height: scaledFont(30),
+        width: scaledFont(30),
         alignSelf: 'flex-end',
         alignItems: 'center',
         justifyContent: "center",

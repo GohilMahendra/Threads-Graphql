@@ -9,6 +9,7 @@ import UserItem from '../../components/search/UserItem'
 import UseTheme from '../../globals/UseTheme'
 import { NavigationProp, useNavigation } from '@react-navigation/native'
 import { SearchStackParams } from '../../navigations/SearchStack'
+import { scaledFont } from '../../globals/utilities'
 
 const Search = () => {
 
@@ -47,7 +48,7 @@ const Search = () => {
       >
         <AntDesign
           name='search1'
-          size={20}
+          size={scaledFont(20)}
           color={theme.placeholder_color}
         />
         <TextInput
@@ -88,8 +89,8 @@ const styles = StyleSheet.create({
   },
   inputSearch:
   {
-    fontSize: 15,
-    marginLeft: 20
+    fontSize: scaledFont(15),
+    marginLeft: scaledFont(20)
   },
   listContainer:
   {

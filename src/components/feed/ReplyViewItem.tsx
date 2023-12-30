@@ -5,7 +5,7 @@ import { Image } from "react-native-elements";
 import UseTheme from "../../globals/UseTheme";
 import { placeholder_image } from "../../globals/asstes";
 import { Text } from "react-native";
-import { timeDifference } from "../../globals/utilities";
+import { scaledFont, timeDifference } from "../../globals/utilities";
 
 type ReplyViewProps =
     {
@@ -56,8 +56,8 @@ const styles = StyleSheet.create({
     },
     imgUser:
     {
-        height: 30,
-        width: 30,
+        height: scaledFont(30),
+        width: scaledFont(40),
         alignItems: "flex-start",
         borderRadius: 30,
         marginRight: 20

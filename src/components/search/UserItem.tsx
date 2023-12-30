@@ -3,6 +3,7 @@ import { TouchableOpacity, Image, View, Text, StyleSheet } from "react-native"
 import { SearchUser } from "../../types/User"
 import { placeholder_image } from "../../globals/asstes";
 import UseTheme from "../../globals/UseTheme";
+import { scaledFont } from "../../globals/utilities";
 type UserItemProps =
   {
     user: SearchUser,
@@ -38,19 +39,19 @@ const styles = StyleSheet.create({
   },
   imgUser:
   {
-    height: 40,
+    height: scaledFont(40),
     backgroundColor: "transparent",
-    width: 40,
-    marginRight: 20,
-    borderRadius: 40
+    width: scaledFont(40),
+    marginRight: scaledFont(20),
+    borderRadius: scaledFont(40)
   },
   txtFullname:
   {
-    fontSize: 18,
+    fontSize: scaledFont(18),
   },
   txtUsername:
   {
-    fontSize: 15,
+    fontSize: scaledFont(15),
   }
 
 })

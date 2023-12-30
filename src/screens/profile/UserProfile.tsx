@@ -23,6 +23,7 @@ import { ProfileStacktype } from '../../navigations/ProfileStack'
 import { HomeStackParams } from '../../navigations/FeedStack'
 import { RootStackType } from '../../navigations/RootStack'
 import Loader from '../../components/global/Loader'
+import { scaledFont } from '../../globals/utilities'
 const { height, width } = Dimensions.get("screen")
 const UserProfile = () => {
     const [user, setUser] = useState<User>({
@@ -258,19 +259,19 @@ const UserProfile = () => {
                         <FontAwesome
                             onPress={() => navigation.goBack()}
                             name='angle-left'
-                            size={25}
+                            size={scaledFont(25)}
                             color={theme.text_color}
                         />
                         <View style={{flexDirection:"row"}}>
                         <AntDesign
                             name='instagram'
-                            size={25}
+                            size={scaledFont(25)}
                             color={theme.text_color}
                             style={{ marginRight: 10 }}
                         />
                         <AntDesign
                             name='bars'
-                            size={25}
+                            size={scaledFont(25)}
                             color={theme.text_color}
                         />
                         </View>
@@ -319,7 +320,7 @@ const UserProfile = () => {
                                 }]}
                             >
                                 <Text style={{
-                                    fontSize: 15,
+                                    fontSize: scaledFont(15),
                                     color: theme.text_color
                                 }}>Threads</Text>
                             </TouchableOpacity>
@@ -331,7 +332,7 @@ const UserProfile = () => {
                                 }]}
                             >
                                 <Text style={{
-                                    fontSize: 15,
+                                    fontSize: scaledFont(15),
                                     color: theme.text_color
                                 }}>Reposts</Text>
                             </TouchableOpacity>
@@ -485,13 +486,13 @@ const styles = StyleSheet.create({
     },
     imageSticky:
     {
-        height: 30,
-        width: 30,
-        borderRadius: 30
+        height: scaledFont(30),
+        width: scaledFont(30),
+        borderRadius: scaledFont(30)
     },
     txtStickyFullname:
     {
-        fontSize: 18,
+        fontSize: scaledFont(18),
     },
     headerContainer:
     {
@@ -510,14 +511,14 @@ const styles = StyleSheet.create({
     },
     txtUserFullname:
     {
-        fontSize: 20,
+        fontSize: scaledFont(20),
         fontWeight: "bold",
     },
     imgUserDetail:
     {
-        height: 70,
-        width: 70,
-        borderRadius: 70
+        height: scaledFont(70),
+        width: scaledFont(70),
+        borderRadius: scaledFont(70)
     },
     btnFollow:
     {
@@ -530,7 +531,7 @@ const styles = StyleSheet.create({
     },
     txtFollow:
     {
-        fontSize: 15,
+        fontSize: scaledFont(15),
         fontWeight: 'bold'
     },
     optionContainer:

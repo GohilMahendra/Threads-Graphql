@@ -7,6 +7,7 @@ import MaterialIcons from "react-native-vector-icons/MaterialIcons";
 import { useNavigation, CommonActions } from "@react-navigation/native";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { ProfileRootComposite } from "../../navigations/Types";
+import { scaledFont } from "../../globals/utilities";
 const Settings = () => {
     const { theme, setTheme } = UseTheme()
     const navigation = useNavigation<ProfileRootComposite>()
@@ -54,7 +55,7 @@ const Settings = () => {
                 <FontAwesome
                     onPress={() => navigation.goBack()}
                     name="angle-left"
-                    size={25}
+                    size={scaledFont(25)}
                     color={theme.text_color}
                 />
                 <Text style={[styles.txtSettings, { color: theme.text_color }]}>Settings</Text>
@@ -66,7 +67,7 @@ const Settings = () => {
                     style={styles.btnRowContainer}>
                     <Ionicons
                         name="person-circle"
-                        size={25}
+                        size={scaledFont(25)}
                         color={theme.text_color}
                     />
                     <Text style={[styles.textOption, { color: theme.text_color, }]}>Account</Text>
@@ -74,7 +75,7 @@ const Settings = () => {
                 <TouchableOpacity style={styles.btnRowContainer}>
                     <Ionicons
                         name="help-circle"
-                        size={25}
+                        size={scaledFont(25)}
                         color={theme.text_color}
                     />
                     <Text style={[styles.textOption, { color: theme.text_color, }]}>Help</Text>
@@ -82,7 +83,7 @@ const Settings = () => {
                 <TouchableOpacity style={styles.btnRowContainer}>
                     <Ionicons
                         name="information-circle-outline"
-                        size={25}
+                        size={scaledFont(25)}
                         color={theme.text_color}
                     />
                     <Text style={[styles.textOption, { color: theme.text_color, }]}>About</Text>
@@ -91,12 +92,13 @@ const Settings = () => {
                     <View style={{ flexDirection: "row", alignItems: "center" }}>
                         <MaterialIcons
                             name="dark-mode"
-                            size={25}
+                            size={scaledFont(25)}
                             color={theme.text_color}
                         />
                         <Text style={[styles.textOption, { color: theme.text_color, }]}>Dark Mode</Text>
                     </View>
                     <Switch
+                        
                         value={darkTheme}
                         onChange={() => changeTheme()}
                     />
@@ -106,7 +108,7 @@ const Settings = () => {
                     style={styles.btnRowContainer}>
                     <Ionicons
                         name="log-out"
-                        size={25}
+                        size={scaledFont(25)}
                         color={theme.text_color}
                     />
                     <Text style={[styles.textOption, { color: theme.text_color, }]}>Sign Out</Text>
@@ -131,12 +133,12 @@ const styles = StyleSheet.create({
     },
     txtSettings:
     {
-        fontSize: 20
+        fontSize: scaledFont(20)
     },
     optionsContainer:
     {
         flex: 1,
-        padding: 20
+        padding: scaledFont(20)
     },
     btnRowContainer:
     {
@@ -146,7 +148,7 @@ const styles = StyleSheet.create({
     },
     textOption:
     {
-        fontSize: 15,
+        fontSize: scaledFont(15),
         marginLeft: 20
     }
 })  

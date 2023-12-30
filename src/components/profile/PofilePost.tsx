@@ -4,7 +4,7 @@ import { View } from "react-native"
 import { placeholder_image } from "../../globals/asstes";
 import Entypo from "react-native-vector-icons/Entypo";
 import {  Thread } from "../../types/Post";
-import { timeDifference } from "../../globals/utilities";
+import { scaledFont, timeDifference } from "../../globals/utilities";
 import GridViewer from "../feed/GridViewer";
 import UseTheme from "../../globals/UseTheme";
 type PostItemsProps =
@@ -18,7 +18,27 @@ const PostItem = (props: PostItemsProps) => {
     const post = props.post
     const media = post.media
     const { theme } = UseTheme()
-
+    const renderBioWithPressableHashtags = (bioText: string | undefined) => {
+        if (!bioText) return null;
+      
+        const words = bioText.split(/\s+/);
+      
+        return (
+          <View style={{ marginVertical: 5, flexDirection: 'row', flexWrap: 'wrap' }}>
+            {words.map((word, index) => (
+              <React.Fragment key={index}>
+                {word.startsWith('#') ? (
+                  <TouchableOpacity onPress={() => console.log('Pressed:', word)}>
+                    <Text style={{ color: 'blue',fontSize:scaledFont(13), fontWeight: 'bold' }}>{word}</Text>
+                  </TouchableOpacity>
+                ) : (
+                  <Text style={{color: theme.text_color,fontSize:scaledFont(13)}}>{word}{' '}</Text>
+                )}
+              </React.Fragment>
+            ))}
+          </View>
+        );
+      };
     return (
         <View style={[styles.container,{ backgroundColor: theme.background_color,}]}>
             <View style={styles.rowContainer}>
@@ -45,15 +65,12 @@ const PostItem = (props: PostItemsProps) => {
                         <Entypo
                             onPress={()=>props.onPressThreeDots(post._id)}
                             name="dots-three-horizontal"
-                            size={18}
+                            size={scaledFont(18)}
                             color={theme.text_color}
                         />
                     </View>
                 </View>
-                <Text style={{
-                    color: theme.text_color,
-                    marginVertical:5
-                }}>{post.content}</Text>
+                {renderBioWithPressableHashtags(post.content)}
                 <GridViewer
                     media={media}
                 />
@@ -91,9 +108,9 @@ const styles = StyleSheet.create({
     },
     userImage:
     {
-        height: 50,
-        width: 50,
-        borderRadius: 50
+        height: scaledFont(50),
+        width: scaledFont(50),
+        borderRadius: scaledFont(50)
     },
     profileRode:
     {
@@ -114,12 +131,12 @@ const styles = StyleSheet.create({
     },
     txtFullname:
     {
-        fontSize: 18,
+        fontSize: scaledFont(18),
         fontWeight: "bold",
     },
     txtUsername:
     {
-        fontSize: 18,
+        fontSize: scaledFont(15),
         fontWeight:'bold'
     },
     rightProfileContainer:
@@ -130,7 +147,8 @@ const styles = StyleSheet.create({
     txtCreatedAt:
     {
         color: "silver",
-        marginRight: 10
+        marginRight: 10,
+        fontSize:scaledFont(13)
     },
     rowLikeComments:
     {
@@ -138,11 +156,11 @@ const styles = StyleSheet.create({
     },
     textComments:
     {
-        fontSize: 13,
+        fontSize: scaledFont(13),
         marginRight: 25
     },
     textLikes:
     {
-        fontSize: 13,
+        fontSize: scaledFont(13),
     }
 })

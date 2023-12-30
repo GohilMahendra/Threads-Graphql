@@ -16,6 +16,7 @@ import UseTheme from '../../globals/UseTheme'
 import { createRepostAction } from '../../redux/slices/UserSlice'
 import { useNavigation } from '@react-navigation/native'
 import { compositeRootHomeStack } from '../../navigations/Types'
+import { scaledFont } from '../../globals/utilities'
 const Home = () => {
   const navigation = useNavigation<compositeRootHomeStack>()
   const { theme } = UseTheme()
@@ -243,7 +244,7 @@ const styles = StyleSheet.create({
   },
   textForyou:
   {
-    fontSize: 15,
+    fontSize: scaledFont(15),
     fontWeight: "bold"
   },
   btnFollowing:
@@ -256,7 +257,7 @@ const styles = StyleSheet.create({
   },
   textFollowing:
   {
-    fontSize: 15,
+    fontSize: scaledFont(15),
     fontWeight: "bold"
   },
   sheetComment:

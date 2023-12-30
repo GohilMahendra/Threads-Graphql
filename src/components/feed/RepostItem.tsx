@@ -7,7 +7,7 @@ import Feather from "react-native-vector-icons/Feather";
 import AntDesign from "react-native-vector-icons/AntDesign";
 import Entypo from "react-native-vector-icons/Entypo";
 import { Thread } from "../../types/Post";
-import { timeDifference } from "../../globals/utilities";
+import { scaledFont, timeDifference } from "../../globals/utilities";
 import Animated, {
     useSharedValue,
     useAnimatedStyle,
@@ -52,6 +52,27 @@ const RepostItem = (props: PostItemsProps) => {
         else
             props.onLikeToggle(post._id, "like")
     }
+    const renderBioWithPressableHashtags = (bioText: string | undefined) => {
+        if (!bioText) return null;
+      
+        const words = bioText.split(/\s+/);
+      
+        return (
+          <View style={{ marginVertical: 5, flexDirection: 'row', flexWrap: 'wrap' }}>
+            {words.map((word, index) => (
+              <React.Fragment key={index}>
+                {word.startsWith('#') ? (
+                  <TouchableOpacity onPress={() => console.log('Pressed:', word)}>
+                    <Text style={{ color: 'blue',fontSize:scaledFont(13), fontWeight: 'bold' }}>{word}</Text>
+                  </TouchableOpacity>
+                ) : (
+                  <Text style={{color: theme.text_color,fontSize:scaledFont(13)}}>{word}{' '}</Text>
+                )}
+              </React.Fragment>
+            ))}
+          </View>
+        );
+      };
 
     return (
         <View style={[styles.container, { backgroundColor: theme.background_color, }]}>
@@ -78,12 +99,12 @@ const RepostItem = (props: PostItemsProps) => {
                         <Text style={styles.txtCreatedAt}>{timeDifference(post.created_at)}</Text>
                         <Entypo
                             name="dots-three-horizontal"
-                            size={18}
+                            size={scaledFont(18)}
                             color={theme.text_color}
                         />
                     </View>
                 </View>
-                <Text style={{color: theme.text_color,marginVertical:5}}>{post.content}</Text>
+               {renderBioWithPressableHashtags(post.content)}
                 {/* origional post container starts */}
                 <View style={[styles.postContainer, { borderColor: theme.text_color }]}>
                     <TouchableOpacity
@@ -104,7 +125,7 @@ const RepostItem = (props: PostItemsProps) => {
                         </View>
 
                     </TouchableOpacity>
-                    <Text style={{ color: theme.text_color }}>{post.Repost?.content}</Text>
+                    {renderBioWithPressableHashtags(post.content)}
                     <GridViewer
                         media={post.Repost?.media || []}
                     />
@@ -117,7 +138,7 @@ const RepostItem = (props: PostItemsProps) => {
                         <FontAwesome
                             onPress={() => toggeleLike()}
                             name={(post.isLiked) ? "heart" : "heart-o"}
-                            size={20}
+                            size={scaledFont(20)}
                             color={post.isLiked ? "red" : theme.text_color}
                         />
                     </Animated.View>
@@ -125,19 +146,19 @@ const RepostItem = (props: PostItemsProps) => {
                         onPress={() => props.onPressComment(post._id)}
                         name="comment-o"
                         style={{ marginRight: 20, marginLeft: 20 }}
-                        size={20}
+                        size={scaledFont(20)}
                         color={theme.text_color}
                     />
                     <AntDesign
                         onPress={() => props.onRepost(repost._id)}
                         name="retweet"
                         style={{ marginRight: 20 }}
-                        size={20}
+                        size={scaledFont(20)}
                         color={theme.text_color}
                     />
                     <Feather
                         name="send"
-                        size={20}
+                        size={scaledFont(20)}
                         color={theme.text_color}
                     />
                 </View>
@@ -166,9 +187,9 @@ const styles = StyleSheet.create({
     },
     imageProfile:
     {
-        height: 40,
-        width: 40,
-        borderRadius: 40
+        height: scaledFont(40),
+        width: scaledFont(40),
+        borderRadius: scaledFont(40)
     },
     rodeContainer:
     {
@@ -191,7 +212,7 @@ const styles = StyleSheet.create({
     },
     txtFullname:
     {
-        fontSize: 18,
+        fontSize: scaledFont(18),
         fontWeight: "bold",
     },
     rightRowProfileContainer:
@@ -202,7 +223,8 @@ const styles = StyleSheet.create({
     txtCreatedAt:
     {
         color: "silver",
-        marginRight: 20
+        marginRight: 20,
+        fontSize: scaledFont(15)
     },
     postContainer:
     {
@@ -218,14 +240,14 @@ const styles = StyleSheet.create({
     },
     imgPostProfile:
     {
-        height: 30,
-        width: 30,
-        borderRadius: 30,
+        height: scaledFont(30),
+        width: scaledFont(30),
+        borderRadius: scaledFont(30),
         marginRight: 15
     },
     profileTxtFullname:
     {
-        fontSize: 18,
+        fontSize: scaledFont(18),
     },
     actionsRowContainer:
     {

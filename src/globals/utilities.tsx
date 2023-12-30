@@ -1,6 +1,7 @@
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { Media } from "../types/Post";
-
+import {Dimensions} from "react-native"
+const {height,width} = Dimensions.get("window")
 export const timeDifference = (timestamp: string) => {
     const now = new Date();
     const time = new Date(timestamp);
@@ -46,4 +47,9 @@ export const extractTags = (contentText: string) => {
     const words = contentText.split(" ")
     const hastags = words.filter((item) => (item[0] == "#"))
     return hastags
+}
+export const scaledFont = (fontSize:number) =>
+{
+    const scaleFactor = width / 375; 
+    return Math.round(fontSize * scaleFactor);
 }

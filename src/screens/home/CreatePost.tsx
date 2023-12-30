@@ -17,6 +17,7 @@ import { RootStackType } from '../../navigations/RootStack';
 import { createPostAction } from '../../redux/slices/UserSlice';
 import { UploadMedia } from '../../types/Post';
 import { CHARACTER_LIMIT } from '../../globals/constants';
+import { scaledFont } from '../../globals/utilities'
 
 const CreatePost = () => {
 
@@ -83,7 +84,7 @@ const CreatePost = () => {
                     <AntDesign
                         onPress={() => navigation.goBack()}
                         name='close'
-                        size={20}
+                        size={scaledFont(20)}
                         color={theme.text_color}
                     />
                     <Text style={[styles.txtHeader, { color: theme.text_color }]}>Create Threads</Text>
@@ -114,7 +115,7 @@ const CreatePost = () => {
                             <AntDesign
                                 onPress={() => setContent("")}
                                 name='close'
-                                size={15}
+                                size={ scaledFont(15)}
                                 color={theme.text_color}
                             />
                         </View>
@@ -125,7 +126,7 @@ const CreatePost = () => {
                                     <MaterialIcons
                                         onPress={() => openImagePicker()}
                                         name='photo-library'
-                                        size={25}
+                                        size={ scaledFont(25)}
                                         color={theme.text_color}
                                     />
                                     :
@@ -145,7 +146,7 @@ const CreatePost = () => {
                                                 <AntDesign
                                                     onPress={() => removeItem(item.uri)}
                                                     name='close'
-                                                    size={15}
+                                                    size={scaledFont(15)}
                                                     color={"white"}
                                                 />
                                             </TouchableOpacity>
@@ -153,7 +154,7 @@ const CreatePost = () => {
                                                 style={styles.iconPlay}
                                                 name='play'
                                                 color={"white"}
-                                                size={15}
+                                                size={scaledFont(15)}
                                             />
                                             }
                                         </View>
@@ -189,7 +190,7 @@ const styles = StyleSheet.create({
     },
     txtHeader:
     {
-        fontSize: 15,
+        fontSize: scaledFont(15),
         textAlign: 'center'
     },
     btnPost:
@@ -203,7 +204,8 @@ const styles = StyleSheet.create({
     txtPost:
     {
         color: "white",
-        fontWeight: "bold"
+        fontWeight: "bold",
+        fontSize:scaledFont(15)
     },
     contentContainer:
     {
@@ -213,10 +215,10 @@ const styles = StyleSheet.create({
     },
     imgUser:
     {
-        height: 40,
-        width: 40,
-        borderRadius: 40,
-        marginRight: 10
+        height: scaledFont(40),
+        width:  scaledFont(40),
+        borderRadius:  scaledFont(40),
+        marginRight:  scaledFont(10)
     },
     rightContainer:
     {
@@ -234,6 +236,7 @@ const styles = StyleSheet.create({
         textAlignVertical: "top",
         maxHeight: 200,
         flex: 1,
+        fontSize: scaledFont(13),
         marginRight: 20
     },
     mediaContainer:
@@ -249,8 +252,8 @@ const styles = StyleSheet.create({
     },
     imageThumb:
     {
-        height: 70,
-        width: 70,
+        height: scaledFont(70),
+        width: scaledFont(70),
         borderRadius: 15
     },
     closeContainer:

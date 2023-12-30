@@ -2,7 +2,7 @@ import React from "react";
 import { StyleSheet, Text, View } from "react-native"
 import UseTheme from "../../globals/UseTheme"
 import { Comment } from "../../types/Comment";
-import { timeDifference } from "../../globals/utilities";
+import { scaledFont, timeDifference } from "../../globals/utilities";
 import { Image } from "react-native";
 import { placeholder_image } from "../../globals/asstes";
 
@@ -50,8 +50,8 @@ const styles = StyleSheet.create({
     },
     imgUser:
     {
-        height: 30,
-        width: 30,
+        height: scaledFont(30),
+        width: scaledFont(30),
         alignItems: "flex-start",
         borderRadius: 30,
         marginRight: 20

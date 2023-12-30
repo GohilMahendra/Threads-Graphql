@@ -7,7 +7,7 @@ import { useSelector } from "react-redux";
 import { RootState } from "../../redux/store";
 import { placeholder_image } from "../../globals/asstes";
 import UseTheme from "../../globals/UseTheme";
-import { timeDifference } from "../../globals/utilities";
+import { scaledFont, timeDifference } from "../../globals/utilities";
 import Entypo from "react-native-vector-icons/Entypo";
 type RepliedPostProps =
     {
@@ -53,23 +53,23 @@ const RepliedPost = (props: RepliedPostProps) => {
                     <Text style={{
                         color: theme.text_color,
                         fontWeight: "bold",
-                        fontSize: 18
+                        fontSize: scaledFont(18)
                     }}>{user.username}</Text>
                     <View style={styles.rightRowContainer}>
                         <Text style={{
                             color: theme.secondary_text_color,
-                            marginRight: 20
+                            marginRight: scaledFont(20)
                         }}>1h</Text>
                         <Entypo
                             onPress={() => props.onReplyThreeDots(commentPost._id)}
                             name="dots-three-horizontal"
-                            size={20}
+                            size={scaledFont(20)}
                             color={theme.text_color}
                         />
                     </View>
                 </View>
                 <Text style={{
-                    fontSize: 14,
+                    fontSize: scaledFont(14),
                     marginVertical: 5,
                     color: theme.text_color
                 }}>{commentPost.content}</Text>
@@ -94,8 +94,8 @@ const styles = StyleSheet.create({
     },
     imgUser:
     {
-        width: 30,
-        height: 30,
+        width: scaledFont(30),
+        height: scaledFont(30),
         borderRadius: 30,
     },
     rightContainer:

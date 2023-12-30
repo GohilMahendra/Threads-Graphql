@@ -7,7 +7,7 @@ import Feather from "react-native-vector-icons/Feather";
 import AntDesign from "react-native-vector-icons/AntDesign";
 import Entypo from "react-native-vector-icons/Entypo";
 import { Thread } from "../../types/Post";
-import { timeDifference } from "../../globals/utilities";
+import { scaledFont, timeDifference } from "../../globals/utilities";
 import Animated, {
     useSharedValue,
     useAnimatedStyle,
@@ -65,10 +65,10 @@ const PostItem = (props: PostItemsProps) => {
               <React.Fragment key={index}>
                 {word.startsWith('#') ? (
                   <TouchableOpacity onPress={() => console.log('Pressed:', word)}>
-                    <Text style={{ color: 'blue', fontWeight: 'bold' }}>{word}</Text>
+                    <Text style={{ color: 'blue',fontSize:scaledFont(13), fontWeight: 'bold' }}>{word}</Text>
                   </TouchableOpacity>
                 ) : (
-                  <Text>{word}{' '}</Text>
+                  <Text style={{color: theme.text_color,fontSize:scaledFont(13)}}>{word}{' '}</Text>
                 )}
               </React.Fragment>
             ))}
@@ -105,17 +105,17 @@ const PostItem = (props: PostItemsProps) => {
                         <Text style={styles.txtCreatedAt}>{timeDifference(post.created_at)}</Text>
                         <Entypo
                             name="dots-three-horizontal"
-                            size={18}
+                            size={scaledFont(18)}
                             color={theme.text_color}
                         />
                     </View>
                 </View>
 
-                {/* {renderBioWithPressableHashtags(post.content)} */}
-                <Text style={{
+                {renderBioWithPressableHashtags(post.content)}
+                {/* <Text style={{
                     color: theme.text_color,
                     marginVertical: 5
-                }}>{post.content}</Text>
+                }}>{post.content}</Text> */}
                 <GridViewer
                     media={media}
                 />
@@ -126,7 +126,7 @@ const PostItem = (props: PostItemsProps) => {
                         <FontAwesome
                             onPress={() => toggeleLike()}
                             name={(post.isLiked) ? "heart" : "heart-o"}
-                            size={20}
+                            size={scaledFont(20)}
                             color={post.isLiked ? "red" : theme.text_color}
                         />
                     </Animated.View>
@@ -134,19 +134,19 @@ const PostItem = (props: PostItemsProps) => {
                         onPress={() => props.onPressComment(post._id)}
                         name="comment-o"
                         style={{ marginRight: 20, marginLeft: 20 }}
-                        size={20}
+                        size={scaledFont(20)}
                         color={theme.text_color}
                     />
                     <AntDesign
                         onPress={() => props.onRepost(post._id)}
                         name="retweet"
                         style={{ marginRight: 20 }}
-                        size={20}
+                        size={scaledFont(20)}
                         color={theme.text_color}
                     />
                     <Feather
                         name="send"
-                        size={20}
+                        size={scaledFont(20)}
                         color={theme.text_color}
                     />
                 </View>
@@ -171,6 +171,7 @@ const styles = StyleSheet.create({
         borderRadius: 15,
         alignSelf: 'center',
         margin: 10,
+        marginVertical:5,
     },
     rowContainer:
     {
@@ -184,9 +185,9 @@ const styles = StyleSheet.create({
     },
     imgProfile:
     {
-        height: 40,
-        width: 40,
-        borderRadius: 40
+        height: scaledFont(40),
+        width: scaledFont(40),
+        borderRadius: scaledFont(40)
     },
     rodeContainer:
     {
@@ -208,12 +209,12 @@ const styles = StyleSheet.create({
     },
     txtFullname:
     {
-        fontSize: 15,
+        fontSize: scaledFont(15),
         fontWeight: "bold",
     },
     txtUsername:
     {
-        fontSize: 18,
+        fontSize: scaledFont(18),
         fontWeight: "bold"
     },
     rightProfileContainer:
@@ -224,7 +225,8 @@ const styles = StyleSheet.create({
     txtCreatedAt:
     {
         color: "silver",
-        marginRight: 20
+        marginRight: 20,
+        fontSize: scaledFont(12)
     },
     actionsRowContainer:
     {
@@ -238,11 +240,11 @@ const styles = StyleSheet.create({
     },
     txtComments:
     {
-        fontSize: 13,
+        fontSize: scaledFont(13),
         marginRight: 25
     },
     textLikes:
     {
-        fontSize: 13,
+        fontSize: scaledFont(13),
     }
 })

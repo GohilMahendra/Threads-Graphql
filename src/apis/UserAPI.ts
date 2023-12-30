@@ -213,13 +213,16 @@ export const followUser = async (userId: string) => {
         const response = await axios.post(quary, {},
             {
                 headers: {
-                    "Content-Type": "multipart/form-data",
+                    "Content-Type": "application/json",
                     "token": token
                 },
             }
         )
         if (response.status == 200)
+        {
+            console.log(response.data)
             return response.data
+        }
         else
             throw new Error(response.data)
     }
@@ -235,13 +238,16 @@ export const unFollowUser = async (userId: string) => {
         const response = await axios.delete(quary,
             {
                 headers: {
-                    "Content-Type": "multipart/form-data",
+                   "Content-Type": "application/json",
                     "token": token
                 },
             }
         )
         if (response.status == 200)
+        {
+            console.log(response.data)
             return response.data
+        }
         else
             throw new Error(response.data)
     }

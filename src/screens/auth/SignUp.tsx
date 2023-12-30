@@ -10,6 +10,7 @@ import UseTheme from '../../globals/UseTheme';
 import { useSelector } from 'react-redux';
 import { RootState } from '../../redux/store';
 import Loader from '../../components/global/Loader';
+import { scaledFont } from '../../globals/utilities';
 const { height, width } = Dimensions.get("screen")
 const SignUp = () => {
     const loading = useSelector((state: RootState) => state.User.loading)
@@ -139,8 +140,8 @@ const styles = StyleSheet.create({
     },
     imageLogo:
     {
-        height: 50,
-        width: 50,
+        height: scaledFont(50),
+        width: scaledFont(50),
         marginVertical: 10
     },
     inputContainer:
@@ -167,7 +168,7 @@ const styles = StyleSheet.create({
     },
     txtSignUp:
     {
-        fontSize: 18,
+        fontSize: scaledFont(18),
         color: "white",
         fontWeight: "bold"
     },

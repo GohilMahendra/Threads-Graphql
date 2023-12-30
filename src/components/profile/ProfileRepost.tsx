@@ -4,7 +4,7 @@ import { View } from "react-native"
 import { placeholder_image } from "../../globals/asstes";
 import Entypo from "react-native-vector-icons/Entypo";
 import {  Thread } from "../../types/Post";
-import { timeDifference } from "../../globals/utilities";
+import { scaledFont, timeDifference } from "../../globals/utilities";
 import GridViewer from "../feed/GridViewer";
 import UseTheme from "../../globals/UseTheme";
 type PostItemsProps =
@@ -17,6 +17,27 @@ const ProfileRepost = (props: PostItemsProps) => {
     const media = post.media
     const repost = post.Repost as Thread
     const {theme} = UseTheme()
+    const renderBioWithPressableHashtags = (bioText: string | undefined) => {
+        if (!bioText) return null;
+      
+        const words = bioText.split(/\s+/);
+      
+        return (
+          <View style={{ marginVertical: 5, flexDirection: 'row', flexWrap: 'wrap' }}>
+            {words.map((word, index) => (
+              <React.Fragment key={index}>
+                {word.startsWith('#') ? (
+                  <TouchableOpacity onPress={() => console.log('Pressed:', word)}>
+                    <Text style={{ color: 'blue',fontSize:scaledFont(13), fontWeight: 'bold' }}>{word}</Text>
+                  </TouchableOpacity>
+                ) : (
+                  <Text style={{color: theme.text_color,fontSize:scaledFont(13)}}>{word}{' '}</Text>
+                )}
+              </React.Fragment>
+            ))}
+          </View>
+        );
+      };
     return (
         <View style={[styles.container,{ backgroundColor: theme.background_color,}]}>
             <View style={styles.rowContainer}>
@@ -41,12 +62,12 @@ const ProfileRepost = (props: PostItemsProps) => {
                         <Entypo
                             onPress={()=>props.onPressThreeDots(post._id)}
                             name="dots-three-horizontal"
-                            size={18}
+                            size={scaledFont(18)}
                             color={theme.text_color}
                         />
                     </View>
                 </View>
-                <Text style={{color: theme.text_color,marginVertical:5}}>{post.content}</Text>
+                {renderBioWithPressableHashtags(post.content)}
                 {/* origional post container starts */}
                 <View style={[styles.postContainer,{ borderColor: theme.text_color,}]}>
                     <TouchableOpacity 
@@ -62,9 +83,7 @@ const ProfileRepost = (props: PostItemsProps) => {
                             <Text style={[styles.textPostFullname,{ color: theme.text_color}]}>{post.Repost?.user.username}</Text>
                         </View>
                     </TouchableOpacity>
-                    <Text style={{
-                        color: theme.text_color
-                    }}>{post.Repost?.content}</Text>
+                    {renderBioWithPressableHashtags(post.Repost?.content)}
                     <GridViewer
                     media={post.Repost?.media || []}
                     />
@@ -94,9 +113,9 @@ const styles = StyleSheet.create({
     },
     imgProfile:
     {
-        height: 50,
-        width: 50,
-        borderRadius: 50
+        height: scaledFont(50),
+        width:  scaledFont(50),
+        borderRadius: scaledFont(50)
     },
     threadRode:
     {
@@ -118,7 +137,7 @@ const styles = StyleSheet.create({
     },
     txtFullname:
     {
-        fontSize: 18,
+        fontSize: scaledFont(18),
         fontWeight: "bold",
     },
     rightRowContainer:
@@ -129,7 +148,8 @@ const styles = StyleSheet.create({
     txtCreatedAt:
     {
         color: "silver",
-        marginRight: 10
+        marginRight: 10,
+        fontSize:scaledFont(13)
     },
     postContainer:
     {
@@ -145,13 +165,13 @@ const styles = StyleSheet.create({
     },
     imgProfilePost:
     {
-        height:30,
-        width:30,
-        borderRadius:30,
+        height:scaledFont(30),
+        width:scaledFont(30),
+        borderRadius:scaledFont(30),
         marginRight:15
     },
     textPostFullname:
     {
-        fontSize:18,
+        fontSize:scaledFont(18),
     }
 })

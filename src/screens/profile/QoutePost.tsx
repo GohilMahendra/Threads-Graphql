@@ -15,6 +15,7 @@ import { RootStackType } from '../../navigations/RootStack';
 import { UploadMedia } from '../../types/Post';
 import PostViewItem from '../../components/profile/PostViewItem';
 import { createRepostAction } from '../../redux/slices/UserSlice'
+import { scaledFont } from '../../globals/utilities'
 
 const QoutePost = () => {
 
@@ -122,7 +123,7 @@ const styles = StyleSheet.create({
     },
     headerText:
     {
-        fontSize: 15,
+        fontSize: scaledFont(15),
         textAlign: 'center'
     },
     btnPost:
@@ -146,9 +147,9 @@ const styles = StyleSheet.create({
     },
     imageUser:
     {
-        height: 40,
-        width: 40,
-        borderRadius: 40,
+        height: scaledFont(40),
+        width: scaledFont(40),
+        borderRadius: scaledFont(40),
         marginRight: 10
     },
     inputContainer:
@@ -163,8 +164,8 @@ const styles = StyleSheet.create({
     inputQoute:
     {
         textAlignVertical: "top",
-        maxHeight: 200,
+        maxHeight: scaledFont(200),
         flex: 1,
-        marginRight: 20
+        marginRight: scaledFont(20)
     }
 })
