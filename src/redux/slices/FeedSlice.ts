@@ -184,6 +184,7 @@ export const FeedSlice = createSlice({
         })
         builder.addCase(FetchMorePostsAction.fulfilled, (state, action: PayloadAction<FetchPostsPayload<Thread>>) => {
             state.loadMoreLoading = false
+            console.log(action.payload.lastOffset)
             state.Threads.push(...action.payload.data)
             state.lastOffset = action.payload.lastOffset
         })

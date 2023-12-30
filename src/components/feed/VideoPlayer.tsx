@@ -1,4 +1,4 @@
-import React, { useRef, useState } from "react";
+import React, { useCallback, useRef, useState } from "react";
 import { Dimensions, StyleSheet, TouchableOpacity, View } from "react-native";
 import { Slider } from "react-native-elements";
 import FontAwesome5Icon from "react-native-vector-icons/FontAwesome5";
@@ -16,18 +16,21 @@ const VideoPlayer = (props: VideoPlayerPropTypes) => {
     const duration = useRef<number>(0)
     const [currentTime, setCurrentTime] = useState(0)
     const videoRef = useRef<Video | null>()
-    const setDuration = (value: number) => {
-        duration.current = value
-    }
-    const togglePause = () => {
-        setPaused((prevState) => !prevState)
-    }
-    const onProgress = (value: number) => {
-        setCurrentTime(value)
-    }
-    const onSlidingComplete = (value: number) => {
-        videoRef.current?.seek(value)
-    }
+    const setDuration = useCallback((value: number) => {
+        duration.current = value;
+      }, []);
+    
+      const togglePause = useCallback(() => {
+        setPaused(prevState => !prevState);
+      }, []);
+    
+      const onProgress = useCallback((progress: { currentTime: number }) => {
+        setCurrentTime(progress.currentTime);
+      }, []);
+    
+      const onSlidingComplete = useCallback((value: number) => {
+        videoRef.current?.seek(value);
+      }, []);
     return (
         <View>
             <TouchableOpacity
@@ -37,9 +40,9 @@ const VideoPlayer = (props: VideoPlayerPropTypes) => {
                     ref={ref => videoRef.current = ref}
                     repeat
                     onError={(err) => console.log(JSON.stringify(err))}
-                    onProgress={(progress) => onProgress(progress.currentTime)}
+                    onProgress={(progress) => onProgress(progress)}
                     onLoad={(data) => setDuration(data.duration)}
-                    paused={paused}
+                    paused={true}
                     resizeMode="contain"
                     source={{ uri: uri }}
                     style={styles.videoContainer}
@@ -47,6 +50,7 @@ const VideoPlayer = (props: VideoPlayerPropTypes) => {
                 <Slider
                     minimumTrackTintColor="white"
                     maximumTrackTintColor="silver"
+                    onSlidingStart={()=>console.log("started")}
                     thumbStyle={styles.slider}
                     value={currentTime}
                     onSlidingComplete={(value) => onSlidingComplete(value)}

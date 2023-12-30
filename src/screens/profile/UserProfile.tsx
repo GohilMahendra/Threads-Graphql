@@ -3,6 +3,7 @@ import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { placeholder_image } from '../../globals/asstes'
 import FontAwesome5Icon from 'react-native-vector-icons/FontAwesome5'
 import FontAwesome from 'react-native-vector-icons/FontAwesome'
+import AntDesign from 'react-native-vector-icons/AntDesign'
 import { CompositeNavigationProp, RouteProp, useNavigation, StackActions, useRoute, NavigationAction, NavigationProp, } from '@react-navigation/native'
 import { FlatList } from 'react-native'
 import { Thread } from '../../types/Post'
@@ -187,11 +188,11 @@ const UserProfile = () => {
         try {
             if (user.isFollowed) {
                 const response = await unFollowUser(userId)
-                setUser(prevUser => ({ ...prevUser, isFollowed: false,followers:prevUser.followers-1 }));
+                setUser(prevUser => ({ ...prevUser, isFollowed: false, followers: prevUser.followers - 1 }));
             }
             else {
                 const response = await followUser(userId)
-                setUser(prevUser => ({ ...prevUser, isFollowed: true,followers:prevUser.followers+1 }));
+                setUser(prevUser => ({ ...prevUser, isFollowed: true, followers: prevUser.followers + 1 }));
             }
         }
         catch (err) {
@@ -260,6 +261,19 @@ const UserProfile = () => {
                             size={25}
                             color={theme.text_color}
                         />
+                        <View style={{flexDirection:"row"}}>
+                        <AntDesign
+                            name='instagram'
+                            size={25}
+                            color={theme.text_color}
+                            style={{ marginRight: 10 }}
+                        />
+                        <AntDesign
+                            name='bars'
+                            size={25}
+                            color={theme.text_color}
+                        />
+                        </View>
                     </View>
                     <View
                         onLayout={event => {
@@ -295,7 +309,7 @@ const UserProfile = () => {
                             }]}>{user.isFollowed ? "Following" : "Follow"}</Text>
                         </TouchableOpacity>
                     </View>
-                    <View style={{backgroundColor: theme.background_color}}>
+                    <View style={{ backgroundColor: theme.background_color }}>
                         <View style={styles.optionContainer}>
                             <TouchableOpacity
                                 onPress={() => onChangeField("Threads")}
@@ -482,7 +496,8 @@ const styles = StyleSheet.create({
     headerContainer:
     {
         flexDirection: 'row',
-        padding: 20
+        padding: 20,
+        justifyContent:'space-between'
     },
     userDetailsContainer:
     {

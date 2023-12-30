@@ -4,20 +4,18 @@ import UseTheme from "../../globals/UseTheme";
 import FontAwesome from "react-native-vector-icons/FontAwesome";
 import Ionicons from "react-native-vector-icons/Ionicons";
 import MaterialIcons from "react-native-vector-icons/MaterialIcons";
-import {useNavigation, CommonActions } from "@react-navigation/native";
+import { useNavigation, CommonActions } from "@react-navigation/native";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { ProfileRootComposite } from "../../navigations/Types";
-import { DarkTheme, lightTheme } from "../../globals/Themes";
 const Settings = () => {
-    const { theme,setTheme} = UseTheme()
+    const { theme, setTheme } = UseTheme()
     const navigation = useNavigation<ProfileRootComposite>()
-    const [darkTheme,setDarkTheme] = useState(theme.mode == "dark")
+    const [darkTheme, setDarkTheme] = useState(theme.mode == "dark")
 
-    const changeTheme = async() =>
-    {
-        setTheme(darkTheme?"light":"dark")
+    const changeTheme = async () => {
+        setTheme(darkTheme ? "light" : "dark")
         setDarkTheme(!darkTheme)
-        await AsyncStorage.setItem("theme",theme.mode)
+        await AsyncStorage.setItem("theme", theme.mode)
     }
     const handleSignOut = () => {
         Alert.alert(
@@ -42,6 +40,7 @@ const Settings = () => {
         await AsyncStorage.removeItem("token")
         await AsyncStorage.removeItem("email")
         await AsyncStorage.removeItem("password")
+        await AsyncStorage.removeItem("theme")
         navigation.dispatch({
             ...CommonActions.reset({
                 index: 0,
@@ -88,19 +87,19 @@ const Settings = () => {
                     />
                     <Text style={[styles.textOption, { color: theme.text_color, }]}>About</Text>
                 </TouchableOpacity>
-                <View style={[styles.btnRowContainer,{justifyContent:"space-between"}]}>
-                   <View style={{flexDirection:"row",alignItems:"center"}}>
-                   <MaterialIcons
-                        name="dark-mode"
-                        size={25}
-                        color={theme.text_color}
+                <View style={[styles.btnRowContainer, { justifyContent: "space-between" }]}>
+                    <View style={{ flexDirection: "row", alignItems: "center" }}>
+                        <MaterialIcons
+                            name="dark-mode"
+                            size={25}
+                            color={theme.text_color}
+                        />
+                        <Text style={[styles.textOption, { color: theme.text_color, }]}>Dark Mode</Text>
+                    </View>
+                    <Switch
+                        value={darkTheme}
+                        onChange={() => changeTheme()}
                     />
-                    <Text style={[styles.textOption, { color: theme.text_color, }]}>Dark Mode</Text>
-                   </View>
-                   <Switch
-                   value={darkTheme}
-                   onChange={()=>changeTheme()}
-                   />
                 </View>
                 <TouchableOpacity
                     onPress={() => handleSignOut()}

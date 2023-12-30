@@ -111,11 +111,11 @@ const PostItem = (props: PostItemsProps) => {
                     </View>
                 </View>
 
-                {renderBioWithPressableHashtags(post.content)}
-                {/* <Text style={{
+                {/* {renderBioWithPressableHashtags(post.content)} */}
+                <Text style={{
                     color: theme.text_color,
                     marginVertical: 5
-                }}>{post.content}</Text> */}
+                }}>{post.content}</Text>
                 <GridViewer
                     media={media}
                 />

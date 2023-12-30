@@ -14,7 +14,7 @@ import RepostItem from '../../components/feed/RepostItem'
 import { RefreshControl } from 'react-native'
 import UseTheme from '../../globals/UseTheme'
 import { createRepostAction } from '../../redux/slices/UserSlice'
-import {useNavigation } from '@react-navigation/native'
+import { useNavigation } from '@react-navigation/native'
 import { compositeRootHomeStack } from '../../navigations/Types'
 const Home = () => {
   const navigation = useNavigation<compositeRootHomeStack>()
@@ -73,7 +73,6 @@ const Home = () => {
   }
   const renderPosts = (item: Thread, index: number) => {
     return (
-
       item.isRepost && item.Repost ?
         <RepostItem
           onLikeToggle={(postId, state) => onLikeToggle(postId, state)}
@@ -95,7 +94,6 @@ const Home = () => {
 
     )
   }
-
   const fetcchMorePosts = async () => {
     await dispatch(FetchMorePostsAction({ post_type: selectedField }))
   }
@@ -105,10 +103,8 @@ const Home = () => {
     }))
   }, [selectedField])
   return (
-      <SafeAreaView
-        style={styles.container}
-      >
-        <GestureHandlerRootView style={styles.gestureContainer}>
+    <SafeAreaView style={styles.container}>
+      <GestureHandlerRootView style={styles.gestureContainer}>
         <View style={[styles.contentContainer, { backgroundColor: theme.background_color }]}>
           <View style={[styles.selectionContainer]}>
             <TouchableOpacity
@@ -118,7 +114,6 @@ const Home = () => {
                 borderBottomWidth: selectedField == "for_me" ? 1 : 0,
               }]}>
               <Text style={[styles.textForyou, { color: (selectedField == "for_me") ? theme.text_color : theme.secondary_text_color, }]}>For You</Text>
-
             </TouchableOpacity>
             <TouchableOpacity
               onPress={() => setSelectedField("following")}
@@ -147,7 +142,7 @@ const Home = () => {
             data={posts}
             showsVerticalScrollIndicator={false}
             keyExtractor={(item, index) => index.toString()}
-            onEndReached={() =>lastOffset && fetcchMorePosts()}
+            onEndReached={() => lastOffset && fetcchMorePosts()}
             renderItem={({ item, index }) => renderPosts(item, index)}
             style={{
               flex: 1
@@ -212,10 +207,9 @@ const Home = () => {
               </View>
             </BottomSheetModal>
           </BottomSheetModalProvider>
-        </View>  
-        </GestureHandlerRootView>
-      </SafeAreaView>
-  
+        </View>
+      </GestureHandlerRootView>
+    </SafeAreaView>
   )
 }
 export default Home
@@ -250,7 +244,7 @@ const styles = StyleSheet.create({
   textForyou:
   {
     fontSize: 15,
-    fontWeight:"bold"
+    fontWeight: "bold"
   },
   btnFollowing:
   {
@@ -263,7 +257,7 @@ const styles = StyleSheet.create({
   textFollowing:
   {
     fontSize: 15,
-    fontWeight:"bold"
+    fontWeight: "bold"
   },
   sheetComment:
   {

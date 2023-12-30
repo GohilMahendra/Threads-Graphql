@@ -106,6 +106,8 @@ const styles = StyleSheet.create({
     container:
     {
         flex: 1,
+        borderTopRightRadius:20,
+        borderTopLeftRadius:20
     },
     avoidingView:
     {

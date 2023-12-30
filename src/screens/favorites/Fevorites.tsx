@@ -85,14 +85,14 @@ const Favorites = () => {
           onLikeToggle={(postId, step) => toggleLike(postId, step)}
           onPressComment={(postId) => replyIconPress(postId)}
           onPressNavigate={() => console.log("navig")}
-          onRepost={() => console.log("repose")}
+          onRepost={(postId) => repostIconPress(postId)}
           post={item}
         /> :
         <PostItem
           onLikeToggle={(postId, step) => toggleLike(postId, step)}
           onPressComment={(postId) => replyIconPress(postId)}
           onPressNavigate={() => console.log("navig")}
-          onRepost={() => console.log("repose")}
+          onRepost={(postId) => repostIconPress(postId)}
           post={item}
         />
     )
@@ -308,9 +308,8 @@ const Favorites = () => {
               }}>
               <View style={{
                 width: "100%",
-                backgroundColor: theme.background_color,
-                borderTopLeftRadius: 20,
-                borderTopRightRadius: 20,
+                backgroundColor: theme.secondary_background_color,
+               
                 padding: 10,
 
               }} >

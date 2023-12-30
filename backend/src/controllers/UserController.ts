@@ -14,8 +14,6 @@ import Like from "../models/Like";
 import { PostDocument } from "../types/Post";
 import Follower from "../models/Follower";
 import Reply from "../models/Reply";
-import { populate } from "dotenv";
-import { path } from "@ffprobe-installer/ffprobe";
 interface UpdateUserRequestBody {
     fullname?: string;
     bio?: string;
@@ -97,6 +95,7 @@ const signUpUser = async (req: Request, res: Response) => {
 
         const otp = otpGenerator.generate(6, { digits: true, upperCaseAlphabets: false, specialChars: false, lowerCaseAlphabets: false })
         newUser.otp = otp
+        newUser.verified = true
         await newUser.save()
 
         sendVerificationEmail(newUser.email, otp)
@@ -260,7 +259,7 @@ const verifyEmail = async (req: CustomRequest, res: Response) => {
 
         user.verified = true
         user.token = undefined
-
+        user.otp = undefined
         await user.save()
 
         return res.status(200).json({
@@ -278,7 +277,6 @@ const verifyEmail = async (req: CustomRequest, res: Response) => {
 
 const SearchUsers = async (req: CustomRequest, res: Response) => {
     try {
-
         const userId = req.userId
         const quary = req.query.name
 

@@ -44,10 +44,11 @@ const GridViewer = (props: GridViewerPropTypes) => {
                 {
                     images.map((image, index) => (
                         <TouchableOpacity
+                            style={{width:"50%"}}
                             onPress={() => onSelectMedia(images[index])}
                             key={image._id}>
                             <Image
-                                resizeMode="contain"
+                                resizeMode="cover"
                                 source={{ uri: getMediaImage(image) }}
                                 style={style.image2x}
                             />
@@ -72,6 +73,7 @@ const GridViewer = (props: GridViewerPropTypes) => {
                     key={images[0]._id}
                     style={style.btnimage3x1st}>
                     <Image
+                         resizeMode="cover"
                         source={{ uri: getMediaImage(images[0]) }}
                         style={style.image3x1st}
                     />
@@ -92,6 +94,7 @@ const GridViewer = (props: GridViewerPropTypes) => {
                             onPress={() => onSelectMedia(images[index])}
                             key={image._id}>
                             <Image
+                                 resizeMode="contain"
                                 source={{ uri: getMediaImage(image) }}
                                 style={style.image3xRest}
                             />
@@ -119,6 +122,7 @@ const GridViewer = (props: GridViewerPropTypes) => {
                             onPress={() => onSelectMedia(images[index])}
                             key={image._id}>
                             <Image
+                                 resizeMode="contain"
                                 source={{ uri: getMediaImage(image) }}
                                 style={style.image4x}
                             />
@@ -191,13 +195,14 @@ const style = StyleSheet.create({
     container2x:
     {
         flexWrap: "wrap",
-        flexDirection: 'row'
+        flexDirection: 'row',
+        width:'100%',
     },
     image2x:
     {
         height: 200,
         borderRadius: 15,
-        width: "100%"
+        width: "100%",
     },
     container3x:
     {

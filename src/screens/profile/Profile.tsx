@@ -3,7 +3,6 @@ import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { placeholder_image } from '../../globals/asstes'
 import { useSelector } from 'react-redux'
 import { RootState, useAppDispatch } from '../../redux/store'
-import Ionicons from 'react-native-vector-icons/Ionicons'
 import AntDesign from 'react-native-vector-icons/AntDesign'
 import { NavigationProp, useNavigation } from '@react-navigation/native'
 import { ProfileStacktype } from '../../navigations/ProfileStack'
@@ -161,7 +160,7 @@ const Profile = () => {
             keyExtractor={(item, index) => index.toString()}
             renderItem={({ item, index }) => renderPosts(item, index)}
             onEndReachedThreshold={0.3}
-            onEndReached={() => loadMorePosts()}
+            onEndReached={() =>lastOffset && loadMorePosts()}
           />
         </ScrollView>
 

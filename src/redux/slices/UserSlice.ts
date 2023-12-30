@@ -6,7 +6,6 @@ import { Thread, UploadMedia } from "../../types/Post";
 import { RootState } from "../store";
 import { FetchPostsPayload } from "../types/global";
 import { createPost, createRepost } from "../../apis/FeedAPI";
-import { extractTags } from "../../globals/utilities";
 import { PAGE_SIZE } from "../../globals/constants";
 type UserStateType =
     {

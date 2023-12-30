@@ -1,10 +1,7 @@
 import React from "react";
-import { Text, Image, Dimensions } from "react-native"
+import { Text, Image, StyleSheet } from "react-native"
 import { View } from "react-native"
 import { placeholder_image } from "../../globals/asstes";
-import FontAwesome from "react-native-vector-icons/FontAwesome";
-import Feather from "react-native-vector-icons/Feather";
-import AntDesign from "react-native-vector-icons/AntDesign";
 import Entypo from "react-native-vector-icons/Entypo";
 import { Thread } from "../../types/Post";
 import { timeDifference } from "../../globals/utilities";
@@ -21,23 +18,9 @@ const PostViewItem = (props: PostItemsProps) => {
     const { theme } = UseTheme()
 
     return (
-        <View style={{
-            padding: 10,
-            backgroundColor: theme.background_color,
-            flexDirection: "row",
-            borderRadius: 15,
-            alignSelf: 'center',
-            margin: 10,
-
-        }}>
-            <View style={{
-                flexDirection: 'row',
-                justifyContent: "center"
-            }}>
-                <View style={{
-                    marginRight: 20,
-                    alignItems: "center"
-                }}>
+        <View style={[styles.container, { backgroundColor: theme.secondary_color, }]}>
+            <View style={styles.rowContaniner}>
+                <View style={styles.profileContainer}>
                     <View
                     >
                         <Image
@@ -45,34 +28,17 @@ const PostViewItem = (props: PostItemsProps) => {
                             source={post.user.profile_picture ? {
                                 uri: post.user.profile_picture
                             } : placeholder_image}
-                            style={{
-                                height: 50,
-                                width: 50,
-                                borderRadius: 50
-                            }}
+                            style={styles.imgUser}
                         />
                     </View>
                 </View>
                 <View
-                    style={{
-                        position: 'absolute',
-                        top: 60,
-                        bottom: 0,
-                        //alignSelf: "center", 
-                        width: 1,
-                        backgroundColor: 'silver',
-                    }}
+                    style={styles.verticalRode}
                 />
             </View>
 
-            <View style={{
-                //  alignItems: 'center',
-                width: "80%",
-            }}>
-                <View style={{
-                    flexDirection: "row",
-                    justifyContent: 'space-between'
-                }}>
+            <View style={styles.rightContainer}>
+                <View style={styles.rightRowContainer}>
                     <View>
                         <Text style={{
                             color: theme.text_color,
@@ -84,14 +50,8 @@ const PostViewItem = (props: PostItemsProps) => {
                             fontSize: 15,
                         }}>{post.user.username}</Text>
                     </View>
-                    <View style={{
-                        flexDirection: 'row',
-                        alignItems: 'center',
-                    }}>
-                        <Text style={{
-                            color: "silver",
-                            marginRight: 20
-                        }}>{timeDifference(post.created_at)}</Text>
+                    <View style={styles.profileRightContainer}>
+                        <Text style={[styles.txtTime, { color: theme.secondary_text_color }]}>{timeDifference(post.created_at)}</Text>
                         <Entypo
                             name="dots-three-horizontal"
                             size={18}
@@ -113,3 +73,58 @@ const PostViewItem = (props: PostItemsProps) => {
 
 }
 export default PostViewItem
+const styles = StyleSheet.create({
+    container:
+    {
+        padding: 10,
+        flexDirection: "row",
+        borderRadius: 15,
+        alignSelf: 'center',
+        margin: 10,
+    },
+    rowContaniner:
+    {
+        flexDirection: 'row',
+        justifyContent: "center"
+    },
+    profileContainer:
+    {
+        marginRight: 20,
+        alignItems: "center"
+    },
+    imgUser:
+    {
+        height: 40,
+        width: 40,
+        borderRadius: 40
+    },
+    verticalRode:
+    {
+        position: 'absolute',
+        top: 60,
+        bottom: 0,
+        //alignSelf: "center", 
+        width: 1,
+        backgroundColor: 'silver',
+    },
+    rightContainer:
+    {
+        //  alignItems: 'center',
+        width: "80%",
+    },
+    rightRowContainer:
+    {
+        flexDirection: "row",
+        justifyContent: 'space-between'
+    },
+    profileRightContainer:
+    {
+        flexDirection: 'row',
+        alignItems: 'center',
+    },
+    txtTime:
+    {
+        marginRight: 20
+    }
+
+})

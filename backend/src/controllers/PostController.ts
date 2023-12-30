@@ -29,9 +29,8 @@ const createPost = async (req: CustomRequest, res: Response) => {
                 message: "no content provided for post"
             })
         }
-        let hashTags:string[] = []
-        if(content)
-        {
+        let hashTags: string[] = []
+        if (content) {
             hashTags = extractHashtags(content)
         }
 
@@ -90,7 +89,8 @@ const getPosts = async (req: CustomRequest, res: Response) => {
         const post_type = req.query.post_type as string
         const pageSize = parseInt(pageSizeParam, 10) || 10;
         if (lastOffset) {
-            quary._id = { $gt: new mongoose.Types.ObjectId(lastOffset) }
+            console.log("last offset from feed", lastOffset)
+            quary._id = { $lt: new mongoose.Types.ObjectId(lastOffset) }
         }
 
         if (post_type == "following") {
@@ -179,7 +179,7 @@ const getPostsByUser = async (req: CustomRequest, res: Response) => {
         const pageSize = parseInt(pageSizeParam, 10) || 10;
         quary.user = userId
         if (lastOffset) {
-            quary._id = { $gt: new mongoose.Types.ObjectId(lastOffset) }
+            quary._id = { $lt: new mongoose.Types.ObjectId(lastOffset) }
         }
         if (post_type === "Repost") {
             quary.isRepost = true
@@ -191,7 +191,7 @@ const getPostsByUser = async (req: CustomRequest, res: Response) => {
                 path: "user",
                 select: "-password -token -otp",
             }).
-            populate<{ Repost: PostDocument& {user:UserDocument}}>({
+            populate<{ Repost: PostDocument & { user: UserDocument } }>({
                 path: "Repost",
                 populate: {
                     path: "user",
@@ -273,7 +273,7 @@ const likePost = async (req: CustomRequest, res: Response) => {
                     message: "not found the post"
                 })
             }
-            const existingLike = await Like.findOne({ user: userId, post:postId });
+            const existingLike = await Like.findOne({ user: userId, post: postId });
             if (existingLike) {
                 return res.status(200).json({
                     message: "post is already liked by current user"
@@ -390,9 +390,9 @@ const getComments = async (req: CustomRequest, res: Response) => {
         const lastOffset = req.query.lastOffset as string
         const pageSizeParam = req.query.pageSize as string;
         const pageSize = parseInt(pageSizeParam, 10) || 10;
-        const quary: any = { postId: postId }
+        const quary: any = { post: postId }
         if (lastOffset) {
-            quary._id = { $gt: new mongoose.Types.ObjectId(lastOffset) }
+            quary._id = { $lt: new mongoose.Types.ObjectId(lastOffset) }
         }
 
         if (!postId) {
@@ -406,7 +406,7 @@ const getComments = async (req: CustomRequest, res: Response) => {
                 select: "-password -token -otp",
             }).
             sort({
-                // created_at: 1,
+                created_at: -1,
                 _id: 1
             }).limit(pageSize)
         await Promise.all(
@@ -473,24 +473,23 @@ const getPostLikeUsers = async (req: CustomRequest, res: Response) => {
             quary._id = { $gt: new mongoose.Types.ObjectId(lastOffset) }
         }
 
-        if(!postId)
-        {
+        if (!postId) {
             return res.status(400).json({
-                messgae:"missing post Id"
+                messgae: "missing post Id"
             })
         }
 
-        const likes = await Like.find({ postId: postId }).populate<{userId:UserDocument}>({
+        const likes = await Like.find({ postId: postId }).populate<{ userId: UserDocument }>({
             path: "userId",
             select: "-password -token -otp"
         }).limit(pageSize)
 
-        const users = likes.map(like=>like.userId)
+        const users = likes.map(like => like.userId)
 
-        await Promise.all(users.map(async(user)=>{
-            const isFollowing = Follower.exists({follower:userId,following: user._id})
-            if(isFollowing!=null)
-            user.isFollowed = true
+        await Promise.all(users.map(async (user) => {
+            const isFollowing = Follower.exists({ follower: userId, following: user._id })
+            if (isFollowing != null)
+                user.isFollowed = true
         }))
 
         return res.status(200).json({
