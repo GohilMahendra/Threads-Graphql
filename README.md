@@ -1,12 +1,12 @@
 ## ENV varibles
--MONGO_URL = your-db-uri
--MAILER_PASS = your-mailer-password
--MAILER_EMAIL = your-mailer-mail
--AWS_ACCESS_KEY = aws-access-key-for-storage-access
--AWS_SECRET_ACCESS_KEY = aws-secret-key-for-storage-access
--AWS_S3_BUCKET_NAME = aws-bucket-name
--AWS_REGION = aws-region-name
--TOKEN_SECRET = token-secret-for-sign-jwt
+- MONGO_URL = your-db-uri
+- MAILER_PASS = your-mailer-password
+- MAILER_EMAIL = your-mailer-mail
+- AWS_ACCESS_KEY = aws-access-key-for-storage-access
+- AWS_SECRET_ACCESS_KEY = aws-secret-key-for-storage-access
+- AWS_S3_BUCKET_NAME = aws-bucket-name
+- AWS_REGION = aws-region-name
+- TOKEN_SECRET = token-secret-for-sign-jwt
 
 ## Screenshots
 
