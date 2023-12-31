@@ -16,8 +16,20 @@ Make sure you have Node.js and npm installed on your machine. If not, you can do
 1. Clone the repository:
 
    ```bash
-   git clone https://github.com/your-username/your-repo.git
-   cd your-repo```
+   git clone https://github.com/GohilMahendra/Thread-Rest.git
+   cd Thread-Rest
+
+2. Install libraries
+
+    ```bash
+    yarn
+
+3. Install pods
+
+    ```bash 
+       cd ios
+       pod install
+    ```
 
 ## Tech Stack
 
