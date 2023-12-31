@@ -186,11 +186,11 @@ const Home = () => {
                   <FontAwesome
                     // onPress={()=>props.onRepost(post._id)}
                     name="retweet"
-                    style={{ marginRight: 10 }}
-                    size={20}
+                    style={{ marginRight: 10}}
+                    size={scaledFont(20)}
                     color={theme.text_color}
                   />
-                  <Text style={{ color: theme.text_color }}>Repost</Text>
+                  <Text style={{ color: theme.text_color,fontSize:scaledFont(15) }}>Repost</Text>
                 </TouchableOpacity>
 
                 <TouchableOpacity
@@ -200,10 +200,10 @@ const Home = () => {
                     // onPress={()=>props.onRepost(post._id)}
                     name="quote-left"
                     style={{ marginRight: 10 }}
-                    size={20}
+                    size={scaledFont(20)}
                     color={theme.text_color}
                   />
-                  <Text style={{ color: theme.text_color }}>Repost with Qoute</Text>
+                  <Text style={{ color: theme.text_color,fontSize:scaledFont(15) }}>Repost with Qoute</Text>
                 </TouchableOpacity>
               </View>
             </BottomSheetModal>
@@ -300,6 +300,7 @@ const styles = StyleSheet.create({
     padding: 20,
     flexDirection: "row",
     borderRadius: 15,
+    alignItems:"center",
     width: "100%"
   }
 })

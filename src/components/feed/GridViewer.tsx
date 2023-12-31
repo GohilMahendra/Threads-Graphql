@@ -94,7 +94,7 @@ const GridViewer = (props: GridViewerPropTypes) => {
                             onPress={() => onSelectMedia(images[index])}
                             key={image._id}>
                             <Image
-                                 resizeMode="contain"
+                                resizeMode="cover"
                                 source={{ uri: getMediaImage(image) }}
                                 style={style.image3xRest}
                             />

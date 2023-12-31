@@ -6,9 +6,9 @@ AWSSDK.config.update({
 });
 
 export const s3 = new AWSSDK.S3({
-    accessKeyId: "AKIAUA2QJHDUT23ASBBD",
-    secretAccessKey: "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",
-    region: "ap-south-1"
+    accessKeyId: process.env.AWS_ACCESS_KEY,
+    secretAccessKey: process.env.AWS_SECRET_ACCESS_KEY,
+    region: process.env.AWS_REGION
 });
 
 export const getSignedUrl = async(key:string) =>

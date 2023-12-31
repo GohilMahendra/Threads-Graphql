@@ -65,7 +65,7 @@ const PostItem = (props: PostItemsProps) => {
               <React.Fragment key={index}>
                 {word.startsWith('#') ? (
                   <TouchableOpacity onPress={() => console.log('Pressed:', word)}>
-                    <Text style={{ color: 'blue',fontSize:scaledFont(13), fontWeight: 'bold' }}>{word}</Text>
+                    <Text style={{ color: 'blue',fontSize:scaledFont(13), fontWeight: 'bold' }}>{word} </Text>
                   </TouchableOpacity>
                 ) : (
                   <Text style={{color: theme.text_color,fontSize:scaledFont(13)}}>{word}{' '}</Text>

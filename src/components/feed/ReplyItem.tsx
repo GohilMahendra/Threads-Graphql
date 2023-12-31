@@ -53,7 +53,7 @@ const styles = StyleSheet.create({
         height: scaledFont(30),
         width: scaledFont(30),
         alignItems: "flex-start",
-        borderRadius: 30,
+        borderRadius: scaledFont(30),
         marginRight: 20
     },
     rightContainer:

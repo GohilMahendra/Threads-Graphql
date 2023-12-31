@@ -256,16 +256,16 @@ const styles = StyleSheet.create({
     ///padding: 10
   },
   selectionSticky:
-    { marginTop: 10 },
+    { marginTop: scaledFont(20) },
   modalContainer:
   {
-    padding: 20,
+    padding: scaledFont(20),
     justifyContent: 'center',
     alignItems: 'center'
   },
   btnEdit:
   {
-    padding: 20,
+    padding: scaledFont(20),
     width: "100%",
     borderRadius: 10,
     marginVertical: 5
@@ -277,7 +277,7 @@ const styles = StyleSheet.create({
   },
   btnDelete:
   {
-    padding: 20,
+    padding: scaledFont(20),
     borderRadius: 10,
     width: "100%",
   },

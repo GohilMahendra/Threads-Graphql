@@ -163,28 +163,27 @@ const UserProfile = () => {
             console.log(err)
         }
     }
-    const renderBioWithPressableHashtags = (bioText: string) => {
-        const paragraphs = bioText.split('\n');
-
-        return paragraphs.map((paragraph, paragraphIndex) => (
-            <React.Fragment key={paragraphIndex}>
-                <View style={{ flexDirection: 'row' }}>
-                    {paragraph.split(/(\s+)/).map((word, wordIndex) => (
-                        <React.Fragment key={wordIndex}>
-                            {word.startsWith('#') ? (
-                                <TouchableOpacity>
-                                    <Text style={{ color: 'blue', fontWeight: 'bold' }}>{word} </Text>
-                                </TouchableOpacity>
-                            ) : (
-                                <Text>{word} </Text>
-                            )}
-                        </React.Fragment>
-                    ))}
-                </View>
-                {paragraphIndex < paragraphs.length - 1 && <Text>{'\n'}</Text>}
-            </React.Fragment>
-        ));
-    };
+    const renderBioWithPressableHashtags = (bioText: string | undefined) => {
+        if (!bioText) return null;
+      
+        const words = bioText.split(/\s+/);
+      
+        return (
+          <View style={{ marginVertical: 5, flexDirection: 'row', flexWrap: 'wrap' }}>
+            {words.map((word, index) => (
+              <React.Fragment key={index}>
+                {word.startsWith('#') ? (
+                  <TouchableOpacity onPress={() => console.log('Pressed:', word)}>
+                    <Text style={{ color: 'blue',fontSize:scaledFont(13), fontWeight: 'bold' }}>{word} </Text>
+                  </TouchableOpacity>
+                ) : (
+                  <Text style={{color: theme.text_color,fontSize:scaledFont(13)}}>{word}{' '}</Text>
+                )}
+              </React.Fragment>
+            ))}
+          </View>
+        );
+      };
     const toggleFollow = async () => {
         try {
             if (user.isFollowed) {
@@ -295,8 +294,7 @@ const UserProfile = () => {
                                 style={styles.imgUserDetail}
                             />
                         </View>
-                        <Text
-                            style={{ color: twitter_blue, flexWrap: "wrap" }}>{renderBioWithPressableHashtags(user.bio || "")}</Text>
+                       {renderBioWithPressableHashtags(user.bio || "")}
                         <Text style={{ color: theme.text_color }}>{user.followers} Followers</Text>
                         <TouchableOpacity
                             onPress={() => toggleFollow()}

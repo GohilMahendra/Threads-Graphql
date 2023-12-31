@@ -143,7 +143,7 @@ const styles = StyleSheet.create({
         //   flex: 1,
         elevation: 20,
         backgroundColor: "green",
-        height: height * 0.9
+        height: height * 0.85
     },
     header:
     {
@@ -189,7 +189,7 @@ const styles = StyleSheet.create({
     commentRowContainer:
     {
         borderRadius: scaledFont(30),
-        maxHeight: 200,
+        maxHeight: scaledFont(200),
         flexDirection: "row",
         alignItems: "center",
         justifyContent: "space-between",
@@ -199,7 +199,7 @@ const styles = StyleSheet.create({
     {
         padding: 5,
         width: "70%",
-        maxHeight: 200,
+        maxHeight: scaledFont(200),
         fontSize: scaledFont(12)
 
     },

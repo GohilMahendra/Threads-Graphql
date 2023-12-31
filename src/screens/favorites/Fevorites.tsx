@@ -22,6 +22,7 @@ import FontAwesome5Icon from 'react-native-vector-icons/FontAwesome5'
 import { useNavigation } from '@react-navigation/native'
 import { FavoriteRootComposite } from '../../navigations/Types'
 import { white } from '../../globals/Colors'
+import { scaledFont } from '../../globals/utilities'
 const Favorites = () => {
   const { theme } = UseTheme()
   const navigation = useNavigation<FavoriteRootComposite>()
@@ -293,25 +294,19 @@ const Favorites = () => {
             backdropComponent={(props) => (
               <BottomSheetBackdrop {...props} disappearsOnIndex={-1} appearsOnIndex={0} />
             )}
+            style={{backgroundColor: theme.secondary_background_color}}
             handleStyle={[styles.handleRepost, {
               backgroundColor: theme.secondary_background_color,
               borderColor: theme.text_color
             }]}
             handleIndicatorStyle={{ borderColor: theme.text_color, borderWidth: 2 }}
           >
-            <View
-              style={{
-                flex: 1,
-                backgroundColor: 'rgba(0,0,0,0.3)',
-                justifyContent: "flex-end",
-                alignItems: "center"
-              }}>
+           
               <View style={{
-                width: "100%",
+                flex:1,
                 backgroundColor: theme.secondary_background_color,
-               
                 padding: 10,
-
+                justifyContent:"center"
               }} >
 
                 <View style={{
@@ -332,7 +327,7 @@ const Favorites = () => {
                     <Text style={{
                       color: "red",
                       fontWeight: "bold",
-                      fontSize: 15
+                      fontSize: scaledFont(15),
                     }}>Delete</Text>
                   </TouchableOpacity>
                   <TouchableOpacity
@@ -350,14 +345,12 @@ const Favorites = () => {
                     <Text style={{
                       color: theme.text_color,
                       fontWeight: "bold",
-                      fontSize: 15,
-
+                      fontSize: scaledFont(15),
                     }}>Cancel</Text>
                   </TouchableOpacity>
                 </View>
 
               </View>
-            </View>
           </BottomSheetModal>
           <BottomSheetModal
             ref={replyBottomSheetRef}
@@ -398,10 +391,10 @@ const Favorites = () => {
                   // onPress={()=>props.onRepost(post._id)}
                   name="retweet"
                   style={{ marginRight: 10 }}
-                  size={20}
+                  size={scaledFont(20)}
                   color={theme.text_color}
                 />
-                <Text style={{ color: theme.text_color }}>Repost</Text>
+                <Text style={{ color: theme.text_color, fontSize:scaledFont(15)}}>Repost</Text>
               </TouchableOpacity>
 
               <TouchableOpacity
@@ -411,10 +404,10 @@ const Favorites = () => {
                   // onPress={()=>props.onRepost(post._id)}
                   name="quote-left"
                   style={{ marginRight: 10 }}
-                  size={20}
+                  size={scaledFont(20)}
                   color={theme.text_color}
                 />
-                <Text style={{ color: theme.text_color }}>Repost with Qoute</Text>
+                <Text style={{ color: theme.text_color,fontSize:scaledFont(15) }}>Repost with Qoute</Text>
               </TouchableOpacity>
             </View>
           </BottomSheetModal>
@@ -452,6 +445,8 @@ const styles = StyleSheet.create({
   {
     flex: 1,
     padding: 20,
+    alignItems:"center",
+    justifyContent:'center'
   },
   btnRepost:
   {
@@ -466,6 +461,7 @@ const styles = StyleSheet.create({
   {
     padding: 20,
     flexDirection: "row",
+    alignItems: 'center',
     borderRadius: 15,
     width: "100%"
   },

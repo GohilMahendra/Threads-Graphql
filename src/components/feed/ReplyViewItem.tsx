@@ -57,9 +57,9 @@ const styles = StyleSheet.create({
     imgUser:
     {
         height: scaledFont(30),
-        width: scaledFont(40),
+        width: scaledFont(30),
         alignItems: "flex-start",
-        borderRadius: 30,
+        borderRadius: scaledFont(30),
         marginRight: 20
     },
     rightContainer:
@@ -75,7 +75,7 @@ const styles = StyleSheet.create({
     },
     txtUsername:
     {
-        fontSize: 15,
+        fontSize: scaledFont(15),
         fontWeight: "500"
     },
     rightProfileContainer:
