@@ -5,7 +5,7 @@ A full stack clone of Meta Threads. It have some mixed functionality like commen
 
 - Node 
 - React Native
-- FFMpeg(if not fine it will be installed with npm)
+- FFMpeg(if not it's fine it will be installed with npm)
 - Xcode
 
 ## Installation
