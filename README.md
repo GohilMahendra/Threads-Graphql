@@ -52,6 +52,45 @@ Make sure you have Node.js and npm installed on your machine. If not, you can do
      ```bash
     yarn dev
 
+### Atlas search indexes
+- UserSearch (username,fullname)
+   ```bash {
+  "mappings": {
+    "dynamic": false,
+    "fields": {
+      "fullname": [
+        {
+          "type": "stringFacet"
+        },
+        {
+          "type": "string"
+        },
+        {
+          "foldDiacritics": false,
+          "maxGrams": 7,
+          "minGrams": 3,
+          "tokenization": "edgeGram",
+          "type": "autocomplete"
+        }
+      ],
+      "username": [
+        {
+          "type": "stringFacet"
+        },
+        {
+          "type": "string"
+        },
+        {
+          "foldDiacritics": false,
+          "maxGrams": 7,
+          "minGrams": 2,
+          "tokenization": "edgeGram",
+          "type": "autocomplete"
+        }
+      ]
+    }
+  }
+}
 ## Tech Stack
 
 ### fronend
