@@ -1,6 +1,24 @@
 ## Threads
 A full stack clone of Meta Threads. It have some mixed functionality like comment from instagram, grid images from twitter
 
+## Requirments
+
+- Node 
+- React Native
+- FFMpeg(if not fine it will be installed with npm)
+- Xcode
+
+## Installation
+
+### React Native
+Make sure you have Node.js and npm installed on your machine. If not, you can download and install them from [here](https://nodejs.org/).
+
+1. Clone the repository:
+
+   ```bash
+   git clone https://github.com/your-username/your-repo.git
+   cd your-repo```
+
 ## Tech Stack
 
 ### fronend
