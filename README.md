@@ -52,7 +52,6 @@ Make sure you have Node.js and npm installed on your machine. If not, you can do
      ```bash
     yarn dev
 
-
 ## Tech Stack
 
 ### fronend
