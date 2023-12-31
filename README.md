@@ -1,10 +1,24 @@
 ## Threads
 A full stack clone of Meta Threads. It have some mixed functionality like comment from instagram, grid images from twitter
 
-## Features
+## Tech Stack
 
-- - fronend
-- 
+### fronend
+- React-Native 
+- Typescript
+- Redux-Toolkit
+- React-navigation v6
+- reanimated v2
+
+### backend
+- MongoDB
+- Node.js
+- Express.js
+- Aws s3
+- JWT statless
+- Typescript
+
+### Features
 
 ## Environment variables
 - MONGO_URL = your-db-uri
