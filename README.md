@@ -18,7 +18,31 @@ A full stack clone of Meta Threads. It have some mixed functionality like commen
 - JWT statless
 - Typescript
 
-### Features
+## Features
+
+### Auth
+- Otp Email verification
+
+### Posts
+- Create Post
+- Delete Post
+- Like A Post
+- Comment on Post
+- Repost The Other Posts
+
+### Followers
+
+- Follow user
+- UnFollow user
+- get following posts
+- get list of follwings
+
+### Replies
+
+- comment on post
+- get posts in which you replies
+- delete the reply
+
 
 ## Environment variables
 - MONGO_URL = your-db-uri
