@@ -53,7 +53,7 @@ Make sure you have Node.js and npm installed on your machine. If not, you can do
     yarn dev
 
 ### Atlas search indexes
-- UserSearch (username,fullname)
+- UserSearch (username,fullname) User Schema
    ```bash {
   "mappings": {
     "dynamic": false,
@@ -74,6 +74,30 @@ Make sure you have Node.js and npm installed on your machine. If not, you can do
         }
       ],
       "username": [
+        {
+          "type": "stringFacet"
+        },
+        {
+          "type": "string"
+        },
+        {
+          "foldDiacritics": false,
+          "maxGrams": 7,
+          "minGrams": 2,
+          "tokenization": "edgeGram",
+          "type": "autocomplete"
+        }
+      ]
+    }
+  }
+}
+
+- ContentSeach (post content full text search) Post Schema
+    ```bash{
+  "mappings": {
+    "dynamic": false,
+    "fields": {
+      "content": [
         {
           "type": "stringFacet"
         },
