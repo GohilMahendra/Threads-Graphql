@@ -1,4 +1,4 @@
-## ENV varibles
+## Environment variables
 - MONGO_URL = your-db-uri
 - MAILER_PASS = your-mailer-password
 - MAILER_EMAIL = your-mailer-mail
