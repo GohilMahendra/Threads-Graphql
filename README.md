@@ -31,6 +31,28 @@ Make sure you have Node.js and npm installed on your machine. If not, you can do
        pod install
     ```
 
+### Node Server
+
+1. install libraries
+    ```bash
+    yarn
+
+2. setup ENV file
+
+- MONGO_URL = your-db-uri
+- MAILER_PASS = your-mailer-password
+- MAILER_EMAIL = your-mailer-mail
+- AWS_ACCESS_KEY = aws-access-key-for-storage-access
+- AWS_SECRET_ACCESS_KEY = aws-secret-key-for-storage-access
+- AWS_S3_BUCKET_NAME = aws-bucket-name
+- AWS_REGION = aws-region-name
+- TOKEN_SECRET = token-secret-for-sign-jwt
+
+3. use this command to run on nodemoon
+     ```bash
+    yarn dev
+
+
 ## Tech Stack
 
 ### fronend
@@ -72,17 +94,6 @@ Make sure you have Node.js and npm installed on your machine. If not, you can do
 - comment on post
 - get posts in which you replies
 - delete the reply
-
-
-## Environment variables
-- MONGO_URL = your-db-uri
-- MAILER_PASS = your-mailer-password
-- MAILER_EMAIL = your-mailer-mail
-- AWS_ACCESS_KEY = aws-access-key-for-storage-access
-- AWS_SECRET_ACCESS_KEY = aws-secret-key-for-storage-access
-- AWS_S3_BUCKET_NAME = aws-bucket-name
-- AWS_REGION = aws-region-name
-- TOKEN_SECRET = token-secret-for-sign-jwt
 
 ## Screenshots
 
