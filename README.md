@@ -1,5 +1,10 @@
 ## Threads
-A full stack clone of Meta Threads. It have some mixed functionality like comment from instagram, grid images from twitter. made with React-Native,Typescript frontend and MongoDB,Express and Node for backend.
+A full stack clone of Meta Threads. It have some mixed functionality like comment from instagram, grid images from twitter
+
+## Features
+
+- - fronend
+- 
 
 ## Environment variables
 - MONGO_URL = your-db-uri
