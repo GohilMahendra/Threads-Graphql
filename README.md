@@ -1,3 +1,6 @@
+## Threads
+A full stack clone of Meta Threads. It have some mixed functionality like comment from instagram, grid images from twitter. made with React-Native,Typescript frontend and MongoDB,Express and Node for backend.
+
 ## Environment variables
 - MONGO_URL = your-db-uri
 - MAILER_PASS = your-mailer-password
