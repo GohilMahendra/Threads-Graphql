@@ -7,7 +7,8 @@ import { useSelector } from 'react-redux'
 import { RootState, useAppDispatch } from '../../redux/store'
 import FollowingUser from '../../components/favorites/FollowingUser'
 import { User } from '../../types/User'
-import { deleteReplyAction, favoriteCreateRepostAction, favoritesLikeAction, favoritesUnlikeAction, getLikedPostsActions, getMoreLikedPostsActions, getMoreRepliedPostsAction, getMoreUserFollowingAction, getRepliedPostsAction, getUserFollowingAction } from '../../redux/actions/FavoriteActions'
+import {  favoriteCreateRepostAction, favoritesLikeAction, favoritesUnlikeAction, getLikedPostsActions, getMoreLikedPostsActions, getMoreUserFollowingAction, getUserFollowingAction,
+  deleteFavoritesReplyAction, favoritesFollowAction,favoritesUnFollowAction,getFavoritesRepliedPostsAction,getMoreFavoritesRepliedPostsAction } from '../../redux/actions/FavoriteActions'
 import { Thread } from '../../types/Post'
 import RepostItem from '../../components/feed/RepostItem'
 import PostItem from '../../components/feed/PostItem'
@@ -58,7 +59,7 @@ const Favorites = () => {
   }
   const onDeleteReply = (replyId: string) => {
     replyThreeDotsBottomSheetRef.current?.close()
-    dispatch(deleteReplyAction({
+    dispatch(deleteFavoritesReplyAction({
       replyId: replyId
     }))
   }
@@ -131,10 +132,10 @@ const Favorites = () => {
     dispatch(getLikedPostsActions(""))
   }
   const getRepliedPosts = async () => {
-    dispatch(getRepliedPostsAction(""))
+    dispatch(getFavoritesRepliedPostsAction(""))
   }
   const getMoreRepliesPosts = async () => {
-    dispatch(getMoreRepliedPostsAction(""))
+    dispatch(getMoreFavoritesRepliedPostsAction(""))
   }
   const getFollowingUsers = async () => {
     dispatch(getUserFollowingAction(""))
@@ -154,6 +155,7 @@ const Favorites = () => {
         backgroundColor: theme.background_color
       }}>
         {screenLoading && <Loader />}
+        <Text style={[styles.title,{color: theme.text_color}]}>Activity</Text>
         <View style={styles.optionRowContainer}>
           <ScrollView
             horizontal
@@ -420,6 +422,13 @@ const Favorites = () => {
 
 export default Favorites
 const styles = StyleSheet.create({
+  title:
+  {
+    marginHorizontal:20,
+    marginTop:10,
+    fontSize:scaledFont(30),
+    fontWeight:"bold"
+  },
   sheetComment:
   {
     borderTopLeftRadius: 15,
@@ -475,7 +484,8 @@ const styles = StyleSheet.create({
   optionRowContainer:
   {
     flexDirection: 'row',
-    padding: 20
+    paddingHorizontal:20,
+    paddingVertical:10
   },
   gestureContainer:
   {

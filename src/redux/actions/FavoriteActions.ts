@@ -33,7 +33,7 @@ export const getMoreUserFollowingAction = createAsyncThunk(
         try {
 
             const state = getState() as RootState
-            const lastOffset = state.Feed.lastOffset
+            const lastOffset = state.Favorite.lastOffset
             if (!lastOffset) {
                 return {
                     data: [],
@@ -143,8 +143,8 @@ export const favoritesUnlikeAction = createAsyncThunk(
         }
     }
 )
-export const followUserAction = createAsyncThunk(
-    "Favorites/followUserAction",
+export const favoritesFollowAction = createAsyncThunk(
+    "Favorites/favoritesFollowAction",
     async ({ userId }: { userId: string }, { rejectWithValue, getState }) => {
         try {
             const response = await followUser(userId)
@@ -159,8 +159,8 @@ export const followUserAction = createAsyncThunk(
 
     }
 )
-export const unFollowUserAction = createAsyncThunk(
-    "Favorites/unFollowUserAction",
+export const favoritesUnFollowAction = createAsyncThunk(
+    "Favorites/favoritesUnFollowAction",
     async ({ userId }: { userId: string }, { rejectWithValue, getState }) => {
         try {
             const response = await unFollowUser(userId)
@@ -175,8 +175,8 @@ export const unFollowUserAction = createAsyncThunk(
 
     }
 )
-export const getRepliedPostsAction = createAsyncThunk(
-    "Favorites/getRepliedPostsAction",
+export const getFavoritesRepliedPostsAction = createAsyncThunk(
+    "Favorites/getFavoritesRepliedPostsAction",
     async (fakeArg: string, { rejectWithValue }) => {
         try {
             const response = await fetchUserRepliedPosts({
@@ -197,8 +197,8 @@ export const getRepliedPostsAction = createAsyncThunk(
 
     }
 )
-export const getMoreRepliedPostsAction = createAsyncThunk(
-    "Favorites/getMoreRepliedPostsAction",
+export const getMoreFavoritesRepliedPostsAction = createAsyncThunk(
+    "Favorites/getMoreFavoritesRepliedPostsAction",
     async (fakeArg: string, { rejectWithValue,getState }) => {
         try {
             const state = getState() as RootState
@@ -245,8 +245,8 @@ export const favoriteCreateRepostAction = createAsyncThunk(
         }
     }
 )
-export const deleteReplyAction = createAsyncThunk(
-    "Favorite/deleteReplyAction",
+export const deleteFavoritesReplyAction = createAsyncThunk(
+    "Favorite/deleteFavoritesReplyAction",
     async ({ replyId}: { replyId: string}, { rejectWithValue }) => {
         try {
             const response = await deleteReply(replyId)

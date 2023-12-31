@@ -4,7 +4,7 @@ import { SearchUser, User } from "../../types/User"
 import { placeholder_image } from "../../globals/asstes";
 import UseTheme from "../../globals/UseTheme";
 import { useAppDispatch } from "../../redux/store";
-import { followUserAction, unFollowUserAction } from "../../redux/actions/FavoriteActions";
+import { favoritesFollowAction, favoritesUnFollowAction } from "../../redux/actions/FavoriteActions";
 import { scaledFont } from "../../globals/utilities";
 type UserItemProps =
   {
@@ -17,10 +17,10 @@ const FollowingUser = (props: UserItemProps) => {
   const dispatch = useAppDispatch()
   const onPressFollow = async () => {
     if (item.isFollowed) {
-      dispatch(unFollowUserAction({ userId: item._id }))
+      dispatch(favoritesUnFollowAction({ userId: item._id }))
     }
     else
-      dispatch(followUserAction({
+      dispatch(favoritesFollowAction({
         userId: item._id
       }))
   }

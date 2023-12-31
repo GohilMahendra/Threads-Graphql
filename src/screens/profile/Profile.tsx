@@ -62,6 +62,7 @@ const Profile = () => {
     }))
   }
 
+
   useEffect(() => {
     dispatch(FetchUserPostsAction({
       post_type: selectedSection
@@ -73,8 +74,10 @@ const Profile = () => {
       <SafeAreaView style={[styles.container, { backgroundColor: theme.background_color }]}>
         {screenLoading && <Loader />}
         <ScrollView
+          nestedScrollEnabled
           stickyHeaderHiddenOnScroll
           stickyHeaderIndices={[2]}
+          scrollEventThrottle={10}
           refreshControl={
             <RefreshControl
               tintColor={theme.text_color}
@@ -109,7 +112,7 @@ const Profile = () => {
                 <Text style={[styles.txtFullname, { color: theme.text_color }]}>{user.fullname}</Text>
                 <Text style={{
                   color: theme.text_color,
-                  fontSize:scaledFont(15)
+                  fontSize: scaledFont(15)
                 }}>{user.username}</Text>
               </View>
               <Image
@@ -117,8 +120,8 @@ const Profile = () => {
                 style={styles.imgProfile}
               />
             </View>
-            <Text style={{ color: theme.text_color,fontSize:scaledFont(13) }} ellipsizeMode="tail" numberOfLines={10}>{user.bio}</Text>
-            <Text style={{ color: theme.secondary_text_color, marginTop: 20,fontSize:scaledFont(12) }}>{user.followers} Followers</Text>
+            <Text style={{ color: theme.text_color, fontSize: scaledFont(13) }} ellipsizeMode="tail" numberOfLines={10}>{user.bio}</Text>
+            <Text style={{ color: theme.secondary_text_color, marginTop: 20, fontSize: scaledFont(12) }}>{user.followers} Followers</Text>
           </View>
           <View style={[styles.selectionSticky, {
             backgroundColor: theme.background_color
@@ -159,10 +162,10 @@ const Profile = () => {
               animating
             />}
             data={posts}
-            keyExtractor={(item, index) => index.toString()}
+            keyExtractor={(item, index) =>item._id}
             renderItem={({ item, index }) => renderPosts(item, index)}
-            onEndReachedThreshold={0.3}
-            onEndReached={() =>lastOffset && loadMorePosts()}
+            onEndReached={() => lastOffset && loadMorePosts()}
+            onEndReachedThreshold={0.5}
           />
         </ScrollView>
 

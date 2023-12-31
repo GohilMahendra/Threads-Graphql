@@ -220,7 +220,6 @@ export const followUser = async (userId: string) => {
         )
         if (response.status == 200)
         {
-            console.log(response.data)
             return response.data
         }
         else
@@ -245,7 +244,6 @@ export const unFollowUser = async (userId: string) => {
         )
         if (response.status == 200)
         {
-            console.log(response.data)
             return response.data
         }
         else

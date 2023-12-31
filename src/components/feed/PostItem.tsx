@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect, useRef } from "react";
 import { Text, Image, TouchableOpacity, StyleSheet } from "react-native"
 import { View } from "react-native"
 import { placeholder_image } from "../../globals/asstes";
@@ -26,8 +26,7 @@ type PostItemsProps =
         onPressNavigate: (userId: string) => void
         onLikeToggle: (postId: string, step: "like" | "unlike") => void
     }
-const PostItem = (props: PostItemsProps) => {
-
+const PostItem =  (props: PostItemsProps) => {
     const post = props.post
     const media = post.media
     const { theme } = UseTheme()
@@ -60,7 +59,7 @@ const PostItem = (props: PostItemsProps) => {
         const words = bioText.split(/\s+/);
       
         return (
-          <View style={{ marginVertical: 5, flexDirection: 'row', flexWrap: 'wrap' }}>
+          <View style={{ flexDirection: 'row', flexWrap: 'wrap' }}>
             {words.map((word, index) => (
               <React.Fragment key={index}>
                 {word.startsWith('#') ? (
@@ -75,7 +74,6 @@ const PostItem = (props: PostItemsProps) => {
           </View>
         );
       };
-      
 
     return (
         <View style={[styles.container, { backgroundColor: theme.background_color, }]}>
@@ -110,8 +108,9 @@ const PostItem = (props: PostItemsProps) => {
                         />
                     </View>
                 </View>
-
+                <View style={{marginVertical:5}}>
                 {renderBioWithPressableHashtags(post.content)}
+                </View>
                 {/* <Text style={{
                     color: theme.text_color,
                     marginVertical: 5

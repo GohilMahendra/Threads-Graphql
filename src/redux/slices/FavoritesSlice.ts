@@ -4,7 +4,11 @@ import { User } from "../../types/User";
 import { FetchPostsPayload } from "../types/global";
 import { String } from "aws-sdk/clients/batch";
 import { CommentedPost } from "../../types/Comment";
-import { deleteReplyAction, favoriteCreateRepostAction, favoritesLikeAction, favoritesUnlikeAction, followUserAction, getLikedPostsActions, getMoreLikedPostsActions, getMoreRepliedPostsAction, getMoreUserFollowingAction, getRepliedPostsAction, getUserFollowingAction, unFollowUserAction } from "../actions/FavoriteActions";
+import {  favoriteCreateRepostAction,
+     favoritesLikeAction, favoritesUnlikeAction, 
+     getLikedPostsActions, getMoreLikedPostsActions, getMoreUserFollowingAction, 
+     getUserFollowingAction,deleteFavoritesReplyAction,favoritesFollowAction,
+     favoritesUnFollowAction,getFavoritesRepliedPostsAction,getMoreFavoritesRepliedPostsAction } from "../actions/FavoriteActions";
 
 type FavoriteSliceType =
     {
@@ -71,28 +75,34 @@ export const FavoriteSlice = createSlice({
             state.loadMoreLoading = false
             state.loadMoreError = action.payload as string
         })
-        builder.addCase(followUserAction.pending, (state) => {
+        builder.addCase(favoritesFollowAction.pending, (state) => {
             state.successMessage = null
             state.error = null
+            state.screeenLoading = true
         })
-        builder.addCase(followUserAction.fulfilled, (state, action: PayloadAction<{ message: string, userId: string }>) => {
+        builder.addCase(favoritesFollowAction.fulfilled, (state, action: PayloadAction<{ message: string, userId: string }>) => {
             state.successMessage = action.payload.message
-            const index = state.users.findIndex(user => user._id)
+            const index = state.users.findIndex(user => user._id == action.payload.userId)
             state.users[index].isFollowed = true
+            state.screeenLoading = false
         })
-        builder.addCase(followUserAction.rejected, (state, action) => {
+        builder.addCase(favoritesFollowAction.rejected, (state, action) => {
+            state.screeenLoading = false
             state.error = action.payload as string
         })
-        builder.addCase(unFollowUserAction.pending, (state) => {
+        builder.addCase(favoritesUnFollowAction.pending, (state) => {
             state.successMessage = null
             state.error = null
+            state.screeenLoading = true
         })
-        builder.addCase(unFollowUserAction.fulfilled, (state, action: PayloadAction<{ message: string, userId: string }>) => {
+        builder.addCase(favoritesUnFollowAction.fulfilled, (state, action: PayloadAction<{ message: string, userId: string }>) => {
             state.successMessage = action.payload.message
-            const index = state.users.findIndex(user => user._id)
+            const index = state.users.findIndex(user => user._id === action.payload.userId)
             state.users[index].isFollowed = false
+            state.screeenLoading = false
         })
-        builder.addCase(unFollowUserAction.rejected, (state, action) => {
+        builder.addCase(favoritesUnFollowAction.rejected, (state, action) => {
+            state.screeenLoading = false
             state.error = action.payload as string
         })
         builder.addCase(getLikedPostsActions.pending, (state) => {
@@ -164,29 +174,29 @@ export const FavoriteSlice = createSlice({
             state.screeenLoading = false
             state.error = action.payload as string
         })
-        builder.addCase(getRepliedPostsAction.pending, (state) => {
+        builder.addCase(getFavoritesRepliedPostsAction.pending, (state) => {
             state.loading = true
             state.error = null
         })
-        builder.addCase(getRepliedPostsAction.fulfilled, (state, action: PayloadAction<FetchPostsPayload<CommentedPost>>) => {
+        builder.addCase(getFavoritesRepliedPostsAction.fulfilled, (state, action: PayloadAction<FetchPostsPayload<CommentedPost>>) => {
             state.loading = false
             state.repliedPosts = action.payload.data
             state.lastOffset = action.payload.lastOffset
         })
-        builder.addCase(getRepliedPostsAction.rejected, (state, action) => {
+        builder.addCase(getFavoritesRepliedPostsAction.rejected, (state, action) => {
             state.loading = false
             state.error = action.payload as string
         })
-        builder.addCase(getMoreRepliedPostsAction.pending, (state) => {
+        builder.addCase(getMoreFavoritesRepliedPostsAction.pending, (state) => {
             state.loading = true
             state.error = null
         })
-        builder.addCase(getMoreRepliedPostsAction.fulfilled, (state, action: PayloadAction<FetchPostsPayload<CommentedPost>>) => {
+        builder.addCase(getMoreFavoritesRepliedPostsAction.fulfilled, (state, action: PayloadAction<FetchPostsPayload<CommentedPost>>) => {
             state.loading = false
             state.repliedPosts.push(...action.payload.data)
             state.lastOffset = action.payload.lastOffset
         })
-        builder.addCase(getMoreRepliedPostsAction.rejected, (state, action) => {
+        builder.addCase(getMoreFavoritesRepliedPostsAction.rejected, (state, action) => {
             state.loading = false
             state.error = action.payload as string
         })
@@ -202,16 +212,16 @@ export const FavoriteSlice = createSlice({
             state.screeenLoading = false
             state.error = action.payload as string
         })
-        builder.addCase(deleteReplyAction.pending, (state) => {
+        builder.addCase(deleteFavoritesReplyAction.pending, (state) => {
             state.screeenLoading = true
             state.error = null
         })
-        builder.addCase(deleteReplyAction.fulfilled, (state, action) => {
+        builder.addCase(deleteFavoritesReplyAction.fulfilled, (state, action) => {
             state.screeenLoading = false
             state.repliedPosts = state.repliedPosts.filter(post => post._id != action.payload.replyId)
 
         })
-        builder.addCase(deleteReplyAction.rejected, (state, action) => {
+        builder.addCase(deleteFavoritesReplyAction.rejected, (state, action) => {
             state.screeenLoading = false
             state.error = action.payload as string
         })

@@ -1,11 +1,11 @@
 import { View, FlatList, TouchableOpacity, ActivityIndicator, SafeAreaView, StyleSheet } from 'react-native'
-import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react'
+import React, { memo, useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import FontAwesome from 'react-native-vector-icons/FontAwesome'
 import { Thread } from '../../types/Post'
 import PostItem from '../../components/feed/PostItem'
 import { useSelector } from 'react-redux'
 import { RootState, useAppDispatch } from '../../redux/store'
-import { FetchMorePostsAction, FetchPostsAction, LikeAction, unLikeAction } from '../../redux/slices/FeedSlice'
+import { FetchMorePostsAction,feedCreateRepostAction, FetchPostsAction, LikeAction, unLikeAction } from '../../redux/slices/FeedSlice'
 import Replies from '../../components/feed/Replies'
 import { BottomSheetBackdrop, BottomSheetModal, BottomSheetModalProvider } from "@gorhom/bottom-sheet";
 import { Text } from 'react-native-elements'
@@ -13,7 +13,6 @@ import { GestureHandlerRootView } from 'react-native-gesture-handler'
 import RepostItem from '../../components/feed/RepostItem'
 import { RefreshControl } from 'react-native'
 import UseTheme from '../../globals/UseTheme'
-import { createRepostAction } from '../../redux/slices/UserSlice'
 import { useNavigation } from '@react-navigation/native'
 import { compositeRootHomeStack } from '../../navigations/Types'
 import { scaledFont } from '../../globals/utilities'
@@ -42,7 +41,7 @@ const Home = () => {
 
   const onPressRepost = async () => {
     repostSheetModalRef.current?.close()
-    await dispatch(createRepostAction({ postId }))
+    await dispatch(feedCreateRepostAction({ postId }))
   }
 
   const onPressQouteRepost = async () => {
@@ -92,7 +91,6 @@ const Home = () => {
           key={item._id}
           post={item}
         />
-
     )
   }
   const fetcchMorePosts = async () => {
@@ -184,26 +182,24 @@ const Home = () => {
                   onPress={() => onPressRepost()}
                   style={[styles.btnRepost, { backgroundColor: theme.secondary_background_color, }]}>
                   <FontAwesome
-                    // onPress={()=>props.onRepost(post._id)}
                     name="retweet"
-                    style={{ marginRight: 10}}
+                    style={{ marginRight: 10 }}
                     size={scaledFont(20)}
                     color={theme.text_color}
                   />
-                  <Text style={{ color: theme.text_color,fontSize:scaledFont(15) }}>Repost</Text>
+                  <Text style={{ color: theme.text_color, fontSize: scaledFont(15) }}>Repost</Text>
                 </TouchableOpacity>
 
                 <TouchableOpacity
                   onPress={() => onPressQouteRepost()}
                   style={[styles.btnQouteRepost, { backgroundColor: theme.secondary_background_color, }]}>
                   <FontAwesome
-                    // onPress={()=>props.onRepost(post._id)}
                     name="quote-left"
                     style={{ marginRight: 10 }}
                     size={scaledFont(20)}
                     color={theme.text_color}
                   />
-                  <Text style={{ color: theme.text_color,fontSize:scaledFont(15) }}>Repost with Qoute</Text>
+                  <Text style={{ color: theme.text_color, fontSize: scaledFont(15) }}>Repost with Qoute</Text>
                 </TouchableOpacity>
               </View>
             </BottomSheetModal>
@@ -300,7 +296,7 @@ const styles = StyleSheet.create({
     padding: 20,
     flexDirection: "row",
     borderRadius: 15,
-    alignItems:"center",
+    alignItems: "center",
     width: "100%"
   }
 })

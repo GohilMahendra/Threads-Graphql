@@ -110,7 +110,7 @@ export const verifyOtpUserAction = createAsyncThunk(
     })
 
 export const createRepostAction = createAsyncThunk(
-    "Feed/createRepostAction",
+    "user/createRepostAction",
     async ({ postId, content }: { postId: string, content?: string }, { rejectWithValue }) => {
         try {
             const response = await createRepost(postId, content)
@@ -123,7 +123,7 @@ export const createRepostAction = createAsyncThunk(
     }
 )
 export const createPostAction = createAsyncThunk(
-    "Feed/createPostAction",
+    "user/createPostAction",
     async ({ content, media }: { content?: string, media: UploadMedia[] }, { rejectWithValue }) => {
         try {
             const response = await createPost({
@@ -142,7 +142,7 @@ export const createPostAction = createAsyncThunk(
 )
 
 export const FetchUserPostsAction = createAsyncThunk(
-    "User/FetchPostsAction",
+    "user/FetchPostsAction",
     async ({ post_type }: { post_type: string }, { rejectWithValue }) => {
         try {
             const response = await fetchUserPosts({
@@ -181,11 +181,11 @@ export const FetchUserPostsAction = createAsyncThunk(
     })
 
 export const FetchMoreUserPostsAction = createAsyncThunk(
-    "User/FetchMorePostsAction",
+    "user/FetchMorePostsAction",
     async ({ post_type }: { post_type: string }, { rejectWithValue, getState }) => {
         try {
             const state = getState() as RootState
-            const lastOffset = state.Feed.lastOffset
+            const lastOffset = state.User.lastOffset
             if (!lastOffset) {
                 return {
                     data: [],
@@ -217,7 +217,6 @@ export const FetchMoreUserPostsAction = createAsyncThunk(
                 }
                 posts.push(post)
             })
-
             return {
                 data: posts,
                 lastOffset: response.meta.lastOffset
@@ -230,7 +229,7 @@ export const FetchMoreUserPostsAction = createAsyncThunk(
     })
 
 export const DeletePostAction = createAsyncThunk(
-    "User/DeletePostAction",
+    "user/DeletePostAction",
     async ({ postId }: { postId: string }, { rejectWithValue, getState }) => {
         try {
             const response = await deleteUserPost(postId)
@@ -299,7 +298,7 @@ export const UserSlice = createSlice({
         })
         builder.addCase(FetchMoreUserPostsAction.fulfilled, (state, action: PayloadAction<FetchPostsPayload<Thread>>) => {
             state.morePostsLoading = false
-             state.Posts.push(...action.payload.data)
+            state.Posts = [...state.Posts,...action.payload.data]
             state.lastOffset = action.payload.lastOffset
         })
         builder.addCase(FetchMoreUserPostsAction.rejected, (state, action) => {

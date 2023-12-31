@@ -186,7 +186,7 @@ Make sure you have Node.js and npm installed on your machine. If not, you can do
 
 | User Profile | User Profile 2 |  Favorites |
 | ------------ | ------------ | ------------ |
-| ![Screenshot 1](screenshots/light%20mode/Simulator%20Screenshot%20-%20iPhone%2015%20Pro%20Max%20-%202023-12-31%20at%2006.01.11.png) | ![Screenshot 2](screenshots/light%20mode/Simulator%20Screenshot%20-%20iPhone%2015%20Pro%20Max%20-%202023-12-31%20at%2006.05.58.png) | ![Screenshot 3](screenshots/light%20mode/Simulator%20Screenshot%20-%20iPhone%2015%20Pro%20Max%20-%202023-12-31%20at%2006.06.52.png) |
+| ![Screenshot 1](screenshots/light%20mode/Simulator%20Screenshot%20-%20iPhone%2015%20Pro%20Max%20-%202023-12-31%20at%2006.01.11.png) | ![Screenshot 2](screenshots/light%20mode/Simulator%20Screenshot%20-%20iPhone%2015%20Pro%20Max%20-%202023-12-31%20at%2006.05.58.png) | ![Screenshot 3](screenshots/light%20mode/Simulator%20Screenshot%20-%20iPhone%20SE%20(3rd%20generation)%20-%202024-01-01%20at%2000.57.44.png) |
 
 | Favorites 2 | Favorites 3 | Favorites 4 |
 | ------------ | ------------ | ------------ |

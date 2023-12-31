@@ -3,89 +3,93 @@ import { Text, Image, TouchableOpacity, Dimensions, StyleSheet } from "react-nat
 import { View } from "react-native"
 import { placeholder_image } from "../../globals/asstes";
 import Entypo from "react-native-vector-icons/Entypo";
-import {  Thread } from "../../types/Post";
+import { Thread } from "../../types/Post";
 import { scaledFont, timeDifference } from "../../globals/utilities";
 import GridViewer from "../feed/GridViewer";
 import UseTheme from "../../globals/UseTheme";
 type PostItemsProps =
     {
         post: Thread,
-        onPressThreeDots:(postId:string)=>void
+        onPressThreeDots: (postId: string) => void
     }
 const ProfileRepost = (props: PostItemsProps) => {
     const post = props.post
     const media = post.media
     const repost = post.Repost as Thread
-    const {theme} = UseTheme()
+    const { theme } = UseTheme()
     const renderBioWithPressableHashtags = (bioText: string | undefined) => {
         if (!bioText) return null;
-      
+
         const words = bioText.split(/\s+/);
-      
+
         return (
-          <View style={{ marginVertical: 5, flexDirection: 'row', flexWrap: 'wrap' }}>
-            {words.map((word, index) => (
-              <React.Fragment key={index}>
-                {word.startsWith('#') ? (
-                  <TouchableOpacity onPress={() => console.log('Pressed:', word)}>
-                    <Text style={{ color: 'blue',fontSize:scaledFont(13), fontWeight: 'bold' }}>{word}</Text>
-                  </TouchableOpacity>
-                ) : (
-                  <Text style={{color: theme.text_color,fontSize:scaledFont(13)}}>{word}{' '}</Text>
-                )}
-              </React.Fragment>
-            ))}
-          </View>
+            <View style={{ flexDirection: 'row', flexWrap: 'wrap' }}>
+                {words.map((word, index) => (
+                    <React.Fragment key={index}>
+                        {word.startsWith('#') ? (
+                            <TouchableOpacity onPress={() => console.log('Pressed:', word)}>
+                                <Text style={{ color: 'blue', fontSize: scaledFont(13), fontWeight: 'bold' }}>{word}</Text>
+                            </TouchableOpacity>
+                        ) : (
+                            <Text style={{ color: theme.text_color, fontSize: scaledFont(13) }}>{word}{' '}</Text>
+                        )}
+                    </React.Fragment>
+                ))}
+            </View>
         );
-      };
+    };
     return (
-        <View style={[styles.container,{ backgroundColor: theme.background_color,}]}>
+        <View style={[styles.container, { backgroundColor: theme.background_color, }]}>
             <View style={styles.rowContainer}>
                 <View style={styles.imageContainer}>
-                   <TouchableOpacity>
-                   <Image
-                        resizeMode="cover"
-                        source={post.user.profile_picture ? {
-                            uri: post.user.profile_picture
-                        } : placeholder_image}
-                        style={styles.imgProfile}
-                    />
-                   </TouchableOpacity>
-                   <View style={styles.threadRode}/>
+                    <TouchableOpacity>
+                        <Image
+                            resizeMode="cover"
+                            source={post.user.profile_picture ? {
+                                uri: post.user.profile_picture
+                            } : placeholder_image}
+                            style={styles.imgProfile}
+                        />
+                    </TouchableOpacity>
+                    <View style={styles.threadRode} />
                 </View>
             </View>
             <View style={styles.rightContainer}>
                 <View style={styles.profileRowContainer}>
-                    <Text style={[styles.txtFullname,{color: theme.text_color,}]}>{post.user.username}</Text>
+                    <Text style={[styles.txtFullname, { color: theme.text_color, }]}>{post.user.username}</Text>
                     <View style={styles.rightRowContainer}>
                         <Text style={styles.txtCreatedAt}>{timeDifference(post.created_at)}</Text>
                         <Entypo
-                            onPress={()=>props.onPressThreeDots(post._id)}
+                            onPress={() => props.onPressThreeDots(post._id)}
                             name="dots-three-horizontal"
                             size={scaledFont(18)}
                             color={theme.text_color}
                         />
                     </View>
                 </View>
-                {renderBioWithPressableHashtags(post.content)}
+                <View style={{ marginVertical: 5 }}>
+                    {renderBioWithPressableHashtags(post.content)}
+                </View>
                 {/* origional post container starts */}
-                <View style={[styles.postContainer,{ borderColor: theme.text_color,}]}>
-                    <TouchableOpacity 
-                    style={styles.postImageContainer}>
+                <View style={[styles.postContainer, { borderColor: theme.text_color, }]}>
+                    <TouchableOpacity
+                        style={styles.postImageContainer}>
                         <Image
-                        style={styles.imgProfilePost}
-                        source={post.Repost?.user.profile_picture?
-                        {uri:post.Repost?.user.profile_picture}:
-                        placeholder_image
-                        }
+                            style={styles.imgProfilePost}
+                            source={post.Repost?.user.profile_picture ?
+                                { uri: post.Repost?.user.profile_picture } :
+                                placeholder_image
+                            }
                         />
                         <View>
-                            <Text style={[styles.textPostFullname,{ color: theme.text_color}]}>{post.Repost?.user.username}</Text>
+                            <Text style={[styles.textPostFullname, { color: theme.text_color }]}>{post.Repost?.user.username}</Text>
                         </View>
                     </TouchableOpacity>
-                    {renderBioWithPressableHashtags(post.Repost?.content)}
+                    <View style={{ marginVertical: 5 }}>
+                        {renderBioWithPressableHashtags(post.content)}
+                    </View>
                     <GridViewer
-                    media={post.Repost?.media || []}
+                        media={post.Repost?.media || []}
                     />
                 </View>
             </View>
@@ -109,12 +113,12 @@ const styles = StyleSheet.create({
     imageContainer:
     {
         marginRight: 20,
-        alignItems:"center"
+        alignItems: "center"
     },
     imgProfile:
     {
         height: scaledFont(50),
-        width:  scaledFont(50),
+        width: scaledFont(50),
         borderRadius: scaledFont(50)
     },
     threadRode:
@@ -132,7 +136,7 @@ const styles = StyleSheet.create({
     profileRowContainer:
     {
         flexDirection: "row",
-        alignItems:"center",
+        alignItems: "center",
         justifyContent: 'space-between'
     },
     txtFullname:
@@ -149,29 +153,29 @@ const styles = StyleSheet.create({
     {
         color: "silver",
         marginRight: 10,
-        fontSize:scaledFont(13)
+        fontSize: scaledFont(13)
     },
     postContainer:
     {
-        padding:5,
-        borderWidth:0.4,
-        borderRadius:10,
+        padding: 5,
+        borderWidth: 0.4,
+        borderRadius: 10,
         //alignItems:'center'
     },
     postImageContainer:
     {
-        flexDirection:'row',
-        marginVertical:5
+        flexDirection: 'row',
+        marginVertical: 5
     },
     imgProfilePost:
     {
-        height:scaledFont(30),
-        width:scaledFont(30),
-        borderRadius:scaledFont(30),
-        marginRight:15
+        height: scaledFont(30),
+        width: scaledFont(30),
+        borderRadius: scaledFont(30),
+        marginRight: 15
     },
     textPostFullname:
     {
-        fontSize:scaledFont(18),
+        fontSize: scaledFont(18),
     }
 })

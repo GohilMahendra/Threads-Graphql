@@ -54,25 +54,25 @@ const RepostItem = (props: PostItemsProps) => {
     }
     const renderBioWithPressableHashtags = (bioText: string | undefined) => {
         if (!bioText) return null;
-      
+
         const words = bioText.split(/\s+/);
-      
+
         return (
-          <View style={{ marginVertical: 5, flexDirection: 'row', flexWrap: 'wrap' }}>
-            {words.map((word, index) => (
-              <React.Fragment key={index}>
-                {word.startsWith('#') ? (
-                  <TouchableOpacity onPress={() => console.log('Pressed:', word)}>
-                    <Text style={{ color: 'blue',fontSize:scaledFont(13), fontWeight: 'bold' }}>{word}</Text>
-                  </TouchableOpacity>
-                ) : (
-                  <Text style={{color: theme.text_color,fontSize:scaledFont(13)}}>{word}{' '}</Text>
-                )}
-              </React.Fragment>
-            ))}
-          </View>
+            <View style={{ flexDirection: 'row', flexWrap: 'wrap' }}>
+                {words.map((word, index) => (
+                    <React.Fragment key={index}>
+                        {word.startsWith('#') ? (
+                            <TouchableOpacity onPress={() => console.log('Pressed:', word)}>
+                                <Text style={{ color: 'blue', fontSize: scaledFont(13), fontWeight: 'bold' }}>{word}</Text>
+                            </TouchableOpacity>
+                        ) : (
+                            <Text style={{ color: theme.text_color, fontSize: scaledFont(13) }}>{word}{' '}</Text>
+                        )}
+                    </React.Fragment>
+                ))}
+            </View>
         );
-      };
+    };
 
     return (
         <View style={[styles.container, { backgroundColor: theme.background_color, }]}>
@@ -104,7 +104,9 @@ const RepostItem = (props: PostItemsProps) => {
                         />
                     </View>
                 </View>
-               {renderBioWithPressableHashtags(post.content)}
+                <View style={{ marginVertical: 5 }}>
+                    {renderBioWithPressableHashtags(post.content)}
+                </View>
                 {/* origional post container starts */}
                 <View style={[styles.postContainer, { borderColor: theme.text_color }]}>
                     <TouchableOpacity
@@ -125,7 +127,9 @@ const RepostItem = (props: PostItemsProps) => {
                         </View>
 
                     </TouchableOpacity>
-                    {renderBioWithPressableHashtags(post.content)}
+                    <View style={{ marginVertical: 5 }}>
+                        {renderBioWithPressableHashtags(post.content)}
+                    </View>
                     <GridViewer
                         media={post.Repost?.media || []}
                     />
