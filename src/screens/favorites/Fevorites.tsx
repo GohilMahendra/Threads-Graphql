@@ -9,7 +9,7 @@ import FollowingUser from '../../components/favorites/FollowingUser'
 import { User } from '../../types/User'
 import {
   favoriteCreateRepostAction, favoritesLikeAction, favoritesUnlikeAction, getLikedPostsActions, getMoreLikedPostsActions, getMoreUserFollowingAction, getUserFollowingAction,
-  deleteFavoritesReplyAction, favoritesFollowAction, favoritesUnFollowAction, getFavoritesRepliedPostsAction, getMoreFavoritesRepliedPostsAction
+  deleteFavoritesReplyAction, getFavoritesRepliedPostsAction, getMoreFavoritesRepliedPostsAction
 } from '../../redux/actions/FavoriteActions'
 import { Thread } from '../../types/Post'
 import RepostItem from '../../components/feed/RepostItem'
@@ -67,23 +67,28 @@ const Favorites = () => {
   }
   const toggleLike = (postId: string, step: string) => {
     if (step == "unlike") {
-      if(selectedOption == "Likes")
-      dispatch(favoritesUnlikeAction({ post_type: "post", postId: postId }))
-      else if(selectedOption == "Replies")
-      dispatch(favoritesUnlikeAction({ post_type: "reply", postId: postId }))
+      if (selectedOption == "Likes")
+        dispatch(favoritesUnlikeAction({ post_type: "post", postId: postId }))
+      else if (selectedOption == "Replies")
+        dispatch(favoritesUnlikeAction({ post_type: "reply", postId: postId }))
     }
     else {
-      if(selectedOption == "Likes")
-      dispatch(favoritesLikeAction({ post_type: "post", postId: postId }))
-      else if(selectedOption == "Replies")
-      dispatch(favoritesLikeAction({ post_type: "reply", postId: postId }))
+      if (selectedOption == "Likes")
+        dispatch(favoritesLikeAction({ post_type: "post", postId: postId }))
+      else if (selectedOption == "Replies")
+        dispatch(favoritesLikeAction({ post_type: "reply", postId: postId }))
     }
+  }
+  const onNavigate = (userId: string) => {
+    navigation.navigate("UserProfile", {
+      userId: userId
+    })
   }
   const renderUsers = (item: User, index: number) => {
     return (
       <FollowingUser
         user={item}
-        onPress={() => console.log("pressed")}
+        onPress={(userId) => onNavigate(userId)}
       />
     )
   }
@@ -233,8 +238,8 @@ const Favorites = () => {
             ListEmptyComponent={() => (
               <View style={{ flex: 1, justifyContent: "center", alignItems: "center" }}>
                 <Text style={{
-                  color: theme.text_color,
-                  fontSize:scaledFont(15)
+                  color: theme.secondary_text_color,
+                  fontSize: scaledFont(15)
                 }}>suggestions are coming Soon !!</Text>
               </View>
             )}
@@ -248,18 +253,19 @@ const Favorites = () => {
           contentContainerStyle={{
             flexGrow: 1
           }}
-          refreshControl={<RefreshControl
-            tintColor={theme.text_color}
-            refreshing={loading}
-            onRefresh={() => getFollowingUsers()}
-          />}
+          refreshControl={
+            <RefreshControl
+              tintColor={theme.text_color}
+              refreshing={loading}
+              onRefresh={() => getFollowingUsers()}
+            />}
           ListEmptyComponent={() =>
             !loading &&
             <View style={styles.emptyContainer}>
               <Text style={{
                 fontSize: scaledFont(15),
                 color: theme.text_color
-              }}>No Followings Done by you</Text>
+              }}>No Followings Done by you !!</Text>
             </View>
           }
           data={users}
@@ -288,8 +294,8 @@ const Favorites = () => {
               <View style={styles.emptyContainer}>
                 <Text style={{
                   fontSize: scaledFont(15),
-                  color: theme.text_color
-                }}>No Likes Done by you</Text>
+                  color: theme.secondary_text_color
+                }}>No likes done by you !!</Text>
               </View>
             }
             keyExtractor={item => item._id}
@@ -315,8 +321,8 @@ const Favorites = () => {
               <View style={styles.emptyContainer}>
                 <Text style={{
                   fontSize: scaledFont(15),
-                  color: theme.text_color
-                }}>No replies created by you</Text>
+                  color: theme.secondary_text_color
+                }}>No replies created by you !!</Text>
               </View>
             }
             onEndReachedThreshold={0.3}

@@ -18,6 +18,7 @@ import Animated, {
 import GridViewer from "./GridViewer";
 import UseTheme from "../../globals/UseTheme";
 import { twitter_blue } from "../../globals/Colors";
+import PressableContent from "./PressableContent";
 type PostItemsProps =
     {
         post: Thread,
@@ -26,7 +27,7 @@ type PostItemsProps =
         onPressNavigate: (userId: string) => void
         onLikeToggle: (postId: string, step: "like" | "unlike") => void
     }
-const PostItem =  (props: PostItemsProps) => {
+const PostItem = (props: PostItemsProps) => {
     const post = props.post
     const media = post.media
     const { theme } = UseTheme()
@@ -52,29 +53,6 @@ const PostItem =  (props: PostItemsProps) => {
         else
             props.onLikeToggle(post._id, "like")
     }
-
-    const renderBioWithPressableHashtags = (bioText: string | undefined) => {
-        if (!bioText) return null;
-      
-        const words = bioText.split(/\s+/);
-      
-        return (
-          <View style={{ flexDirection: 'row', flexWrap: 'wrap' }}>
-            {words.map((word, index) => (
-              <React.Fragment key={index}>
-                {word.startsWith('#') ? (
-                  <TouchableOpacity onPress={() => console.log('Pressed:', word)}>
-                    <Text style={{ color: 'blue',fontSize:scaledFont(13), fontWeight: 'bold' }}>{word} </Text>
-                  </TouchableOpacity>
-                ) : (
-                  <Text style={{color: theme.text_color,fontSize:scaledFont(13)}}>{word}{' '}</Text>
-                )}
-              </React.Fragment>
-            ))}
-          </View>
-        );
-      };
-
     return (
         <View style={[styles.container, { backgroundColor: theme.background_color, }]}>
             <View style={styles.rowContainer}>
@@ -108,13 +86,12 @@ const PostItem =  (props: PostItemsProps) => {
                         />
                     </View>
                 </View>
-                <View style={{marginVertical:5}}>
-                {renderBioWithPressableHashtags(post.content)}
+                <View style={{ marginVertical: 5 }}>
+                    {post.content && <PressableContent
+                        content={post.content}
+                        onPressHashTag={(tag: string) => console.log(tag)}
+                    />}
                 </View>
-                {/* <Text style={{
-                    color: theme.text_color,
-                    marginVertical: 5
-                }}>{post.content}</Text> */}
                 <GridViewer
                     media={media}
                 />
@@ -170,7 +147,7 @@ const styles = StyleSheet.create({
         borderRadius: 15,
         alignSelf: 'center',
         margin: 10,
-        marginVertical:5,
+        marginVertical: 5,
     },
     rowContainer:
     {
@@ -179,7 +156,7 @@ const styles = StyleSheet.create({
     },
     profileContainer:
     {
-        marginRight: 20,
+       marginRight: 20,
         alignItems: "center"
     },
     imgProfile:

@@ -311,11 +311,9 @@ export const UserSlice = createSlice({
             state.error = null
         })
         builder.addCase(DeletePostAction.fulfilled, (state, action: PayloadAction<{ postId: string }>) => {
+            console.log("Hi, I am deleting this post")
             state.screenLoading = false
-            const index = state.Posts.findIndex(post => post._id === action.payload.postId);
-            if (index !== -1) {
-                state.Posts.splice(index, 1);
-            }
+            state.Posts = state.Posts.filter(post=>post._id !== action.payload.postId)
         })
         builder.addCase(DeletePostAction.rejected, (state, action) => {
             state.screenLoading = false

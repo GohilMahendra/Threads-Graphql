@@ -3,12 +3,16 @@ import React from 'react'
 import Profile from '../screens/profile/Profile'
 import EditProfile from '../screens/profile/EditProfile'
 import Settings from '../screens/profile/Settings'
+import UserProfile from '../screens/profile/UserProfile'
 
 export type ProfileStacktype =
     {
         Profile: undefined,
         EditProfile: undefined,
-        Settings: undefined
+        Settings: undefined,
+        UserProfile: {
+            userId: string
+         }
     }
 const ProfileStackNavigator = createNativeStackNavigator<ProfileStacktype>()
 const ProfileStack = () => {
@@ -30,6 +34,10 @@ const ProfileStack = () => {
              <ProfileStackNavigator.Screen
                 name='Settings'
                 component={Settings}
+            />
+            <ProfileStackNavigator.Screen
+            name='UserProfile'
+            component={UserProfile}
             />
         </ProfileStackNavigator.Navigator>
     )

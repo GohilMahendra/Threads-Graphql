@@ -3,47 +3,28 @@ import { Text, Image, TouchableOpacity, Dimensions, StyleSheet } from "react-nat
 import { View } from "react-native"
 import { placeholder_image } from "../../globals/asstes";
 import Entypo from "react-native-vector-icons/Entypo";
-import {  Thread } from "../../types/Post";
+import { Thread } from "../../types/Post";
 import { scaledFont, timeDifference } from "../../globals/utilities";
 import GridViewer from "../feed/GridViewer";
 import UseTheme from "../../globals/UseTheme";
+import PressableContent from "../feed/PressableContent";
 type PostItemsProps =
     {
         post: Thread,
-        onPressThreeDots:(postId:string)=>void
-       
+        onPressThreeDots: (postId: string) => void
+        onPressNavigate: (userId: string) => void
     }
 const PostItem = (props: PostItemsProps) => {
 
     const post = props.post
     const media = post.media
     const { theme } = UseTheme()
-    const renderBioWithPressableHashtags = (bioText: string | undefined) => {
-        if (!bioText) return null;
-      
-        const words = bioText.split(/\s+/);
-      
-        return (
-          <View style={{ marginVertical: 5, flexDirection: 'row', flexWrap: 'wrap' }}>
-            {words.map((word, index) => (
-              <React.Fragment key={index}>
-                {word.startsWith('#') ? (
-                  <TouchableOpacity onPress={() => console.log('Pressed:', word)}>
-                    <Text style={{ color: 'blue',fontSize:scaledFont(13), fontWeight: 'bold' }}>{word}</Text>
-                  </TouchableOpacity>
-                ) : (
-                  <Text style={{color: theme.text_color,fontSize:scaledFont(13)}}>{word}{' '}</Text>
-                )}
-              </React.Fragment>
-            ))}
-          </View>
-        );
-      };
+
     return (
-        <View style={[styles.container,{ backgroundColor: theme.background_color,}]}>
+        <View style={[styles.container, { backgroundColor: theme.background_color, }]}>
             <View style={styles.rowContainer}>
                 <View style={styles.imageContainer}>
-                    <TouchableOpacity>
+                    <TouchableOpacity onPress={() => props.onPressNavigate(post.user._id)}>
                         <Image
                             resizeMode="cover"
                             source={post.user.profile_picture ? {
@@ -53,24 +34,27 @@ const PostItem = (props: PostItemsProps) => {
                         />
                     </TouchableOpacity>
                 </View>
-                <View style={styles.profileRode}/>
+                <View style={styles.profileRode} />
             </View>
             <View style={styles.rightContainer}>
                 <View style={styles.profileRowContainer}>
                     <View>
-                        <Text style={[styles.txtUsername,{ color: theme.text_color,}]}>{post.user.username}</Text>
+                        <Text style={[styles.txtUsername, { color: theme.text_color, }]}>{post.user.username}</Text>
                     </View>
                     <View style={styles.rightProfileContainer}>
                         <Text style={styles.txtCreatedAt}>{timeDifference(post.created_at)}</Text>
                         <Entypo
-                            onPress={()=>props.onPressThreeDots(post._id)}
+                            onPress={() => props.onPressThreeDots(post._id)}
                             name="dots-three-horizontal"
                             size={scaledFont(18)}
                             color={theme.text_color}
                         />
                     </View>
                 </View>
-                {renderBioWithPressableHashtags(post.content)}
+                {post.content && <PressableContent
+                    content={post.content}
+                    onPressHashTag={(tag: string) => console.log(tag)}
+                />}
                 <GridViewer
                     media={media}
                 />
@@ -78,8 +62,8 @@ const PostItem = (props: PostItemsProps) => {
                     (post.replies > 0 || post.likes > 0)
                     &&
                     <View style={styles.rowLikeComments}>
-                        <Text style={[styles.textComments,{  color: theme.secondary_text_color}]}>{post.replies} comments</Text>
-                        <Text style={[styles.textLikes,{ color: theme.secondary_text_color}]}>{post.likes} Likes</Text>
+                        <Text style={[styles.textComments, { color: theme.secondary_text_color }]}>{post.replies} comments</Text>
+                        <Text style={[styles.textLikes, { color: theme.secondary_text_color }]}>{post.likes} Likes</Text>
                     </View>
                 }
             </View>
@@ -137,7 +121,7 @@ const styles = StyleSheet.create({
     txtUsername:
     {
         fontSize: scaledFont(15),
-        fontWeight:'bold'
+        fontWeight: 'bold'
     },
     rightProfileContainer:
     {
@@ -148,7 +132,7 @@ const styles = StyleSheet.create({
     {
         color: "silver",
         marginRight: 10,
-        fontSize:scaledFont(13)
+        fontSize: scaledFont(13)
     },
     rowLikeComments:
     {

@@ -12,4 +12,5 @@ export type composeteAuthRootStack = CompositeNavigationProp<NavigationProp<Auth
 export type compositeRootUserTab = CompositeNavigationProp<NavigationProp<RootStackType>,NavigationProp<UserTabType>>
 export type compositeRootHomeStack = CompositeNavigationProp<NavigationProp<RootStackType,"CreatePost">,NavigationProp<HomeStackParams>>
 export type ProfileRootComposite = CompositeNavigationProp<NavigationProp<ProfileStacktype>,NavigationProp<RootStackType>>
-export type FavoriteRootComposite = CompositeNavigationProp<NavigationProp<FavoriteStackType>,NavigationProp<RootStackType>>
+export type FavoriteRootComposite = CompositeNavigationProp<NavigationProp<FavoriteStackType,"Favorite">,NavigationProp<RootStackType>>
+export type compositeUserProfileRootNavigation = CompositeNavigationProp<NavigationProp<HomeStackParams, "Home">, NavigationProp<RootStackType>>

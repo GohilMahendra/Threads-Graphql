@@ -1,5 +1,5 @@
-import { View, Text, SafeAreaView, Vibration, Image, StyleSheet, TouchableOpacity, ScrollView, RefreshControl, ActivityIndicator, Dimensions } from 'react-native'
-import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react'
+import { View, Text, SafeAreaView, Image, StyleSheet, TouchableOpacity, ActivityIndicator, Dimensions, RefreshControl } from 'react-native'
+import React, { useCallback, useEffect, useId, useMemo, useRef, useState } from 'react'
 import { placeholder_image } from '../../globals/asstes'
 import { useSelector } from 'react-redux'
 import { RootState, useAppDispatch } from '../../redux/store'
@@ -16,9 +16,13 @@ import UseTheme from '../../globals/UseTheme'
 import ProfileRepost from '../../components/profile/ProfileRepost'
 import Loader from '../../components/global/Loader'
 import { scaledFont } from '../../globals/utilities'
-const { height, width } = Dimensions.get("window")
+import Animated, {
+  useSharedValue,
+  withSpring,
+  withTiming
+} from 'react-native-reanimated';
+const { height } = Dimensions.get("screen")
 const Profile = () => {
-
   const user = useSelector((state: RootState) => state.User.user)
   const posts = useSelector((state: RootState) => state.User.Posts)
   const loading = useSelector((state: RootState) => state.User.loading)
@@ -31,6 +35,14 @@ const Profile = () => {
   const snapPoints = useMemo(() => ['30%'], []);
   const [postId, setPostId] = useState("")
   const { theme } = UseTheme()
+  const translateY = useSharedValue(scaledFont(-100));
+
+  const scrollHandler = (yHeight: number) => {
+    const yMoveIndex = yHeight > height ? 0 : scaledFont(-100);
+    if (translateY.value !== yMoveIndex) {
+      translateY.value = withTiming(yMoveIndex, { duration: 500 });
+    }
+  }
   const handleThreedotPress = useCallback((postId: string) => {
     setPostId(postId)
     threeDotPressModalRef.current?.present()
@@ -41,16 +53,24 @@ const Profile = () => {
     await dispatch(DeletePostAction({ postId }))
 
   }
+  const onNavigate = (userId: string) => {
+    if(userId != user._id)
+    navigation.navigate("UserProfile", {
+      userId: userId
+    })
+  }
   const dispatch = useAppDispatch()
   const renderPosts = (item: Thread, index: number) => {
     return (
       item.Repost && item.isRepost ?
         <ProfileRepost
           post={item}
+          onPressNavigate = {(userId)=> onNavigate(userId)}
           onPressThreeDots={(postId: string) => handleThreedotPress(postId)}
         /> :
         <ProfilePost
           post={item}
+          onPressNavigate = {(userId)=> onNavigate(userId)}
           onPressThreeDots={(postId: string) => handleThreedotPress(postId)}
         />
     )
@@ -62,6 +82,83 @@ const Profile = () => {
     }))
   }
 
+  const renderHeaderContainer = () => {
+    return (
+      <View>
+        <View style={styles.headerContainer}>
+          <AntDesign
+            //onPress={() => navigation.navigate("Settings")}
+            name='instagram'
+            size={scaledFont(25)}
+            color={theme.text_color}
+            style={{ marginRight: 10 }}
+          />
+          <AntDesign
+            onPress={() => navigation.navigate("Settings")}
+            name='bars'
+            size={scaledFont(25)}
+            color={theme.text_color}
+          />
+        </View>
+        <View style={styles.userInfoContainer}>
+          <View style={styles.profileRowContainer}>
+            <View>
+              <Text style={[styles.txtFullname, { color: theme.text_color }]}>{user.fullname}</Text>
+              <Text style={{
+                color: theme.text_color,
+                fontSize: scaledFont(15)
+              }}>{user.username}</Text>
+            </View>
+            <Image
+              source={user.profile_picture ? { uri: user.profile_picture } : placeholder_image}
+              style={styles.imgProfile}
+            />
+          </View>
+          <Text style={{ color: theme.text_color, fontSize: scaledFont(13) }} ellipsizeMode="tail" numberOfLines={10}>{user.bio}</Text>
+          <Text style={{ color: theme.secondary_text_color, marginTop: 20, fontSize: scaledFont(12) }}>{user.followers} Followers</Text>
+        </View>
+        <View style={[styles.selectionSticky, {
+          backgroundColor: theme.background_color
+        }]}>
+          <View style={styles.selectionRowContainer}>
+            <TouchableOpacity
+              onPress={() => setSelectedSection("Thread")}
+              style={[styles.btnThreads, {
+                borderBottomWidth: (selectedSection == "Thread") ? 1 : 0,
+                borderColor: theme.text_color
+              }]}
+            >
+              <Text style={{
+                fontSize: scaledFont(15),
+                color: theme.text_color
+              }}>Threads</Text>
+            </TouchableOpacity>
+            <TouchableOpacity
+              onPress={() => setSelectedSection("Repost")}
+              style={[styles.btnReposts, {
+                borderBottomWidth: (selectedSection == "Repost") ? 1 : 0,
+                borderColor: theme.text_color
+              }]}
+            >
+              <Text style={{
+                fontSize: scaledFont(15),
+                color: theme.text_color
+              }}>Reposts</Text>
+            </TouchableOpacity>
+          </View>
+        </View>
+      </View>
+    )
+  }
+  
+  const renderEmptyComponent = () => {
+      return (
+          <View style={styles.emptyContainer}>
+              <Text style={[styles.txtEmpty,
+              {color: theme.secondary_text_color}]}>No Posts Created By {user.username}</Text>
+          </View>
+      )
+  }
 
   useEffect(() => {
     dispatch(FetchUserPostsAction({
@@ -73,102 +170,64 @@ const Profile = () => {
     <GestureHandlerRootView style={{ flex: 1 }}>
       <SafeAreaView style={[styles.container, { backgroundColor: theme.background_color }]}>
         {screenLoading && <Loader />}
-        <ScrollView
-          nestedScrollEnabled
-          stickyHeaderHiddenOnScroll
-          stickyHeaderIndices={[2]}
-          scrollEventThrottle={10}
+        <Animated.View style={[styles.selectionSticky, {
+          backgroundColor: theme.background_color,
+          position: "absolute",
+          zIndex: 1000,
+          transform: [{ translateY: translateY }]
+        }]}>
+          <View style={styles.selectionRowContainer}>
+            <TouchableOpacity
+              onPress={() => setSelectedSection("Thread")}
+              style={[styles.btnThreads, {
+                borderBottomWidth: (selectedSection == "Thread") ? 1 : 0,
+                borderColor: theme.text_color
+              }]}
+            >
+              <Text style={{
+                fontSize: scaledFont(15),
+                color: theme.text_color
+              }}>Threads</Text>
+            </TouchableOpacity>
+            <TouchableOpacity
+              onPress={() => setSelectedSection("Repost")}
+              style={[styles.btnReposts, {
+                borderBottomWidth: (selectedSection == "Repost") ? 1 : 0,
+                borderColor: theme.text_color
+              }]}
+            >
+              <Text style={{
+                fontSize: scaledFont(15),
+                color: theme.text_color
+              }}>Reposts</Text>
+            </TouchableOpacity>
+          </View>
+        </Animated.View>
+        <FlatList
+          style={styles.flatList}
+          ListHeaderComponent={() => renderHeaderContainer()}
+          onScroll={(event) => scrollHandler(event.nativeEvent.contentOffset.y)}
           refreshControl={
             <RefreshControl
-              tintColor={theme.text_color}
               refreshing={loading}
-              onRefresh={() => {
-                dispatch(FetchUserPostsAction({ post_type: selectedSection }))
-              }}
+              onRefresh={() => dispatch(FetchUserPostsAction({
+                post_type: selectedSection
+              }))}
             />
           }
-          //  contentContainerStyle={{flex:1}}
-          style={{
-            flex: 1,
-          }}>
-          <View style={styles.headerContainer}>
-            <AntDesign
-              //onPress={() => navigation.navigate("Settings")}
-              name='instagram'
-              size={scaledFont(25)}
-              color={theme.text_color}
-              style={{ marginRight: 10 }}
-            />
-            <AntDesign
-              onPress={() => navigation.navigate("Settings")}
-              name='bars'
-              size={scaledFont(25)}
-              color={theme.text_color}
-            />
-          </View>
-          <View style={styles.userInfoContainer}>
-            <View style={styles.profileRowContainer}>
-              <View>
-                <Text style={[styles.txtFullname, { color: theme.text_color }]}>{user.fullname}</Text>
-                <Text style={{
-                  color: theme.text_color,
-                  fontSize: scaledFont(15)
-                }}>{user.username}</Text>
-              </View>
-              <Image
-                source={user.profile_picture ? { uri: user.profile_picture } : placeholder_image}
-                style={styles.imgProfile}
-              />
-            </View>
-            <Text style={{ color: theme.text_color, fontSize: scaledFont(13) }} ellipsizeMode="tail" numberOfLines={10}>{user.bio}</Text>
-            <Text style={{ color: theme.secondary_text_color, marginTop: 20, fontSize: scaledFont(12) }}>{user.followers} Followers</Text>
-          </View>
-          <View style={[styles.selectionSticky, {
-            backgroundColor: theme.background_color
-          }]}>
-            <View style={styles.selectionRowContainer}>
-              <TouchableOpacity
-                onPress={() => setSelectedSection("Thread")}
-                style={[styles.btnThreads, {
-                  borderBottomWidth: (selectedSection == "Thread") ? 1 : 0,
-                  borderColor: theme.text_color
-                }]}
-              >
-                <Text style={{
-                  fontSize: scaledFont(15),
-                  color: theme.text_color
-                }}>Threads</Text>
-              </TouchableOpacity>
-              <TouchableOpacity
-                onPress={() => setSelectedSection("Repost")}
-                style={[styles.btnReposts, {
-                  borderBottomWidth: (selectedSection == "Repost") ? 1 : 0,
-                  borderColor: theme.text_color
-                }]}
-              >
-                <Text style={{
-                  fontSize: scaledFont(15),
-                  color: theme.text_color
-                }}>Reposts</Text>
-              </TouchableOpacity>
-            </View>
-          </View>
-
-          <FlatList
-            style={styles.flatList}
-            ListFooterComponent={() => morePostsLoading && <ActivityIndicator
-              color={theme.text_color}
-              size={20}
-              animating
-            />}
-            data={posts}
-            keyExtractor={(item, index) =>item._id}
-            renderItem={({ item, index }) => renderPosts(item, index)}
-            onEndReached={() => lastOffset && loadMorePosts()}
-            onEndReachedThreshold={0.5}
-          />
-        </ScrollView>
-
+          scrollEventThrottle={10}
+          ListEmptyComponent={() => !loading && renderEmptyComponent()}
+          ListFooterComponent={() => morePostsLoading && <ActivityIndicator
+            color={theme.text_color}
+            size={20}
+            animating
+          />}
+          data={posts}
+          keyExtractor={(item) => item._id}
+          renderItem={({ item, index }) => renderPosts(item, index)}
+          onEndReached={() => lastOffset && loadMorePosts()}
+          onEndReachedThreshold={0.5}
+        />
       </SafeAreaView>
       <BottomSheetModalProvider>
         <BottomSheetModal
@@ -190,8 +249,7 @@ const Profile = () => {
             <TouchableOpacity
               onPress={() => threeDotPressModalRef.current?.close()}
               style={[styles.btnEdit, { backgroundColor: theme.secondary_color, }]}>
-              <Text
-                style={[styles.textEdit, { color: theme.text_color, }]}
+              <Text style={[styles.textEdit, { color: theme.text_color, }]}
               >Cancel</Text>
             </TouchableOpacity>
           </View>
@@ -259,7 +317,9 @@ const styles = StyleSheet.create({
     ///padding: 10
   },
   selectionSticky:
-    { marginTop: scaledFont(20) },
+  {
+    marginTop: scaledFont(20),
+  },
   modalContainer:
   {
     padding: scaledFont(20),
@@ -298,5 +358,16 @@ const styles = StyleSheet.create({
   sheetHandleIndicator:
   {
     borderRadius: 15,
+  },
+  emptyContainer:
+  {
+    flex: 1,
+    padding: 20,
+    justifyContent: "center",
+    alignItems: "center"
+  },
+  txtEmpty:
+  {
+      fontSize: scaledFont(15),
   }
 })

@@ -3,7 +3,6 @@ import { Thread, UploadMedia } from "../../types/Post";
 import { commentPost, createPost, createRepost, fetchPosts, likePost, unLikePost } from "../../apis/FeedAPI";
 import { RootState } from "../store";
 import { FetchPostsPayload } from "../types/global";
-import axios from "axios";
 type FeedStateType =
     {
         Threads: Thread[],
@@ -189,7 +188,7 @@ export const FeedSlice = createSlice({
         builder.addCase(FetchPostsAction.fulfilled, (state, action: PayloadAction<FetchPostsPayload<Thread>>) => {
             state.loading = false
             state.Threads = action.payload.data,
-            state.lastOffset = action.payload.lastOffset
+                state.lastOffset = action.payload.lastOffset
         })
         builder.addCase(FetchPostsAction.rejected, (state, action) => {
             state.loading = false,
@@ -202,13 +201,12 @@ export const FeedSlice = createSlice({
         })
         builder.addCase(FetchMorePostsAction.fulfilled, (state, action: PayloadAction<FetchPostsPayload<Thread>>) => {
             state.loadMoreLoading = false
-            console.log(action.payload.lastOffset)
             state.Threads.push(...action.payload.data)
             state.lastOffset = action.payload.lastOffset
         })
         builder.addCase(FetchMorePostsAction.rejected, (state, action) => {
             state.loadMoreLoading = false,
-            state.loadMoreError = action.payload as string
+                state.loadMoreError = action.payload as string
         })
 
         builder.addCase(LikeAction.pending, (state) => {
@@ -216,22 +214,24 @@ export const FeedSlice = createSlice({
         })
         builder.addCase(LikeAction.fulfilled, (state, action: PayloadAction<{ postId: string }>) => {
             state.LikeSuccess = true
-            const index = state.Threads.findIndex((item) => item._id == action.payload.postId)
-            if (index != -1) {
-                state.Threads[index] = {...state.Threads[index],isLiked:true,likes:state.Threads[index].likes+1}
-            }
+            state.Threads.forEach((item, index) => {
+                if (item._id === action.payload.postId) {
+                    item.isLiked = true
+                    item.likes++
+                }
+            })
         })
         builder.addCase(LikeAction.rejected, (state, payload) => {
             state.LikeSuccess = false
         })
         builder.addCase(unLikeAction.fulfilled, (state, action: PayloadAction<{ postId: string }>) => {
             state.LikeSuccess = true
-            const index = state.Threads.findIndex((item) => item._id == action.payload.postId)
-            if (index != -1) {
-                console.log("unliking post of",state.Threads[index].user.fullname)
-
-                state.Threads[index] = {...state.Threads[index],isLiked:false,likes:state.Threads[index].likes-1}
-            }
+            state.Threads.forEach((item, index) => {
+                if (item._id === action.payload.postId) {
+                    item.isLiked = false
+                    item.likes--
+                }
+            })
         })
         builder.addCase(feedCreateRepostAction.pending, (state) => {
             state.screenLoading = true
@@ -241,7 +241,7 @@ export const FeedSlice = createSlice({
             state.screenLoading = false
         })
         builder.addCase(feedCreateRepostAction.rejected, (state, action) => {
-           state.error = action.payload as string
+            state.error = action.payload as string
         })
     }
 })

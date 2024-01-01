@@ -1,10 +1,10 @@
-import { View, Text, SafeAreaView, Image, TouchableOpacity, ScrollView, RefreshControl, Dimensions, StyleSheet, ActivityIndicator } from 'react-native'
-import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react'
+import { View, Text, SafeAreaView, Image, TouchableOpacity, Dimensions, StyleSheet, ActivityIndicator, RefreshControl } from 'react-native'
+import React, { useEffect, useMemo, useRef, useState } from 'react'
 import { placeholder_image } from '../../globals/asstes'
 import FontAwesome5Icon from 'react-native-vector-icons/FontAwesome5'
 import FontAwesome from 'react-native-vector-icons/FontAwesome'
 import AntDesign from 'react-native-vector-icons/AntDesign'
-import { CompositeNavigationProp, RouteProp, useNavigation, StackActions, useRoute, NavigationAction, NavigationProp, } from '@react-navigation/native'
+import { RouteProp, useNavigation, StackActions, useRoute } from '@react-navigation/native'
 import { FlatList } from 'react-native'
 import { Thread } from '../../types/Post'
 import { BottomSheetBackdrop, BottomSheetModal, BottomSheetModalProvider, } from '@gorhom/bottom-sheet'
@@ -16,14 +16,12 @@ import { fetchUserById, followUser, unFollowUser } from '../../apis/UserAPI'
 import { createRepost, fetchPostsByUser, likePost, unLikePost } from '../../apis/FeedAPI'
 import RepostItem from '../../components/feed/RepostItem'
 import PostItem from '../../components/feed/PostItem'
-import { twitter_blue } from '../../globals/Colors'
 import { PAGE_SIZE } from '../../globals/constants'
 import Replies from '../../components/feed/Replies'
-import { ProfileStacktype } from '../../navigations/ProfileStack'
-import { HomeStackParams } from '../../navigations/FeedStack'
-import { RootStackType } from '../../navigations/RootStack'
 import Loader from '../../components/global/Loader'
 import { scaledFont } from '../../globals/utilities'
+import Animated, { useSharedValue, withTiming } from 'react-native-reanimated'
+import { compositeUserProfileRootNavigation } from '../../navigations/Types'
 const { height, width } = Dimensions.get("screen")
 const UserProfile = () => {
     const [user, setUser] = useState<User>({
@@ -38,7 +36,6 @@ const UserProfile = () => {
         profile_picture: "",
         isFollowed: false
     })
-    type compositeUserProfileRootNavigation = CompositeNavigationProp<NavigationProp<HomeStackParams, "Home">, NavigationProp<RootStackType>>
     const [loading, setLoading] = useState(false)
     const [moreLoading, setMoreLoading] = useState(false)
     const [screenLoading, setScreenLoading] = useState(false)
@@ -48,13 +45,21 @@ const UserProfile = () => {
     const detailViewHeight = useRef<number>(0)
     const [lastOffset, setLastOffset] = useState<string | null>(null)
     const navigation = useNavigation<compositeUserProfileRootNavigation>()
-    const [selectedSection, setSelectedSection] = useState<"Threads" | "Reposts">("Threads")
+    const [selectedSection, setSelectedSection] = useState<"Thread" | "Repost">("Thread")
     const [postId, setPostId] = useState("")
     const { theme } = UseTheme()
     const replySnapPoints = useMemo(() => ['90%', "50%"], []);
     const snapPointsRepost = useMemo(() => ["30%"], []);
     const replyBottomSheetRef = useRef<BottomSheetModal>(null)
     const repostBottomSheetRef = useRef<BottomSheetModal>(null)
+    const translateY = useSharedValue(scaledFont(-100));
+
+    const scrollHandler = (yHeight: number) => {
+        const yMoveIndex = yHeight > height ? 0 : scaledFont(-100);
+        if (translateY.value !== yMoveIndex) {
+            translateY.value = withTiming(yMoveIndex, { duration: 500 });
+        }
+    }
     const navigateToProfile = (userId: string) => {
         if (userId != route.params.userId) {
             const push = StackActions.push("UserProfile", { userId: userId })
@@ -110,17 +115,17 @@ const UserProfile = () => {
                 />
         )
     }
-    const onChangeField = (field: "Threads" | "Reposts") => {
+    const onChangeField = (field: "Thread" | "Repost") => {
         setSelectedSection(field)
         getPosts(field)
     }
-    const getPosts = async (field: "Threads" | "Reposts") => {
+    const getPosts = async (field: "Thread" | "Repost") => {
         try {
             setLoading(true)
             setPosts([])
             const response = await fetchPostsByUser({
                 pageSize: PAGE_SIZE,
-                post_type: field == "Reposts" ? "Repost" : "Thread",
+                post_type: field,
                 userId: userId,
             })
             setPosts(response.data)
@@ -141,7 +146,7 @@ const UserProfile = () => {
             setMoreLoading(true)
             const response = await fetchPostsByUser({
                 pageSize: PAGE_SIZE,
-                post_type: selectedSection == "Reposts" ? "Repost" : "Thread",
+                post_type: selectedSection,
                 userId: userId,
                 lastOffset: lastOffset
             })
@@ -165,25 +170,25 @@ const UserProfile = () => {
     }
     const renderBioWithPressableHashtags = (bioText: string | undefined) => {
         if (!bioText) return null;
-      
+
         const words = bioText.split(/\s+/);
-      
+
         return (
-          <View style={{ marginVertical: 5, flexDirection: 'row', flexWrap: 'wrap' }}>
-            {words.map((word, index) => (
-              <React.Fragment key={index}>
-                {word.startsWith('#') ? (
-                  <TouchableOpacity onPress={() => console.log('Pressed:', word)}>
-                    <Text style={{ color: 'blue',fontSize:scaledFont(13), fontWeight: 'bold' }}>{word} </Text>
-                  </TouchableOpacity>
-                ) : (
-                  <Text style={{color: theme.text_color,fontSize:scaledFont(13)}}>{word}{' '}</Text>
-                )}
-              </React.Fragment>
-            ))}
-          </View>
+            <View style={{ marginVertical: 5, flexDirection: 'row', flexWrap: 'wrap' }}>
+                {words.map((word, index) => (
+                    <React.Fragment key={index}>
+                        {word.startsWith('#') ? (
+                            <TouchableOpacity onPress={() => console.log('Pressed:', word)}>
+                                <Text style={{ color: 'blue', fontSize: scaledFont(13), fontWeight: 'bold' }}>{word} </Text>
+                            </TouchableOpacity>
+                        ) : (
+                            <Text style={{ color: theme.text_color, fontSize: scaledFont(13) }}>{word}{' '}</Text>
+                        )}
+                    </React.Fragment>
+                ))}
+            </View>
         );
-      };
+    };
     const toggleFollow = async () => {
         try {
             if (user.isFollowed) {
@@ -204,18 +209,20 @@ const UserProfile = () => {
             if (step == "like") {
                 const respose = await likePost(postId)
                 const index = posts.findIndex(post => post._id == postId)
-                if (index) {
+                if (index != -1) {
                     const postThreads = [...posts]
                     postThreads[index].isLiked = true
+                    postThreads[index].likes++
                     setPosts(postThreads)
                 }
             }
             else {
                 const response = await unLikePost(postId)
                 const index = posts.findIndex(post => post._id == postId)
-                if (index) {
+                if (index != -1) {
                     const postThreads = [...posts]
                     postThreads[index].isLiked = false
+                    postThreads[index].likes--
                     setPosts(postThreads)
                 }
             }
@@ -226,7 +233,104 @@ const UserProfile = () => {
     }
     const getUserAndPosts = async () => {
         await getUser()
-        await getPosts("Threads")
+        await getPosts("Thread")
+    }
+    const renderHeaderComponent = () => {
+        return (
+            <View>
+                <View style={styles.headerContainer}>
+                    <FontAwesome
+                        onPress={() => navigation.goBack()}
+                        name='angle-left'
+                        size={scaledFont(25)}
+                        color={theme.text_color}
+                    />
+                    <View style={{ flexDirection: "row" }}>
+                        <AntDesign
+                            name='instagram'
+                            size={scaledFont(25)}
+                            color={theme.text_color}
+                            style={{ marginRight: 10 }}
+                        />
+                        <AntDesign
+                            name='bars'
+                            size={scaledFont(25)}
+                            color={theme.text_color}
+                        />
+                    </View>
+                </View>
+                <View
+                    onLayout={event => {
+                        detailViewHeight.current = event.nativeEvent.layout.height
+                    }}
+                    style={styles.userDetailsContainer}>
+                    <View style={styles.userDetailRowContainer}>
+                        <View>
+                            <Text style={[styles.txtUserFullname, {
+                                color: theme.text_color
+                            }]}>{user.fullname}</Text>
+                            <Text style={{
+                                color: theme.text_color
+                            }}>{user.username}</Text>
+                        </View>
+                        <Image
+                            source={user.profile_picture ? { uri: user.profile_picture } : placeholder_image}
+                            style={styles.imgUserDetail}
+                        />
+                    </View>
+                    {renderBioWithPressableHashtags(user.bio || "")}
+                    <Text style={{ color: theme.text_color }}>{user.followers} Followers</Text>
+                    <TouchableOpacity
+                        onPress={() => toggleFollow()}
+                        style={[styles.btnFollow, {
+                            backgroundColor: user.isFollowed ? theme.background_color : theme.text_color,
+                            borderWidth: user.isFollowed ? 1 : 0,
+                            borderColor: user.isFollowed ? theme.text_color : theme.background_color,
+                        }]}>
+                        <Text style={[styles.txtFollow, {
+                            color: user.isFollowed ? theme.text_color : theme.background_color
+                        }]}>{user.isFollowed ? "Following" : "Follow"}</Text>
+                    </TouchableOpacity>
+                </View>
+                <View style={{ backgroundColor: theme.background_color }}>
+                    <View style={styles.optionContainer}>
+                        <TouchableOpacity
+                            onPress={() => onChangeField("Thread")}
+                            style={[styles.btnThreads, {
+                                borderBottomWidth: (selectedSection == "Thread") ? 1 : 0,
+                                borderColor: theme.text_color
+                            }]}
+                        >
+                            <Text style={{
+                                fontSize: scaledFont(15),
+                                color: theme.text_color
+                            }}>Threads</Text>
+                        </TouchableOpacity>
+                        <TouchableOpacity
+                            onPress={() => onChangeField("Repost")}
+                            style={[styles.btnReposts, {
+                                borderBottomWidth: (selectedSection == "Repost") ? 1 : 0,
+                                borderColor: theme.text_color
+                            }]}
+                        >
+                            <Text style={{
+                                fontSize: scaledFont(15),
+                                color: theme.text_color
+                            }}>Reposts</Text>
+                        </TouchableOpacity>
+
+                    </View>
+                </View>
+            </View>
+        )
+    }
+    const renderEmptyComponent = () => {
+        return (
+            <View style={styles.emptyContainer}>
+                <Text style={[styles.txtEmpty,
+                {color: theme.secondary_text_color}]}>No posts created by {user.username}</Text>
+            </View>
+        )
     }
     useEffect(() => {
         getUserAndPosts()
@@ -240,120 +344,66 @@ const UserProfile = () => {
                     backgroundColor: theme.background_color
                 }}>
                 {screenLoading && <Loader />}
-                <ScrollView
-                    nestedScrollEnabled
-                    stickyHeaderHiddenOnScroll
-                    stickyHeaderIndices={[2]}
-                    scrollEventThrottle={10}
+                <Animated.View style={{
+                    backgroundColor: theme.background_color,
+                    transform: [{ translateY: translateY }],
+                    position: "absolute",
+                    paddingTop: 20,
+                    zIndex: 1000
+                }}>
+                    <View style={styles.optionContainer}>
+                        <TouchableOpacity
+                            onPress={() => onChangeField("Thread")}
+                            style={[styles.btnThreads, {
+                                borderBottomWidth: (selectedSection == "Thread") ? 1 : 0,
+                                borderColor: theme.text_color
+                            }]}
+                        >
+                            <Text style={{
+                                fontSize: scaledFont(15),
+                                color: theme.text_color
+                            }}>Threads</Text>
+                        </TouchableOpacity>
+                        <TouchableOpacity
+                            onPress={() => onChangeField("Repost")}
+                            style={[styles.btnReposts, {
+                                borderBottomWidth: (selectedSection == "Repost") ? 1 : 0,
+                                borderColor: theme.text_color
+                            }]}
+                        >
+                            <Text style={{
+                                fontSize: scaledFont(15),
+                                color: theme.text_color
+                            }}>Reposts</Text>
+                        </TouchableOpacity>
+
+                    </View>
+                </Animated.View>
+                <FlatList
+                    contentContainerStyle={{ flexGrow: 1 }}
                     refreshControl={
                         <RefreshControl
-                            tintColor={theme.text_color}
                             refreshing={loading}
-                            onRefresh={() => getUserAndPosts()}
+                            onRefresh={() => getPosts(selectedSection)}
                         />
                     }
-                    style={styles.scrollContainer}>
-
-                    <View style={styles.headerContainer}>
-                        <FontAwesome
-                            onPress={() => navigation.goBack()}
-                            name='angle-left'
-                            size={scaledFont(25)}
+                    ListHeaderComponent={() => renderHeaderComponent()}
+                    ListEmptyComponent={() => !loading && renderEmptyComponent()}
+                    data={posts}
+                    keyExtractor={item => item._id}
+                    ListFooterComponent={() =>
+                        moreLoading && <ActivityIndicator
                             color={theme.text_color}
+                            size={"small"}
+                            animating
                         />
-                        <View style={{flexDirection:"row"}}>
-                        <AntDesign
-                            name='instagram'
-                            size={scaledFont(25)}
-                            color={theme.text_color}
-                            style={{ marginRight: 10 }}
-                        />
-                        <AntDesign
-                            name='bars'
-                            size={scaledFont(25)}
-                            color={theme.text_color}
-                        />
-                        </View>
-                    </View>
-                    <View
-                        onLayout={event => {
-                            detailViewHeight.current = event.nativeEvent.layout.height
-                        }}
-                        style={styles.userDetailsContainer}>
-                        <View style={styles.userDetailRowContainer}>
-                            <View>
-                                <Text style={[styles.txtUserFullname, {
-                                    color: theme.text_color
-                                }]}>{user.fullname}</Text>
-                                <Text style={{
-                                    color: theme.text_color
-                                }}>{user.username}</Text>
-                            </View>
-                            <Image
-                                source={user.profile_picture ? { uri: user.profile_picture } : placeholder_image}
-                                style={styles.imgUserDetail}
-                            />
-                        </View>
-                       {renderBioWithPressableHashtags(user.bio || "")}
-                        <Text style={{ color: theme.text_color }}>{user.followers} Followers</Text>
-                        <TouchableOpacity
-                            onPress={() => toggleFollow()}
-                            style={[styles.btnFollow, {
-                                backgroundColor: user.isFollowed ? theme.background_color : theme.text_color,
-                                borderWidth: user.isFollowed ? 1 : 0,
-                                borderColor: user.isFollowed ? theme.text_color : theme.background_color,
-                            }]}>
-                            <Text style={[styles.txtFollow, {
-                                color: user.isFollowed ? theme.text_color : theme.background_color
-                            }]}>{user.isFollowed ? "Following" : "Follow"}</Text>
-                        </TouchableOpacity>
-                    </View>
-                    <View style={{ backgroundColor: theme.background_color }}>
-                        <View style={styles.optionContainer}>
-                            <TouchableOpacity
-                                onPress={() => onChangeField("Threads")}
-                                style={[styles.btnThreads, {
-                                    borderBottomWidth: (selectedSection == "Threads") ? 1 : 0,
-                                    borderColor: theme.text_color
-                                }]}
-                            >
-                                <Text style={{
-                                    fontSize: scaledFont(15),
-                                    color: theme.text_color
-                                }}>Threads</Text>
-                            </TouchableOpacity>
-                            <TouchableOpacity
-                                onPress={() => onChangeField("Reposts")}
-                                style={[styles.btnReposts, {
-                                    borderBottomWidth: (selectedSection == "Reposts") ? 1 : 0,
-                                    borderColor: theme.text_color
-                                }]}
-                            >
-                                <Text style={{
-                                    fontSize: scaledFont(15),
-                                    color: theme.text_color
-                                }}>Reposts</Text>
-                            </TouchableOpacity>
-
-                        </View>
-                    </View>
-                    <View>
-                        <FlatList
-                            data={posts}
-                            keyExtractor={item => item._id}
-                            ListFooterComponent={() =>
-                                moreLoading && <ActivityIndicator
-                                    color={theme.text_color}
-                                    size={"small"}
-                                    animating
-                                />
-                            }
-                            renderItem={({ item, index }) => renderPosts(item, index)}
-                            onEndReached={() => getMorePosts()
-                            }
-                        />
-                    </View>
-                </ScrollView>
+                    }
+                    scrollEventThrottle={10}
+                    onScroll={(event) => scrollHandler(event.nativeEvent.contentOffset.y)}
+                    renderItem={({ item, index }) => renderPosts(item, index)}
+                    onEndReached={() => lastOffset && getMorePosts()
+                    }
+                />
             </SafeAreaView>
             <BottomSheetModalProvider>
                 <BottomSheetModal
@@ -496,7 +546,7 @@ const styles = StyleSheet.create({
     {
         flexDirection: 'row',
         padding: 20,
-        justifyContent:'space-between'
+        justifyContent: 'space-between'
     },
     userDetailsContainer:
     {
@@ -553,5 +603,15 @@ const styles = StyleSheet.create({
         width: "50%",
         justifyContent: "center",
         alignItems: "center",
+    },
+    emptyContainer:
+    {
+        flex: 1,
+        justifyContent: "center",
+        alignItems: "center"
+    },
+    txtEmpty:
+    {
+        fontSize: scaledFont(15),
     }
 })

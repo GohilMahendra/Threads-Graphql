@@ -150,6 +150,7 @@ export const FavoriteSlice = createSlice({
                     }
                 });
             }
+            state.screeenLoading = false
         })
         builder.addCase(favoritesLikeAction.rejected, (state, action) => {
             state.screeenLoading = false
@@ -160,7 +161,6 @@ export const FavoriteSlice = createSlice({
             state.error = null
         })
         builder.addCase(favoritesUnlikeAction.fulfilled, (state, action) => {
-            state.screeenLoading = false
             if (action.payload.postType == "post") {
                 const index = state.posts.findIndex(post => post._id == action.payload.postId)
                 if (index != -1)
@@ -173,6 +173,7 @@ export const FavoriteSlice = createSlice({
                     }
                 });
             }
+            state.screeenLoading = false
         })
         builder.addCase(favoritesUnlikeAction.rejected, (state, action) => {
             state.screeenLoading = false

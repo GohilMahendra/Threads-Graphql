@@ -7,42 +7,21 @@ import { Thread } from "../../types/Post";
 import { scaledFont, timeDifference } from "../../globals/utilities";
 import GridViewer from "../feed/GridViewer";
 import UseTheme from "../../globals/UseTheme";
+import PressableContent from "../feed/PressableContent";
 type PostItemsProps =
     {
         post: Thread,
         onPressThreeDots: (postId: string) => void
+        onPressNavigate: (userId: string) => void
     }
 const ProfileRepost = (props: PostItemsProps) => {
     const post = props.post
-    const media = post.media
-    const repost = post.Repost as Thread
     const { theme } = UseTheme()
-    const renderBioWithPressableHashtags = (bioText: string | undefined) => {
-        if (!bioText) return null;
-
-        const words = bioText.split(/\s+/);
-
-        return (
-            <View style={{ flexDirection: 'row', flexWrap: 'wrap' }}>
-                {words.map((word, index) => (
-                    <React.Fragment key={index}>
-                        {word.startsWith('#') ? (
-                            <TouchableOpacity onPress={() => console.log('Pressed:', word)}>
-                                <Text style={{ color: 'blue', fontSize: scaledFont(13), fontWeight: 'bold' }}>{word}</Text>
-                            </TouchableOpacity>
-                        ) : (
-                            <Text style={{ color: theme.text_color, fontSize: scaledFont(13) }}>{word}{' '}</Text>
-                        )}
-                    </React.Fragment>
-                ))}
-            </View>
-        );
-    };
     return (
         <View style={[styles.container, { backgroundColor: theme.background_color, }]}>
             <View style={styles.rowContainer}>
                 <View style={styles.imageContainer}>
-                    <TouchableOpacity>
+                    <TouchableOpacity onPress={() => props.onPressNavigate(post.user._id)}>
                         <Image
                             resizeMode="cover"
                             source={post.user.profile_picture ? {
@@ -68,11 +47,15 @@ const ProfileRepost = (props: PostItemsProps) => {
                     </View>
                 </View>
                 <View style={{ marginVertical: 5 }}>
-                    {renderBioWithPressableHashtags(post.content)}
+                    {post.content && <PressableContent
+                        content={post.content}
+                        onPressHashTag={(tag: string) => console.log(tag)}
+                    />}
                 </View>
                 {/* origional post container starts */}
                 <View style={[styles.postContainer, { borderColor: theme.text_color, }]}>
                     <TouchableOpacity
+                        onPress={() => props.onPressNavigate(post.Repost?.user._id || "")}
                         style={styles.postImageContainer}>
                         <Image
                             style={styles.imgProfilePost}
@@ -86,7 +69,10 @@ const ProfileRepost = (props: PostItemsProps) => {
                         </View>
                     </TouchableOpacity>
                     <View style={{ marginVertical: 5 }}>
-                        {renderBioWithPressableHashtags(post.content)}
+                        {post.Repost?.content && <PressableContent
+                            content={post.Repost.content}
+                            onPressHashTag={(tag: string) => console.log(tag)}
+                        />}
                     </View>
                     <GridViewer
                         media={post.Repost?.media || []}
