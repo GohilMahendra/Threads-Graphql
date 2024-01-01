@@ -11,6 +11,7 @@ import { generateThumbnail } from "../utilities/Thumbnail";
 import { PostDocument } from "../types/Post";
 import Follower from "../models/Follower";
 import { extractHashtags } from "../utilities/Content";
+import User from "../models/User";
 const createPost = async (req: CustomRequest, res: Response) => {
     try {
         const userId = req.userId
@@ -88,6 +89,8 @@ const getPosts = async (req: CustomRequest, res: Response) => {
         const pageSizeParam = req.query.pageSize as string;
         const post_type = req.query.post_type as string
         const pageSize = parseInt(pageSizeParam, 10) || 10;
+        const searchTerm = req.query.searchTerm as string
+
         if (lastOffset) {
             quary._id = { $lt: new mongoose.Types.ObjectId(lastOffset) }
         }
@@ -97,6 +100,7 @@ const getPosts = async (req: CustomRequest, res: Response) => {
             const followingIds = followings.map((following) => following.following?._id)
             quary.user = { $in: followingIds }
         }
+
         const posts = await Post.find(quary)
             .sort({ created_at: -1, _id: 1 })
             .populate<{ user: UserDocument }>({
@@ -162,6 +166,7 @@ const getPosts = async (req: CustomRequest, res: Response) => {
         })
     }
     catch (err) {
+        console.log(err)
         res.status(500).json({
             message: "internal server Error"
         })
@@ -460,46 +465,135 @@ const deletePost = async (req: CustomRequest, res: Response) => {
     }
 }
 
-const getPostLikeUsers = async (req: CustomRequest, res: Response) => {
+
+const getPostsFullTextSearch = async (req: CustomRequest, res: Response) => {
     try {
-        const userId = req.userId
-        const postId = req.params.postId
-        const lastOffset = req.query.lastOffset as string
+        const userId = req.userId;
+        const lastOffset = req.query.lastOffset as string;
         const pageSizeParam = req.query.pageSize as string;
         const pageSize = parseInt(pageSizeParam, 10) || 10;
-        const quary: any = { postId: postId }
+        const searchTerm = req.query.searchTerm as string;
+
+        const pipeline: any[] = [];
+
+        pipeline.push({$search: {
+            index: "ContentSearch",
+            text: {
+                query: searchTerm,
+                path: "content",
+            },
+        }})
         if (lastOffset) {
-            quary._id = { $gt: new mongoose.Types.ObjectId(lastOffset) }
+            pipeline.push({
+                $match: {
+                    _id: { $lt: new mongoose.Types.ObjectId(lastOffset) }
+                },
+            });
         }
 
-        if (!postId) {
-            return res.status(400).json({
-                messgae: "missing post Id"
-            })
-        }
+        pipeline.push(
+            {
+                $sort: { created_at: -1, _id: 1 },
+            },
+            {
+                $limit: pageSize,
+            },
+            {
+                $lookup: {
+                    from: User.collection.name,
+                    localField: "user",
+                    foreignField: "_id",
+                    as: "user",
+                },
+            },
+            {
+                    $unwind: "$user",
+            },
+            {
+                $project:{
+                   "user.otp":0,
+                   "user.token":0,
+                   "user.password":0
+                }
+            },
+            {
+                $lookup: {
+                    from: Like.collection.name,
+                    localField: "_id",
+                    foreignField: "post",
+                    as: "LikesLookup",
+                },
+            },
+            {
+                $addFields: {
+                    isLiked: { $in: [userId, "$LikesLookup.user"] },
+                },
+            },
+            {
+                $project:{
+                    "LikesLookup":0
+                }
+            }
+            
+        );
 
-        const likes = await Like.find({ postId: postId }).populate<{ userId: UserDocument }>({
-            path: "userId",
-            select: "-password -token -otp"
-        }).limit(pageSize)
+        const posts = await Post.aggregate(pipeline);
 
-        const users = likes.map(like => like.userId)
+        let userPosts = posts
+        const updatedUserPosts = await Promise.all(userPosts.map(async (post, index: number) => {
+            const media = post.media;
+            const user = post.user;
+            if (user.profile_picture) {
+                user.profile_picture = await getSignedUrl(user.profile_picture);
+            }
+            for (const mediaFile of media) {
+                mediaFile.media_url = await getSignedUrl(mediaFile.media_url);
+                if (mediaFile.thumbnail) {
+                    mediaFile.thumbnail = await getSignedUrl(mediaFile.thumbnail);
+                }
+            }
+            const exist_liked = await Like.exists({ user: userId, post: post._id });
+            const isLiked = exist_liked != null;
+            post.isLiked = isLiked;
 
-        await Promise.all(users.map(async (user) => {
-            const isFollowing = Follower.exists({ follower: userId, following: user._id })
-            if (isFollowing != null)
-                user.isFollowed = true
-        }))
+        }));
 
-        return res.status(200).json({
-            data: users
-        })
-    }
-    catch (err) {
-        return res.status(500).json({
-            message: err
-        })
+        await Promise.all(userPosts.map(async (post, index: number) => {
+            if (post.isRepost && post.Repost) {
+                const user = post.Repost.user
+                const media = post.Repost.media
+                if (user.profile_picture) {
+                    const key = user.profile_picture
+                    const uri = await getSignedUrl(key)
+                    user.profile_picture = uri
+                }
+                for (const mediaFile of media) {
+                    mediaFile.media_url = await getSignedUrl(mediaFile.media_url);
+                    if (mediaFile.thumbnail) {
+                        mediaFile.thumbnail = await getSignedUrl(mediaFile.thumbnail);
+                    }
+                }
+                post.Repost.media = media
+                post.Repost.user = user
+
+            }
+        }));
+        res.status(200).json({
+            data: userPosts,
+            meta: {
+                pagesize: pageSize,
+                lastOffset: (posts.length == pageSize) ? posts[posts.length - 1]._id : null
+            }
+        });
+    } catch (err) {
+        console.log(err);
+        res.status(500).json({
+            message: "Internal Server Error",
+        });
     }
 }
 
-export default { createPost, getPosts, getPostsByUser, likePost, commentPost, deletePost, unLikePost, getComments }
+
+ 
+
+export default { createPost, getPosts, getPostsByUser, likePost, commentPost, deletePost, unLikePost, getComments,getPostsFullTextSearch }

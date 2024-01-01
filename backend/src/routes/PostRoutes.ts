@@ -8,6 +8,7 @@ const router = express.Router()
 
 router.post("/",verifyRequest,upload.array("media",4),PostController.createPost)
 router.get("/",verifyRequest,PostController.getPosts)
+router.get("/full-text-search",verifyRequest,PostController.getPostsFullTextSearch)
 router.get("/:userId",verifyRequest,PostController.getPostsByUser)
 router.post("/:postId/likes",verifyRequest,PostController.likePost)
 router.delete("/:postId/likes",verifyRequest,PostController.unLikePost)
