@@ -219,7 +219,7 @@ const Profile = () => {
           ListEmptyComponent={() => !loading && renderEmptyComponent()}
           ListFooterComponent={() => morePostsLoading && <ActivityIndicator
             color={theme.text_color}
-            size={20}
+            size={"small"}
             animating
           />}
           data={posts}

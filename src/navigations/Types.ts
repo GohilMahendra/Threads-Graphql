@@ -5,6 +5,7 @@ import { UserTabType } from "./UserTab";
 import { HomeStackParams } from "./FeedStack";
 import { ProfileStacktype } from "./ProfileStack";
 import { FavoriteStackType } from "./FavoriteStack";
+import { SearchStackParams } from "./SearchStack";
 
 
 // composite navigation types for navigate into nested navigation
@@ -14,3 +15,4 @@ export type compositeRootHomeStack = CompositeNavigationProp<NavigationProp<Root
 export type ProfileRootComposite = CompositeNavigationProp<NavigationProp<ProfileStacktype>,NavigationProp<RootStackType>>
 export type FavoriteRootComposite = CompositeNavigationProp<NavigationProp<FavoriteStackType,"Favorite">,NavigationProp<RootStackType>>
 export type compositeUserProfileRootNavigation = CompositeNavigationProp<NavigationProp<HomeStackParams, "Home">, NavigationProp<RootStackType>>
+export type compositePostSearchRootNavigation = CompositeNavigationProp<NavigationProp<SearchStackParams, "PostSearch">, NavigationProp<RootStackType>>

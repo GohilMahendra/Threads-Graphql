@@ -1,9 +1,7 @@
 import AsyncStorage from "@react-native-async-storage/async-storage"
 import axios from "axios"
 import { BASE_URL } from "../globals/constants"
-import { tokens } from "react-native-paper/lib/typescript/styles/themes/v3/tokens"
-import { bool } from "aws-sdk/clients/signer"
-import { Media, UploadMedia } from "../types/Post"
+import { UploadMedia } from "../types/Post"
 
 const getToken = async () => {
     const token = await AsyncStorage.getItem("token")
@@ -40,7 +38,6 @@ export const createPost = async ({ args }: { args: CreatePostArgs }) => {
                 }
             })
         if (uploadPostResponse.status == 200) {
-            console.log("post created succesfully")
             return uploadPostResponse.data
         }
 
@@ -62,7 +59,7 @@ export const createRepost = async (postId: string, content?: string) => {
 
         formData.append("is_repost", "true")
         formData.append("postId", postId)
-        
+
         const uploadPostResponse = await axios.post(BASE_URL + "posts",
             formData,
             {
@@ -98,10 +95,7 @@ export const fetchPosts = async ({
         }
 
         if (post_type === "following") {
-            console.log("following qyaru called")
             query += `&post_type=following`;
-
-            console.log(query)
         }
 
         const response = await axios.get(query, {
@@ -251,6 +245,41 @@ export const fetchComments = async (postId: string, pagesize: number = 10, offse
 
         if (response.status == 200)
             return response.data
+        else
+            throw new Error(response.data)
+    }
+    catch (err: any) {
+        throw new Error(err?.response?.data)
+    }
+}
+
+export const searchPosts = async ({
+    pageSize = 10,
+    lastOffset,
+    searchTerm,
+}: { pageSize: number, lastOffset?: string, searchTerm: string }) => {
+    try {
+        const token = await getToken()
+
+        let quary: string = ""
+
+        if (lastOffset) {
+            quary = BASE_URL + `posts/full-text-search?searchTerm=${searchTerm}&pageSize=${pageSize}&lastOffset=${lastOffset}`
+        }
+        else {
+            quary = BASE_URL + `posts/full-text-search?searchTerm=${searchTerm}&pageSize=${pageSize}`
+        }
+        const response = await axios.get(quary, {
+            headers: {
+                "Content-Type": "application/json",
+                "token": token
+            }
+        })
+
+        if (response.status == 200)
+            {
+                return response.data
+            }
         else
             throw new Error(response.data)
     }

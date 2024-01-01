@@ -135,7 +135,7 @@ const Home = () => {
               <ActivityIndicator
                 animating
                 color={theme.text_color}
-                size={20}
+                size={"small"}
               />
             }
             data={posts}
