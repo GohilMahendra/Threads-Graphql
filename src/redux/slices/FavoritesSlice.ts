@@ -144,9 +144,11 @@ export const FavoriteSlice = createSlice({
                     state.posts[index].isLiked = true
             }
             else {
-                const index = state.repliedPosts.findIndex(commentPost => commentPost.post._id == action.payload.postId)
-                if (index != -1)
-                    state.repliedPosts[index].post.isLiked = true
+                state.repliedPosts.forEach(commentPost => {
+                    if (commentPost.post._id === action.payload.postId) {
+                        commentPost.post.isLiked = true;
+                    }
+                });
             }
         })
         builder.addCase(favoritesLikeAction.rejected, (state, action) => {
@@ -165,9 +167,11 @@ export const FavoriteSlice = createSlice({
                     state.posts[index].isLiked = false
             }
             else {
-                const index = state.repliedPosts.findIndex(commentPost => commentPost.post._id == action.payload.postId)
-                if (index != -1)
-                    state.repliedPosts[index].post.isLiked = false
+                state.repliedPosts.forEach(commentPost => {
+                    if (commentPost.post._id === action.payload.postId) {
+                        commentPost.post.isLiked = false;
+                    }
+                });
             }
         })
         builder.addCase(favoritesUnlikeAction.rejected, (state, action) => {

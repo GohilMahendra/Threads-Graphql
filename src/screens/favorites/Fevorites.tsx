@@ -7,8 +7,10 @@ import { useSelector } from 'react-redux'
 import { RootState, useAppDispatch } from '../../redux/store'
 import FollowingUser from '../../components/favorites/FollowingUser'
 import { User } from '../../types/User'
-import {  favoriteCreateRepostAction, favoritesLikeAction, favoritesUnlikeAction, getLikedPostsActions, getMoreLikedPostsActions, getMoreUserFollowingAction, getUserFollowingAction,
-  deleteFavoritesReplyAction, favoritesFollowAction,favoritesUnFollowAction,getFavoritesRepliedPostsAction,getMoreFavoritesRepliedPostsAction } from '../../redux/actions/FavoriteActions'
+import {
+  favoriteCreateRepostAction, favoritesLikeAction, favoritesUnlikeAction, getLikedPostsActions, getMoreLikedPostsActions, getMoreUserFollowingAction, getUserFollowingAction,
+  deleteFavoritesReplyAction, favoritesFollowAction, favoritesUnFollowAction, getFavoritesRepliedPostsAction, getMoreFavoritesRepliedPostsAction
+} from '../../redux/actions/FavoriteActions'
 import { Thread } from '../../types/Post'
 import RepostItem from '../../components/feed/RepostItem'
 import PostItem from '../../components/feed/PostItem'
@@ -33,7 +35,7 @@ const Favorites = () => {
   const suggestedUsers = useSelector((state: RootState) => state.Favorite.suggestedUsers)
   const screenLoading = useSelector((state: RootState) => state.Favorite.screeenLoading)
   const posts = useSelector((state: RootState) => state.Favorite.posts)
-  const lastOffset =  useSelector((state: RootState) => state.Favorite.lastOffset)
+  const lastOffset = useSelector((state: RootState) => state.Favorite.lastOffset)
   const [replyId, setReplyId] = useState<string>("")
   const [postId, setPostId] = useState<string>("")
   const repliedPosts = useSelector((state: RootState) => state.Favorite.repliedPosts)
@@ -65,9 +67,15 @@ const Favorites = () => {
   }
   const toggleLike = (postId: string, step: string) => {
     if (step == "unlike") {
+      if(selectedOption == "Likes")
+      dispatch(favoritesUnlikeAction({ post_type: "post", postId: postId }))
+      else if(selectedOption == "Replies")
       dispatch(favoritesUnlikeAction({ post_type: "reply", postId: postId }))
     }
     else {
+      if(selectedOption == "Likes")
+      dispatch(favoritesLikeAction({ post_type: "post", postId: postId }))
+      else if(selectedOption == "Replies")
       dispatch(favoritesLikeAction({ post_type: "reply", postId: postId }))
     }
   }
@@ -155,7 +163,7 @@ const Favorites = () => {
         backgroundColor: theme.background_color
       }}>
         {screenLoading && <Loader />}
-        <Text style={[styles.title,{color: theme.text_color}]}>Activity</Text>
+        <Text style={[styles.title, { color: theme.text_color }]}>Activity</Text>
         <View style={styles.optionRowContainer}>
           <ScrollView
             horizontal
@@ -194,7 +202,7 @@ const Favorites = () => {
               }]}>
               <Text style={{
                 fontWeight: "bold",
-                color: selectedOption == "Replies" ?white : theme.text_color
+                color: selectedOption == "Replies" ? white : theme.text_color
               }}>Replies</Text>
             </TouchableOpacity>
             <TouchableOpacity
@@ -215,6 +223,9 @@ const Favorites = () => {
         {
           selectedOption == "All" &&
           <FlatList
+            contentContainerStyle={{
+              flexGrow: 1
+            }}
             refreshControl={<RefreshControl
               tintColor={theme.text_color}
               refreshing={loading}
@@ -222,7 +233,8 @@ const Favorites = () => {
             ListEmptyComponent={() => (
               <View style={{ flex: 1, justifyContent: "center", alignItems: "center" }}>
                 <Text style={{
-                  color: theme.text_color
+                  color: theme.text_color,
+                  fontSize:scaledFont(15)
                 }}>suggestions are coming Soon !!</Text>
               </View>
             )}
@@ -233,14 +245,26 @@ const Favorites = () => {
           />
         }
         {selectedOption == "followings" && <FlatList
+          contentContainerStyle={{
+            flexGrow: 1
+          }}
           refreshControl={<RefreshControl
             tintColor={theme.text_color}
             refreshing={loading}
             onRefresh={() => getFollowingUsers()}
           />}
+          ListEmptyComponent={() =>
+            !loading &&
+            <View style={styles.emptyContainer}>
+              <Text style={{
+                fontSize: scaledFont(15),
+                color: theme.text_color
+              }}>No Followings Done by you</Text>
+            </View>
+          }
           data={users}
           onEndReachedThreshold={0.3}
-          onEndReached={() =>lastOffset && dispatch(getMoreUserFollowingAction(""))}
+          onEndReached={() => lastOffset && dispatch(getMoreUserFollowingAction(""))}
           keyExtractor={item => item._id}
           renderItem={({ item, index }) => renderUsers(item, index)}
         />
@@ -248,14 +272,26 @@ const Favorites = () => {
         {
           selectedOption == "Likes" &&
           <FlatList
+            contentContainerStyle={{
+              flexGrow: 1
+            }}
             refreshControl={<RefreshControl
               tintColor={theme.text_color}
               refreshing={loading}
               onRefresh={() => getLikedPosts()}
             />}
             onEndReachedThreshold={0.3}
-            onEndReached={() =>lastOffset && dispatch(getMoreLikedPostsActions(""))}
+            onEndReached={() => lastOffset && dispatch(getMoreLikedPostsActions(""))}
             data={posts}
+            ListEmptyComponent={() =>
+              !loading &&
+              <View style={styles.emptyContainer}>
+                <Text style={{
+                  fontSize: scaledFont(15),
+                  color: theme.text_color
+                }}>No Likes Done by you</Text>
+              </View>
+            }
             keyExtractor={item => item._id}
             renderItem={({ item, index }) => renderPosts(item, index)}
           />
@@ -264,7 +300,10 @@ const Favorites = () => {
           selectedOption == "Replies" &&
           <FlatList
             style={{
-              flex: 1
+              flex: 1,
+            }}
+            contentContainerStyle={{
+              flexGrow: 1
             }}
             refreshControl={<RefreshControl
               tintColor={theme.text_color}
@@ -273,16 +312,15 @@ const Favorites = () => {
             />}
             ListEmptyComponent={() =>
               !loading &&
-              <View style={{
-                flex: 1,
-                justifyContent: 'center',
-                alignContent: "center"
-              }}>
-                <Text>No replies created by you</Text>
+              <View style={styles.emptyContainer}>
+                <Text style={{
+                  fontSize: scaledFont(15),
+                  color: theme.text_color
+                }}>No replies created by you</Text>
               </View>
             }
             onEndReachedThreshold={0.3}
-            onEndReached={() =>lastOffset && getMoreRepliesPosts()}
+            onEndReached={() => lastOffset && getMoreRepliesPosts()}
             data={repliedPosts}
             keyExtractor={item => item._id}
             renderItem={({ item, index }) => renderReplies(item, index)}
@@ -296,63 +334,63 @@ const Favorites = () => {
             backdropComponent={(props) => (
               <BottomSheetBackdrop {...props} disappearsOnIndex={-1} appearsOnIndex={0} />
             )}
-            style={{backgroundColor: theme.secondary_background_color}}
+            style={{ backgroundColor: theme.secondary_background_color }}
             handleStyle={[styles.handleRepost, {
               backgroundColor: theme.secondary_background_color,
               borderColor: theme.text_color
             }]}
             handleIndicatorStyle={{ borderColor: theme.text_color, borderWidth: 2 }}
           >
-           
+
+            <View style={{
+              flex: 1,
+              backgroundColor: theme.secondary_background_color,
+              padding: 10,
+              justifyContent: "center"
+            }} >
+
               <View style={{
-                flex:1,
-                backgroundColor: theme.secondary_background_color,
-                padding: 10,
-                justifyContent:"center"
-              }} >
-
-                <View style={{
-                  justifyContent: 'center',
-                  alignItems: "center",
-                  marginVertical: 10
-                }}>
-                  <TouchableOpacity
-                    onPress={() => onDeleteReply(replyId)}
-                    style={{
-                      width: "100%",
-                      borderRadius: 15,
-                      //  marginTop:20,
-                      backgroundColor: theme.secondary_color,
-                      padding: 20
-                    }}
-                  >
-                    <Text style={{
-                      color: "red",
-                      fontWeight: "bold",
-                      fontSize: scaledFont(15),
-                    }}>Delete</Text>
-                  </TouchableOpacity>
-                  <TouchableOpacity
-                    onPress={() => {
-                      replyThreeDotsBottomSheetRef.current?.close()
-                    }}
-                    style={{
-                      width: "100%",
-                      borderRadius: 15,
-                      marginVertical: 10,
-                      backgroundColor: theme.secondary_color,
-                      padding: 20
-                    }}
-                  >
-                    <Text style={{
-                      color: theme.text_color,
-                      fontWeight: "bold",
-                      fontSize: scaledFont(15),
-                    }}>Cancel</Text>
-                  </TouchableOpacity>
-                </View>
-
+                justifyContent: 'center',
+                alignItems: "center",
+                marginVertical: 10
+              }}>
+                <TouchableOpacity
+                  onPress={() => onDeleteReply(replyId)}
+                  style={{
+                    width: "100%",
+                    borderRadius: 15,
+                    //  marginTop:20,
+                    backgroundColor: theme.secondary_color,
+                    padding: 20
+                  }}
+                >
+                  <Text style={{
+                    color: "red",
+                    fontWeight: "bold",
+                    fontSize: scaledFont(15),
+                  }}>Delete</Text>
+                </TouchableOpacity>
+                <TouchableOpacity
+                  onPress={() => {
+                    replyThreeDotsBottomSheetRef.current?.close()
+                  }}
+                  style={{
+                    width: "100%",
+                    borderRadius: 15,
+                    marginVertical: 10,
+                    backgroundColor: theme.secondary_color,
+                    padding: 20
+                  }}
+                >
+                  <Text style={{
+                    color: theme.text_color,
+                    fontWeight: "bold",
+                    fontSize: scaledFont(15),
+                  }}>Cancel</Text>
+                </TouchableOpacity>
               </View>
+
+            </View>
           </BottomSheetModal>
           <BottomSheetModal
             ref={replyBottomSheetRef}
@@ -396,7 +434,7 @@ const Favorites = () => {
                   size={scaledFont(20)}
                   color={theme.text_color}
                 />
-                <Text style={{ color: theme.text_color, fontSize:scaledFont(15)}}>Repost</Text>
+                <Text style={{ color: theme.text_color, fontSize: scaledFont(15) }}>Repost</Text>
               </TouchableOpacity>
 
               <TouchableOpacity
@@ -409,7 +447,7 @@ const Favorites = () => {
                   size={scaledFont(20)}
                   color={theme.text_color}
                 />
-                <Text style={{ color: theme.text_color,fontSize:scaledFont(15) }}>Repost with Qoute</Text>
+                <Text style={{ color: theme.text_color, fontSize: scaledFont(15) }}>Repost with Qoute</Text>
               </TouchableOpacity>
             </View>
           </BottomSheetModal>
@@ -424,10 +462,10 @@ export default Favorites
 const styles = StyleSheet.create({
   title:
   {
-    marginHorizontal:20,
-    marginTop:10,
-    fontSize:scaledFont(30),
-    fontWeight:"bold"
+    marginHorizontal: 20,
+    marginTop: 10,
+    fontSize: scaledFont(30),
+    fontWeight: "bold"
   },
   sheetComment:
   {
@@ -454,8 +492,8 @@ const styles = StyleSheet.create({
   {
     flex: 1,
     padding: 20,
-    alignItems:"center",
-    justifyContent:'center'
+    alignItems: "center",
+    justifyContent: 'center'
   },
   btnRepost:
   {
@@ -484,11 +522,18 @@ const styles = StyleSheet.create({
   optionRowContainer:
   {
     flexDirection: 'row',
-    paddingHorizontal:20,
-    paddingVertical:10
+    paddingHorizontal: 20,
+    paddingVertical: 10
   },
   gestureContainer:
   {
     flex: 1
+  },
+  emptyContainer:
+  {
+    flexGrow: 1,
+    justifyContent: 'center',
+    alignItems: "center",
+    padding: 20
   }
 })

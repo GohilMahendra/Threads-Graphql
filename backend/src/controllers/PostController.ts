@@ -465,7 +465,6 @@ const deletePost = async (req: CustomRequest, res: Response) => {
     }
 }
 
-
 const getPostsFullTextSearch = async (req: CustomRequest, res: Response) => {
     try {
         const userId = req.userId;
@@ -542,7 +541,7 @@ const getPostsFullTextSearch = async (req: CustomRequest, res: Response) => {
         let userPosts = posts
         const updatedUserPosts = await Promise.all(userPosts.map(async (post, index: number) => {
             const media = post.media;
-            const user = post.user;
+            const user = post.user as UserDocument;
             if (user.profile_picture) {
                 user.profile_picture = await getSignedUrl(user.profile_picture);
             }
@@ -560,8 +559,8 @@ const getPostsFullTextSearch = async (req: CustomRequest, res: Response) => {
 
         await Promise.all(userPosts.map(async (post, index: number) => {
             if (post.isRepost && post.Repost) {
-                const user = post.Repost.user
-                const media = post.Repost.media
+                const user = post.Repost.user as UserDocument
+                const media = (post.Repost as PostDocument).media
                 if (user.profile_picture) {
                     const key = user.profile_picture
                     const uri = await getSignedUrl(key)
