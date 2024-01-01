@@ -180,6 +180,10 @@ Make sure you have Node.js and npm installed on your machine. If not, you can do
 | ------------ | ------------ | ------------ |
 | ![Screenshot 1](screenshots/light%20mode/Simulator%20Screenshot%20-%20iPhone%2015%20Pro%20Max%20-%202023-12-31%20at%2005.58.48.png) | ![Screenshot 2](screenshots/light%20mode/Simulator%20Screenshot%20-%20iPhone%2015%20Pro%20Max%20-%202023-12-31%20at%2005.58.48.png) | ![Screenshot 3](screenshots/light%20mode/Simulator%20Screenshot%20-%20iPhone%2015%20Pro%20Max%20-%202023-12-31%20at%2005.59.22.png) |
 
+| Full Text search 1 | Full Text search 2 | Full Text search 3 |
+| ------------ | ------------ | ------------ |
+| ![Screenshot 1](screenshots/light%20mode/Simulator%20Screenshot%20-%20iPhone%2015%20Pro%20-%202024-01-02%20at%2002.13.04.png) | ![Screenshot 2](screenshots/light%20mode/Simulator%20Screenshot%20-%20iPhone%2015%20Pro%20-%202024-01-02%20at%2002.18.59.png) | ![Screenshot 3](screenshots/light%20mode/Simulator%20Screenshot%20-%20iPhone%2015%20Pro%20-%202024-01-02%20at%2002.13.10.png) |
+
 | Create Threads | User Profile | Edit Profile |
 | ------------ | ------------ | ------------ |
 | ![Screenshot 1](screenshots/light%20mode/Simulator%20Screenshot%20-%20iPhone%2015%20Pro%20Max%20-%202023-12-31%20at%2005.59.55.png) | ![Screenshot 2](screenshots/light%20mode/Simulator%20Screenshot%20-%20iPhone%2015%20Pro%20Max%20-%202023-12-31%20at%2006.00.09.png) | ![Screenshot 3](screenshots/light%20mode/Simulator%20Screenshot%20-%20iPhone%2015%20Pro%20Max%20-%202023-12-31%20at%2006.01.04.png) |
@@ -218,7 +222,9 @@ Make sure you have Node.js and npm installed on your machine. If not, you can do
 | ------------ | ------------ | ------------ |
 | ![Screenshot 1](screenshots/dark%20mode/Simulator%20Screenshot%20-%20iPhone%2015%20Pro%20Max%20-%202023-12-31%20at%2006.23.06.png) | ![Screenshot 2](screenshots/dark%20mode/Simulator%20Screenshot%20-%20iPhone%2015%20Pro%20Max%20-%202023-12-31%20at%2006.23.31.png) | ![Screenshot 3](screenshots/dark%20mode/Simulator%20Screenshot%20-%20iPhone%2015%20Pro%20Max%20-%202023-12-31%20at%2006.23.40.png) |
 
-
+| Full Text search 1 | Full Text search 2 | Full Text search 3 |
+| ------------ | ------------ | ------------ |
+| ![Screenshot 1](screenshots/dark%20mode/Simulator%20Screenshot%20-%20iPhone%2015%20Pro%20-%202024-01-02%20at%2002.12.37.png) | ![Screenshot 2](screenshots/dark%20mode/Simulator%20Screenshot%20-%20iPhone%2015%20Pro%20-%202024-01-02%20at%2002.18.52.png) | ![Screenshot 3](screenshots/dark%20mode/Simulator%20Screenshot%20-%20iPhone%2015%20Pro%20-%202024-01-02%20at%2002.12.49.png) |
 
 | Profile 01 | Profile 02 | Create Thread |
 | ------------ | ------------ | ------------ |
