@@ -80,16 +80,15 @@ export const getLikedPostsActions = createAsyncThunk(
 )
 export const getMoreLikedPostsActions = createAsyncThunk(
     "Favorites/getMoreLikedPostsActions",
-    async (fakeArg: string, { rejectWithValue , getState}) => {
+    async (fakeArg: string, { rejectWithValue, getState }) => {
         try {
 
             const state = getState() as RootState
             const offset = state.Favorite.lastOffset
-            if(!offset)
-            {
+            if (!offset) {
                 return {
-                    data:[],
-                    lastOffset:null
+                    data: [],
+                    lastOffset: null
                 }
             }
             const response = await fetchUserLikedPosts({
@@ -114,12 +113,12 @@ export const getMoreLikedPostsActions = createAsyncThunk(
 )
 export const favoritesLikeAction = createAsyncThunk(
     "Favorite/favoritesLikeAction",
-    async ({ postId,post_type}: { postId: string,post_type:"post"|"reply"}, { rejectWithValue }) => {
+    async ({ postId, post_type }: { postId: string, post_type: "post" | "reply" }, { rejectWithValue }) => {
         try {
             const response = await likePost(postId)
             return {
                 postId: postId,
-                postType:post_type
+                postType: post_type
             }
         }
         catch (err) {
@@ -130,12 +129,12 @@ export const favoritesLikeAction = createAsyncThunk(
 )
 export const favoritesUnlikeAction = createAsyncThunk(
     "Favorite/favoritesUnlikeAction",
-    async ({ postId,post_type}: { postId: string,post_type:"post"|"reply"}, { rejectWithValue }) => {
+    async ({ postId, post_type }: { postId: string, post_type: "post" | "reply" }, { rejectWithValue }) => {
         try {
             const response = await unLikePost(postId)
             return {
                 postId: postId,
-                postType:post_type
+                postType: post_type
             }
         }
         catch (err) {
@@ -199,15 +198,14 @@ export const getFavoritesRepliedPostsAction = createAsyncThunk(
 )
 export const getMoreFavoritesRepliedPostsAction = createAsyncThunk(
     "Favorites/getMoreFavoritesRepliedPostsAction",
-    async (fakeArg: string, { rejectWithValue,getState }) => {
+    async (fakeArg: string, { rejectWithValue, getState }) => {
         try {
             const state = getState() as RootState
             const offset = state.Favorite.lastOffset
-            if(!offset)
-            {
+            if (!offset) {
                 return {
-                    data:[],
-                    lastOffset:null
+                    data: [],
+                    lastOffset: null
                 }
             }
             const response = await fetchUserRepliedPosts({
@@ -232,7 +230,7 @@ export const getMoreFavoritesRepliedPostsAction = createAsyncThunk(
 
 export const favoriteCreateRepostAction = createAsyncThunk(
     "Favorite/favoriteCreateRepostAction",
-    async ({ postId}: { postId: string}, { rejectWithValue }) => {
+    async ({ postId }: { postId: string }, { rejectWithValue }) => {
         try {
             const response = await createRepost(postId)
             return {
@@ -247,7 +245,7 @@ export const favoriteCreateRepostAction = createAsyncThunk(
 )
 export const deleteFavoritesReplyAction = createAsyncThunk(
     "Favorite/deleteFavoritesReplyAction",
-    async ({ replyId}: { replyId: string}, { rejectWithValue }) => {
+    async ({ replyId }: { replyId: string }, { rejectWithValue }) => {
         try {
             const response = await deleteReply(replyId)
             return {

@@ -9,7 +9,7 @@ import { ProfileStacktype } from '../../navigations/ProfileStack'
 import {
     launchImageLibrary
 } from "react-native-image-picker"
-import { UpdateAction } from '../../redux/slices/UserSlice'
+import { UpdateAction } from '../../redux/actions/UserActions'
 import UseTheme from '../../globals/UseTheme'
 import Loader from '../../components/global/Loader'
 import { ScrollView } from 'react-native'

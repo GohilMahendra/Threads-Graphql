@@ -5,7 +5,7 @@ import { Thread } from '../../types/Post'
 import PostItem from '../../components/feed/PostItem'
 import { useSelector } from 'react-redux'
 import { RootState, useAppDispatch } from '../../redux/store'
-import { FetchMorePostsAction,feedCreateRepostAction, FetchPostsAction, LikeAction, unLikeAction } from '../../redux/slices/FeedSlice'
+import { FetchMorePostsAction,feedCreateRepostAction, FetchPostsAction, LikeAction, unLikeAction } from '../../redux/actions/FeedActions'
 import Replies from '../../components/feed/Replies'
 import { BottomSheetBackdrop, BottomSheetModal, BottomSheetModalProvider } from "@gorhom/bottom-sheet";
 import { Text } from 'react-native-elements'

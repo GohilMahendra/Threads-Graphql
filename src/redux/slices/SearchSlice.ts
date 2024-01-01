@@ -1,8 +1,6 @@
-import { PayloadAction, createAsyncThunk, createSlice } from "@reduxjs/toolkit"
-import { SearchUser, SignUpArgsType, UpdateArgsType, User, UserResponse } from "../../types/User";
-import { loginUser, signUpUser, updateUser } from "../../apis/UserAPI";
-import AsyncStorage from "@react-native-async-storage/async-storage";
-import { searchUsers } from "../../apis/SearchAPI";
+import { PayloadAction, createSlice } from "@reduxjs/toolkit"
+import { SearchUser } from "../../types/User";
+import { SearchUserAction } from "../actions/SearchActions";
 type SearchType = 
 {
     users: SearchUser[],
@@ -19,20 +17,6 @@ const initialState: SearchType =
 
 }
 
-export const SearchUserAction = createAsyncThunk(
-    "search/SearchUserAction",
-    async({name}:{name:string},{rejectWithValue})=>{
-        try
-        {
-            const response = await searchUsers(name)
-            const users:SearchUser[] = response.data
-            return users
-        }
-        catch(err)
-        {
-            return rejectWithValue(JSON.stringify(err))
-        }
-})
 
 export const SearchSlice = createSlice({
     name:"Search",

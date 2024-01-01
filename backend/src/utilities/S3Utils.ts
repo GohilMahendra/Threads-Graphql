@@ -5,10 +5,11 @@ AWSSDK.config.update({
     signatureVersion: 'v4'
 });
 
+const CONTENT_EXPIRY_TIME = 60 * 60
 export const s3 = new AWSSDK.S3({
-    accessKeyId: process.env.AWS_ACCESS_KEY,
-    secretAccessKey: process.env.AWS_SECRET_ACCESS_KEY,
-    region: process.env.AWS_REGION
+    accessKeyId: "AKIAUA2QJHDUT23ASBBD",
+    secretAccessKey: "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",
+    region: "ap-south-1"
 });
 
 export const getSignedUrl = async(key:string) =>
@@ -16,6 +17,7 @@ export const getSignedUrl = async(key:string) =>
     const signedUrl  = await s3.getSignedUrlPromise('getObject', {
         Bucket: process.env.AWS_S3_BUCKET_NAME,
         Key: key,
+        Expires: CONTENT_EXPIRY_TIME
     });
 
     return signedUrl

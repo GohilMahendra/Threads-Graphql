@@ -1,9 +1,8 @@
 import {
     View, Text, Image, TextInput,
-    SafeAreaView, TouchableOpacity, Dimensions, KeyboardAvoidingView, Platform, ScrollView, StyleSheet
+    SafeAreaView, TouchableOpacity, KeyboardAvoidingView, Platform, ScrollView, StyleSheet
 } from 'react-native'
 import React, { useState } from 'react'
-import FontAwesome from 'react-native-vector-icons/FontAwesome'
 import AntDesign from 'react-native-vector-icons/AntDesign'
 import { placeholder_image } from '../../globals/asstes'
 import { useSelector } from 'react-redux';
@@ -12,9 +11,8 @@ import UseTheme from '../../globals/UseTheme';
 import Loader from '../../components/global/Loader';
 import { NavigationProp, RouteProp, useNavigation, useRoute } from '@react-navigation/native';
 import { RootStackType } from '../../navigations/RootStack';
-import { UploadMedia } from '../../types/Post';
 import PostViewItem from '../../components/profile/PostViewItem';
-import { createRepostAction } from '../../redux/slices/UserSlice'
+import { createRepostAction } from '../../redux/actions/UserActions'
 import { scaledFont } from '../../globals/utilities'
 
 const QoutePost = () => {
@@ -107,8 +105,8 @@ const styles = StyleSheet.create({
     container:
     {
         flex: 1,
-        borderTopRightRadius:20,
-        borderTopLeftRadius:20
+        borderTopRightRadius: 20,
+        borderTopLeftRadius: 20
     },
     avoidingView:
     {

@@ -1,9 +1,9 @@
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import { NavigationProp, useNavigation, CompositeNavigationProp, useTheme } from '@react-navigation/native';
+import { useNavigation } from '@react-navigation/native';
 import React, { useEffect } from 'react'
 import { SafeAreaView, StyleSheet, Text } from "react-native";
 import { useAppDispatch } from '../../redux/store';
-import { SignInAction } from '../../redux/slices/UserSlice';
+import { SignInAction } from '../../redux/actions/UserActions';
 import { compositeRootUserTab } from '../../navigations/Types';
 import UseTheme from '../../globals/UseTheme';
 import { Image } from 'react-native';
@@ -13,7 +13,7 @@ import { scaledFont } from '../../globals/utilities';
 const SplashScreen = () => {
     const dispatch = useAppDispatch()
     const navigation = useNavigation<compositeRootUserTab>()
-    const { theme ,setTheme} = UseTheme()
+    const { theme, setTheme } = UseTheme()
     const signIn = async () => {
         try {
             const email = await AsyncStorage.getItem("email")
@@ -40,11 +40,10 @@ const SplashScreen = () => {
         }
 
     }
-    const checkTheme = async() =>
-    {
+    const checkTheme = async () => {
         const mode = await AsyncStorage.getItem("theme") as "dark" | "light"
-        if(mode)
-        setTheme(mode)
+        if (mode)
+            setTheme(mode)
     }
     useEffect(() => {
         checkTheme()

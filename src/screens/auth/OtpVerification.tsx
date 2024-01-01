@@ -1,12 +1,10 @@
 import React, { useRef, useState } from 'react'
-import { View, Text, SafeAreaView, Dimensions, TextInput, TouchableOpacity, StyleSheet } from 'react-native'
+import { View, Text, SafeAreaView, TextInput, TouchableOpacity, StyleSheet } from 'react-native'
 import { NavigationProp, RouteProp, CommonActions, useNavigation, useRoute } from '@react-navigation/native';
 import { AuthStackType } from '../../navigations/AuthStack';
 import FontAwesome from 'react-native-vector-icons/FontAwesome';
-import axios from 'axios';
-import { BASE_URL } from '../../globals/constants';
 import { useAppDispatch } from '../../redux/store';
-import { verifyOtpUserAction } from '../../redux/slices/UserSlice';
+import { verifyOtpUserAction } from '../../redux/actions/UserActions';
 import { scaledFont } from '../../globals/utilities';
 const OtpVerification = () => {
     const [otp, setOtp] = useState<string>("")
@@ -63,7 +61,6 @@ const OtpVerification = () => {
             })
         }
     }
-
 
     return (
         <SafeAreaView style={styles.container}>

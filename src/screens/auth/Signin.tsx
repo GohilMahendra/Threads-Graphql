@@ -3,7 +3,7 @@ import { View, Text, SafeAreaView, Image, Dimensions, TextInput, TouchableOpacit
 import { useNavigation } from '@react-navigation/native';
 import UseTheme from '../../globals/UseTheme';
 import { RootState, useAppDispatch } from '../../redux/store';
-import { SignInAction } from '../../redux/slices/UserSlice';
+import { SignInAction } from '../../redux/actions/UserActions';
 import { useSelector } from 'react-redux';
 import Loader from '../../components/global/Loader';
 import { composeteAuthRootStack } from '../../navigations/Types';

@@ -14,7 +14,7 @@ import UseTheme from '../../globals/UseTheme';
 import Loader from '../../components/global/Loader';
 import { NavigationProp, useNavigation } from '@react-navigation/native';
 import { RootStackType } from '../../navigations/RootStack';
-import { createPostAction } from '../../redux/slices/UserSlice';
+import { createPostAction } from '../../redux/actions/UserActions';
 import { UploadMedia } from '../../types/Post';
 import { CHARACTER_LIMIT } from '../../globals/constants';
 import { scaledFont } from '../../globals/utilities'

@@ -17,7 +17,6 @@ import Animated, {
 } from "react-native-reanimated";
 import GridViewer from "./GridViewer";
 import UseTheme from "../../globals/UseTheme";
-import { twitter_blue } from "../../globals/Colors";
 import PressableContent from "./PressableContent";
 type PostItemsProps =
     {

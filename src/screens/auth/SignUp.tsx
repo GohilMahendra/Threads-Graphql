@@ -1,16 +1,15 @@
 import React, { useState } from 'react'
 import { View, Text, SafeAreaView, Image, Dimensions, TextInput, TouchableOpacity, Switch, Pressable, ScrollView, StyleSheet } from 'react-native'
 import { applogo } from "../../globals/asstes";
-import AntDesign from "react-native-vector-icons/AntDesign";
-import FontAwesome5 from "react-native-vector-icons/FontAwesome5";
 import { NavigationProp, useNavigation } from '@react-navigation/native';
 import { AuthStackType } from '../../navigations/AuthStack';
 import { signUpUser } from '../../apis/UserAPI';
 import UseTheme from '../../globals/UseTheme';
 import { useSelector } from 'react-redux';
-import { RootState } from '../../redux/store';
+import { RootState, useAppDispatch } from '../../redux/store';
 import Loader from '../../components/global/Loader';
 import { scaledFont } from '../../globals/utilities';
+import { SignUpAction } from '../../redux/actions/UserActions';
 const { height, width } = Dimensions.get("screen")
 const SignUp = () => {
     const loading = useSelector((state: RootState) => state.User.loading)
@@ -21,19 +20,24 @@ const SignUp = () => {
     const [fullName, setFullName] = useState("")
     const navigation = useNavigation<NavigationProp<AuthStackType, "SignIn">>()
     const { theme } = UseTheme()
+    const dispatch = useAppDispatch()
     const SignUp = async () => {
         const email_lowercase = email.toLowerCase()
         const username_lowercase = userName.toLowerCase()
         const fullname_lowercase = fullName.toLowerCase()
-        const response = await signUpUser({
+
+        const responseSignUp = await dispatch(SignUpAction({
             email: email_lowercase,
             password: password,
             fullname: fullname_lowercase,
             username: username_lowercase
-        })
-        navigation.navigate("OtpVerification", {
-            email: email_lowercase
-        })
+        }))
+
+        if (SignUpAction.fulfilled.match(responseSignUp)) {
+            navigation.navigate("OtpVerification", {
+                email: email_lowercase
+            })
+        }
     }
     return (
         <SafeAreaView style={[styles.container, { backgroundColor: theme.background_color }]}>

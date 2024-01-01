@@ -1,6 +1,6 @@
 import React from "react";
 import { TouchableOpacity, Image, View, Text, StyleSheet } from "react-native"
-import { SearchUser, User } from "../../types/User"
+import { User } from "../../types/User"
 import { placeholder_image } from "../../globals/asstes";
 import UseTheme from "../../globals/UseTheme";
 import { useAppDispatch } from "../../redux/store";

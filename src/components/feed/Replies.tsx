@@ -8,7 +8,7 @@ import { Text } from "react-native";
 import { useSelector } from "react-redux";
 import { RootState, useAppDispatch } from "../../redux/store";
 import MaterialIcons from "react-native-vector-icons/MaterialIcons";
-import { commentPostAction, getCommentsAction, getMoreCommentsAction } from "../../redux/slices/ReplySlice";
+import { commentPostAction, getCommentsAction, getMoreCommentsAction } from "../../redux/actions/ReplyActions";
 import { StyleSheet } from "react-native";
 import UseTheme from "../../globals/UseTheme";
 import Loader from "../global/Loader";
