@@ -12,13 +12,19 @@ export const loginUser = async (email: string, password: string) => {
             { headers: { 'Content-Type': 'application/json' } }
         );
 
-        if(response.status == 200)
-        return response.data
+        if (response.status == 200)
+            return response.data
         else
-        throw new Error(response.data)
+            throw new Error(response.data)
     }
     catch (error: any) {
-        throw new Error(error?.response?.data)
+        if (error.response) {
+            throw new Error(error.response.status + error.response.data.message);
+        } else if (error.request) {
+            throw new Error("No Response from Server");
+        } else {
+            throw new Error("Error:" + error.message);
+        }
     }
 
 }
@@ -31,13 +37,19 @@ export const signUpUser = async (args: SignUpArgsType) => {
             { ...args },
             { headers: { 'Content-Type': 'application/json' } }
         )
-        if(response.status == 200)
-        return response.data
+        if (response.status == 200)
+            return response.data
         else
-        throw new Error(response.data)
+            throw new Error(response.data)
     }
     catch (error: any) {
-        throw new Error(error?.response?.data)
+        if (error.response) {
+            throw new Error(error.response.status + error.response.data.message);
+        } else if (error.request) {
+            throw new Error("No Response from Server");
+        } else {
+            throw new Error("Error:" + error.message);
+        }
     }
 }
 
@@ -63,18 +75,21 @@ export const updateUser = async (args: UpdateArgsType) => {
                     "token": token
                 },
             })
-
-        console.log(response.request)
         if (response.status == 200) {
             return response.data
         }
         else {
-           return response.data
+            return response.data
         }
     }
-    catch (err: any) {
-       throw new Error(err?.response?.data)
-
+    catch (error: any) {
+        if (error.response) {
+            throw new Error(error.response.status + error.response.data.message);
+        } else if (error.request) {
+            throw new Error("No Response from Server");
+        } else {
+            throw new Error("Error:" + error.message);
+        }
     }
 }
 
@@ -95,8 +110,14 @@ export const verifyOtp = async (email: string, otp: string) => {
         else
             throw new Error(response.data)
     }
-    catch (err: any) {
-        throw new Error(err?.response?.data)
+    catch (error: any) {
+        if (error.response) {
+            throw new Error(error.response.status + error.response.data.message);
+        } else if (error.request) {
+            throw new Error("No Response from Server");
+        } else {
+            throw new Error("Error:" + error.message);
+        }
     }
 }
 
@@ -127,12 +148,18 @@ export const fetchUserPosts = async ({
             return response.data
         }
         else {
-        
+
             throw new Error(response.data)
         }
     }
-    catch (err:any) {
-        throw new Error(err?.response?.data)
+    catch (error: any) {
+        if (error.response) {
+            throw new Error(error.response.status + error.response.data.message);
+        } else if (error.request) {
+            throw new Error("No Response from Server");
+        } else {
+            throw new Error("Error:" + error.message);
+        }
     }
 }
 
@@ -153,8 +180,14 @@ export const deleteUserPost = async (postId: string) => {
             throw new Error(response.data)
         }
     }
-    catch (err:any) {
-        throw new Error(err?.response?.data)
+    catch (error: any) {
+        if (error.response) {
+            throw new Error(error.response.status + error.response.data.message);
+        } else if (error.request) {
+            throw new Error("No Response from Server");
+        } else {
+            throw new Error("Error:" + error.message);
+        }
     }
 }
 
@@ -175,8 +208,14 @@ export const fetchUserById = async (userId: string) => {
             throw new Error(response.data)
         }
     }
-    catch (err: any) {
-        throw new Error(err?.response?.data)
+    catch (error: any) {
+        if (error.response) {
+            throw new Error(error.response.status + error.response.data.message);
+        } else if (error.request) {
+            throw new Error("No Response from Server");
+        } else {
+            throw new Error("Error:" + error.message);
+        }
     }
 }
 
@@ -184,8 +223,7 @@ export const getCurrentFollowings = async (pageSize: number = 10, lastOffset?: s
     try {
         let quary = `${BASE_URL}followers?pageSize=${pageSize}`
 
-        if(lastOffset)
-        {
+        if (lastOffset) {
             quary = `${quary}&lastOffset=${lastOffset}`
         }
         const token = await getToken()
@@ -201,8 +239,14 @@ export const getCurrentFollowings = async (pageSize: number = 10, lastOffset?: s
         else
             throw new Error(response.data)
     }
-    catch (err: any) {
-        throw new Error(err?.response?.data)
+    catch (error: any) {
+        if (error.response) {
+            throw new Error(error.response.status + error.response.data.message);
+        } else if (error.request) {
+            throw new Error("No Response from Server");
+        } else {
+            throw new Error("Error:" + error.message);
+        }
     }
 
 }
@@ -218,15 +262,20 @@ export const followUser = async (userId: string) => {
                 },
             }
         )
-        if (response.status == 200)
-        {
+        if (response.status == 200) {
             return response.data
         }
         else
             throw new Error(response.data)
     }
-    catch (err: any) {
-        throw new Error(err?.response?.data)
+    catch (error: any) {
+        if (error.response) {
+            throw new Error(error.response.status + error.response.data.message);
+        } else if (error.request) {
+            throw new Error("No Response from Server");
+        } else {
+            throw new Error("Error:" + error.message);
+        }
     }
 
 }
@@ -237,20 +286,25 @@ export const unFollowUser = async (userId: string) => {
         const response = await axios.delete(quary,
             {
                 headers: {
-                   "Content-Type": "application/json",
+                    "Content-Type": "application/json",
                     "token": token
                 },
             }
         )
-        if (response.status == 200)
-        {
+        if (response.status == 200) {
             return response.data
         }
         else
             throw new Error(response.data)
     }
-    catch (err: any) {
-        throw new Error(err?.response?.data)
+    catch (error: any) {
+        if (error.response) {
+            throw new Error(error.response.status + error.response.data.message);
+        } else if (error.request) {
+            throw new Error("No Response from Server");
+        } else {
+            throw new Error("Error:" + error.message);
+        }
     }
 
 }
@@ -280,8 +334,14 @@ export const fetchUserLikedPosts = async ({
             throw new Error(response.data)
         }
     }
-    catch (err:any) {
-        throw new Error(err?.response?.data)
+    catch (error: any) {
+        if (error.response) {
+            throw new Error(error.response.status + error.response.data.message);
+        } else if (error.request) {
+            throw new Error("No Response from Server");
+        } else {
+            throw new Error("Error:" + error.message);
+        }
     }
 }
 
@@ -310,8 +370,14 @@ export const fetchUserRepliedPosts = async ({
             throw new Error(response.data)
         }
     }
-    catch (err:any) {
-        throw new Error(err?.response?.data)
+    catch (error: any) {
+        if (error.response) {
+            throw new Error(error.response.status + error.response.data.message);
+        } else if (error.request) {
+            throw new Error("No Response from Server");
+        } else {
+            throw new Error("Error:" + error.message);
+        }
     }
 }
 
@@ -332,8 +398,14 @@ export const deleteReply = async (replyId: string) => {
         else
             throw new Error(response.data)
     }
-    catch (err: any) {
-        throw new Error(err?.response?.data)
+    catch (error: any) {
+        if (error.response) {
+            throw new Error(error.response.status + error.response.data.message);
+        } else if (error.request) {
+            throw new Error("No Response from Server");
+        } else {
+            throw new Error("Error:" + error.message);
+        }
     }
 
 }

@@ -184,8 +184,8 @@ const styles = StyleSheet.create({
     rodeContainer:
     {
         position: 'absolute',
-        top: 60,
-        bottom: 20,
+        top: scaledFont(60),
+        bottom: scaledFont(20),
         width: 1,
         backgroundColor: 'silver',
     },
@@ -214,7 +214,7 @@ const styles = StyleSheet.create({
     {
         color: "silver",
         marginRight: 20,
-        fontSize: scaledFont(15)
+        fontSize: scaledFont(12)
     },
     postContainer:
     {

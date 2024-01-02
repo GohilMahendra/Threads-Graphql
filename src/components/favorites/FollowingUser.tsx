@@ -45,6 +45,7 @@ const FollowingUser = (props: UserItemProps) => {
           borderWidth: item.isFollowed ? 1 : 0
         }]}>
         <Text style={{
+          fontSize: scaledFont(15),
           color: item.isFollowed ? theme.text_color : theme.background_color
         }}>{item.isFollowed ? "Following" : "Follow"}</Text>
       </TouchableOpacity>

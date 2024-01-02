@@ -99,14 +99,14 @@ const Favorites = () => {
         <RepostItem
           onLikeToggle={(postId, step) => toggleLike(postId, step)}
           onPressComment={(postId) => replyIconPress(postId)}
-          onPressNavigate={() => console.log("navig")}
+          onPressNavigate={(userId) => onNavigate(userId)}
           onRepost={(postId) => repostIconPress(postId)}
           post={item}
         /> :
         <PostItem
           onLikeToggle={(postId, step) => toggleLike(postId, step)}
           onPressComment={(postId) => replyIconPress(postId)}
-          onPressNavigate={() => console.log("navig")}
+          onPressNavigate={(userId) => onNavigate(userId)}
           onRepost={(postId) => repostIconPress(postId)}
           post={item}
         />
@@ -132,6 +132,7 @@ const Favorites = () => {
   const renderReplies = (item: CommentedPost, index: number) => {
     return (
       <RepliedPost
+        onNavigate={(userId) => onNavigate(userId)}
         onRepostIcon={(postId) => repostIconPress(postId)}
         onPressComment={(postId) => replyIconPress(postId)}
         onReplyThreeDots={(replyId) => onReplyThreeDots(replyId)}
@@ -250,6 +251,7 @@ const Favorites = () => {
           />
         }
         {selectedOption == "followings" && <FlatList
+          showsVerticalScrollIndicator={false}
           contentContainerStyle={{
             flexGrow: 1
           }}
@@ -278,6 +280,7 @@ const Favorites = () => {
         {
           selectedOption == "Likes" &&
           <FlatList
+            showsVerticalScrollIndicator={false}
             contentContainerStyle={{
               flexGrow: 1
             }}
@@ -286,7 +289,7 @@ const Favorites = () => {
               refreshing={loading}
               onRefresh={() => getLikedPosts()}
             />}
-            onEndReachedThreshold={0.3}
+            onEndReachedThreshold={0.5}
             onEndReached={() => lastOffset && dispatch(getMoreLikedPostsActions(""))}
             data={posts}
             ListEmptyComponent={() =>
@@ -305,6 +308,7 @@ const Favorites = () => {
         {
           selectedOption == "Replies" &&
           <FlatList
+            showsVerticalScrollIndicator={false}
             style={{
               flex: 1,
             }}

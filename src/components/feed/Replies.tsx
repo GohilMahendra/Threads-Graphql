@@ -27,6 +27,7 @@ const Replies = (props: ReplyPropTypes) => {
     const loading = useSelector((state: RootState) => state.Reply.loading)
     const screeenLoading = useSelector((state: RootState) => state.Reply.screeenLoading)
     const error = useSelector((state: RootState) => state.Reply.error)
+    const lastoffset = useSelector((state: RootState) => state.Reply.lastOffset)
     const loadMoreLoading = useSelector((state: RootState) => state.Reply.loadMoreLoading)
     const loadMoreError = useSelector((state: RootState) => state.Reply.loadMoreError)
     const [comment, setComment] = useState<string>("")
@@ -37,11 +38,14 @@ const Replies = (props: ReplyPropTypes) => {
         if (!comment)
             return null
 
-        dispath(commentPostAction({
+        await dispath(commentPostAction({
             content: comment,
             postId: postId
         }))
         setComment("")
+        await dispath(getCommentsAction({
+            postId
+        }))
     }
 
     const getComments = async () => {
@@ -51,10 +55,10 @@ const Replies = (props: ReplyPropTypes) => {
     }
     const commentRenderItem = (comment: Comment, index: number) => {
         return (
-           <ReplyViewItem
-           comment={comment}
-           onPress={(userId)=>console.log(userId)}
-           />
+            <ReplyViewItem
+                comment={comment}
+                onPress={(userId) => console.log(userId)}
+            />
         )
     }
     useEffect(() => {
@@ -65,6 +69,7 @@ const Replies = (props: ReplyPropTypes) => {
     return (
         <KeyboardAvoidingView
             behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
+            keyboardVerticalOffset={scaledFont(50)}
             style={[styles.container, { backgroundColor: theme.secondary_background_color }]}>
             {/* list containing replies */}
             {screeenLoading && <Loader />}
@@ -88,7 +93,8 @@ const Replies = (props: ReplyPropTypes) => {
                     </View> : null
                 }
                 contentContainerStyle={{
-                    flex: 1
+                    flexGrow: 1,
+                    paddingBottom: scaledFont(150)
                 }}
                 style={{
                     flex: 1,
@@ -103,8 +109,8 @@ const Replies = (props: ReplyPropTypes) => {
                 }
                 data={comments}
                 renderItem={({ item, index }) => commentRenderItem(item, index)}
-                keyExtractor={(item, index) => index.toString()}
-                onEndReached={() => dispath(getMoreCommentsAction({ postId }))}
+                keyExtractor={(item, index) => item._id}
+                onEndReached={() => lastoffset && dispath(getMoreCommentsAction({ postId }))}
             />
             <View style={[styles.commentContainer, { backgroundColor: theme.background_color }]}>
                 <Image
@@ -140,7 +146,7 @@ export default Replies
 const styles = StyleSheet.create({
     container:
     {
-        //   flex: 1,
+        width: width,
         elevation: 20,
         backgroundColor: "green",
         height: height * 0.85
@@ -169,11 +175,10 @@ const styles = StyleSheet.create({
     commentContainer:
     {
         position: 'absolute',
-        bottom: 100,
-        // top:"70%",
-
+        bottom: scaledFont(100),
         paddingVertical: 10,
-        borderRadius: 10,
+        borderRadius: scaledFont(5),
+        width:"95%",
         justifyContent: 'center',
         flexDirection: 'row',
         alignItems: 'center',

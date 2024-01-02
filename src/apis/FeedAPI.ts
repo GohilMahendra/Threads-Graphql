@@ -44,8 +44,14 @@ export const createPost = async ({ args }: { args: CreatePostArgs }) => {
         else
             throw new Error(uploadPostResponse.data)
     }
-    catch (err: any) {
-        throw new Error(err?.response?.data)
+    catch (error: any) {
+        if (error.response) {
+            throw new Error(error.response.status + error.response.data.message);
+        } else if (error.request) {
+            throw new Error("No Response from Server");
+        } else {
+            throw new Error("Error:" + error.message);
+        }
     }
 }
 
@@ -75,8 +81,14 @@ export const createRepost = async (postId: string, content?: string) => {
         else
             throw new Error(uploadPostResponse.data)
     }
-    catch (err: any) {
-        throw new Error(err?.response?.data)
+    catch (error: any) {
+        if (error.response) {
+            throw new Error(error.response.status + error.response.data.message);
+        } else if (error.request) {
+            throw new Error("No Response from Server");
+        } else {
+            throw new Error("Error:" + error.message);
+        }
     }
 }
 
@@ -111,8 +123,14 @@ export const fetchPosts = async ({
             throw new Error(response.data)
         }
     }
-    catch (err: any) {
-        throw new Error(err?.response?.data)
+    catch (error: any) {
+        if (error.response) {
+            throw new Error(error.response.status + error.response.data.message);
+        } else if (error.request) {
+            throw new Error("No Response from Server");
+        } else {
+            throw new Error("Error:" + error.message);
+        }
     }
 }
 
@@ -153,8 +171,14 @@ export const fetchPostsByUser = async ({
             throw new Error(response.data)
         }
     }
-    catch (err: any) {
-        throw new Error(err?.response?.data)
+    catch (error: any) {
+        if (error.response) {
+            throw new Error(error.response.status + error.response.data.message);
+        } else if (error.request) {
+            throw new Error("No Response from Server");
+        } else {
+            throw new Error("Error:" + error.message);
+        }
     }
 }
 export const likePost = async (postId: string) => {
@@ -174,8 +198,14 @@ export const likePost = async (postId: string) => {
             throw new Error(response.data)
         }
     }
-    catch (err: any) {
-        throw new Error(err?.response?.data)
+    catch (error: any) {
+        if (error.response) {
+            throw new Error(error.response.status + error.response.data.message);
+        } else if (error.request) {
+            throw new Error("No Response from Server");
+        } else {
+            throw new Error("Error:" + error.message);
+        }
     }
 }
 
@@ -196,8 +226,14 @@ export const unLikePost = async (postId: string) => {
             throw new Error(response.data)
         }
     }
-    catch (err: any) {
-        throw new Error(err?.response?.data)
+    catch (error: any) {
+        if (error.response) {
+            throw new Error(error.response.status + error.response.data.message);
+        } else if (error.request) {
+            throw new Error("No Response from Server");
+        } else {
+            throw new Error("Error:" + error.message);
+        }
     }
 }
 
@@ -219,8 +255,14 @@ export const commentPost = async (postId: string, content: string) => {
             throw new Error(response.data)
         }
     }
-    catch (err: any) {
-        throw new Error(err?.response?.data)
+    catch (error: any) {
+        if (error.response) {
+            throw new Error(error.response.status + error.response.data.message);
+        } else if (error.request) {
+            throw new Error("No Response from Server");
+        } else {
+            throw new Error("Error:" + error.message);
+        }
     }
 }
 
@@ -231,7 +273,7 @@ export const fetchComments = async (postId: string, pagesize: number = 10, offse
         let quary: string = ""
 
         if (offset) {
-            quary = BASE_URL + `posts/${postId}/replies?pageSize=${pagesize}&lastOffSet=${offset}`
+            quary = BASE_URL + `posts/${postId}/replies?pageSize=${pagesize}&lastOffset=${offset}`
         }
         else {
             quary = BASE_URL + `posts/${postId}/replies?pageSize=${pagesize}`
@@ -248,8 +290,14 @@ export const fetchComments = async (postId: string, pagesize: number = 10, offse
         else
             throw new Error(response.data)
     }
-    catch (err: any) {
-        throw new Error(err?.response?.data)
+    catch (error: any) {
+        if (error.response) {
+            throw new Error(error.response.status + error.response.data.message);
+        } else if (error.request) {
+            throw new Error("No Response from Server");
+        } else {
+            throw new Error("Error:" + error.message);
+        }
     }
 }
 
@@ -283,7 +331,13 @@ export const searchPosts = async ({
         else
             throw new Error(response.data)
     }
-    catch (err: any) {
-        throw new Error(err?.response?.data)
+    catch (error: any) {
+        if (error.response) {
+            throw new Error(error.response.status + error.response.data.message);
+        } else if (error.request) {
+            throw new Error("No Response from Server");
+        } else {
+            throw new Error("Error:" + error.message);
+        }
     }
 }

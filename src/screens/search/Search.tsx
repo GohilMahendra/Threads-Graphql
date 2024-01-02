@@ -76,7 +76,7 @@ const Search = () => {
               <View style={styles.headerListInnerConrainer}>
                 <FontAwesome
                   name='search'
-                  size={20}
+                  size={scaledFont(20)}
                   color={theme.text_color}
                 />
                 <Text style={[styles.textTerm, { color: theme.text_color }]}>Search for {searchTerm}</Text>

@@ -37,9 +37,9 @@ const SignIn = () => {
                 style={styles.imageLogo}
             />
             {error && <Text style={{
-                color:"red",
-                fontSize:scaledFont(18),
-                fontWeight:"bold"
+                color: "red",
+                fontSize: scaledFont(18),
+                fontWeight: "bold"
             }}>{error}</Text>}
             <View style={[styles.inputContainer, { backgroundColor: theme.secondary_color, }]}>
                 <TextInput
@@ -70,7 +70,7 @@ const SignIn = () => {
                 <Text style={styles.textSignIn}>Sign In</Text>
             </TouchableOpacity>
             <View style={styles.rowContainer}>
-                <Text style={{ color: theme.text_color }}>Dont have any account ? </Text>
+                <Text style={{ color: theme.text_color, fontSize: scaledFont(12) }}>Dont have any account ? </Text>
                 <Pressable onPress={() => navigation.navigate("SignUp")}>
                     <Text
                         style={[styles.txtRegister, { color: theme.text_color }]}
@@ -107,6 +107,7 @@ const styles = StyleSheet.create({
     {
         flex: 1,
         padding: 5,
+        fontSize: scaledFont(12)
     },
     btnSignIn:
     {
@@ -129,6 +130,7 @@ const styles = StyleSheet.create({
     },
     txtRegister:
     {
-        textDecorationLine: "underline"
+        textDecorationLine: "underline",
+        fontSize: scaledFont(12)
     }
 })

@@ -279,7 +279,7 @@ const UserProfile = () => {
                         />
                     </View>
                     {renderBioWithPressableHashtags(user.bio || "")}
-                    <Text style={{ color: theme.text_color }}>{user.followers} Followers</Text>
+                    <Text style={{ color: theme.secondary_text_color ,fontSize: scaledFont(12)}}>{user.followers} Followers</Text>
                     <TouchableOpacity
                         onPress={() => toggleFollow()}
                         style={[styles.btnFollow, {

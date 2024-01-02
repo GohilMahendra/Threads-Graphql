@@ -5,6 +5,13 @@ import { Media } from "../../types/Post";
 import Fontisto from "react-native-vector-icons/Fontisto";
 import FontAwesome5Icon from "react-native-vector-icons/FontAwesome5";
 import VideoPlayer from "./VideoPlayer";
+import { GestureHandlerRootView, Gesture, GestureDetector } from "react-native-gesture-handler";
+import Animated, {
+    useSharedValue,
+    useAnimatedStyle,
+    useAnimatedGestureHandler,
+    withSpring,
+} from 'react-native-reanimated';
 type GridViewerPropTypes =
     {
         media: Media[],
@@ -14,13 +21,27 @@ const GridViewer = (props: GridViewerPropTypes) => {
 
     const images = props.media
     const [selectedMedia, setSelectedMedia] = useState<Media | null>(null)
+    const scale = useSharedValue(1)
+    const savedScale = useSharedValue(1)
     const onSelectMedia = (media: Media) => {
         setTimeout(() => {
             setSelectedMedia(media)
         }, 500);
     }
+    const animatedStyle = useAnimatedStyle(() => ({
+        transform: [{ scale: scale.value }],
+    }));
+
+    const pinchGesture = Gesture.Pinch()
+    .onUpdate((e) => {
+      scale.value = Math.max(0.5,Math.min(3,savedScale.value * e.scale))
+    })
+    .onEnd(() => {
+        scale.value = withSpring(1)
+    });
+    
     return (
-        <View style={style.container}>
+        <GestureHandlerRootView style={style.container}>
             {images.length == 1 && <TouchableOpacity
                 onPress={() => onSelectMedia(images[0])}
             >
@@ -44,7 +65,7 @@ const GridViewer = (props: GridViewerPropTypes) => {
                 {
                     images.map((image, index) => (
                         <TouchableOpacity
-                            style={{width:"50%"}}
+                            style={{ width: "50%" }}
                             onPress={() => onSelectMedia(images[index])}
                             key={image._id}>
                             <Image
@@ -73,7 +94,7 @@ const GridViewer = (props: GridViewerPropTypes) => {
                     key={images[0]._id}
                     style={style.btnimage3x1st}>
                     <Image
-                         resizeMode="cover"
+                        resizeMode="cover"
                         source={{ uri: getMediaImage(images[0]) }}
                         style={style.image3x1st}
                     />
@@ -122,7 +143,7 @@ const GridViewer = (props: GridViewerPropTypes) => {
                             onPress={() => onSelectMedia(images[index])}
                             key={image._id}>
                             <Image
-                                 resizeMode="contain"
+                                resizeMode="contain"
                                 source={{ uri: getMediaImage(image) }}
                                 style={style.image4x}
                             />
@@ -144,28 +165,33 @@ const GridViewer = (props: GridViewerPropTypes) => {
             <Modal
                 visible={selectedMedia != null}
                 animationType="fade"
-                onRequestClose={() => setSelectedMedia(null)}
+                onRequestClose={() => {setSelectedMedia(null),scale.value = 1}}
             >
                 {selectedMedia && <View style={style.previewContainer}>
                     <View style={style.cancelContainer}>
                         <Fontisto
-                            onPress={() => setSelectedMedia(null)}
+                            onPress={() => {setSelectedMedia(null),scale.value = 1}}
                             name="close"
                             color={"white"}
                             size={30}
                         />
 
                     </View>
-                    {selectedMedia.media_type.includes("image") && <Image
-                        source={{
-                            uri: (selectedMedia.media_type.includes("image"))
-                                ? selectedMedia.media_url : selectedMedia.thumbnail
-                        }}
-                        resizeMode={"contain"}
-                        style={{
-                            flex: 1,
-                        }}
-                    />
+                    {selectedMedia.media_type.includes("image") &&
+                        <GestureDetector gesture={pinchGesture}>
+                        <Animated.View style={[animatedStyle,{flex:1}]}>
+                            <Image
+                                source={{
+                                    uri: (selectedMedia.media_type.includes("image"))
+                                        ? selectedMedia.media_url : selectedMedia.thumbnail
+                                }}
+                                resizeMode={"contain"}
+                                style={{
+                                    flex: 1,
+                                }}
+                            />
+                        </Animated.View>
+                        </GestureDetector>
                     }
                     {selectedMedia.media_type.includes("video") && <VideoPlayer
                         uri={selectedMedia.media_url}
@@ -175,7 +201,7 @@ const GridViewer = (props: GridViewerPropTypes) => {
                 }
             </Modal>
 
-        </View>
+        </GestureHandlerRootView>
     )
 }
 export default GridViewer
@@ -196,7 +222,7 @@ const style = StyleSheet.create({
     {
         flexWrap: "wrap",
         flexDirection: 'row',
-        width:'100%',
+        width: '100%',
     },
     image2x:
     {
@@ -259,8 +285,8 @@ const style = StyleSheet.create({
     cancelContainer:
     {
         position: "absolute",
-        right: 20,
-        top: 30,
+        right: scaledFont(20),
+        top: scaledFont(30),
         zIndex: 1000,
     }
 })

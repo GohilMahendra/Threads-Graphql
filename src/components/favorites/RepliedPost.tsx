@@ -16,6 +16,7 @@ type RepliedPostProps =
         onReplyThreeDots: (replyId: string) => void
         onPressComment: (postId: string) => void
         onRepostIcon: (postId: string) => void
+        onNavigate: (userId:string) => void
     }
 const RepliedPost = (props: RepliedPostProps) => {
     const { commentPost } = props
@@ -29,14 +30,14 @@ const RepliedPost = (props: RepliedPostProps) => {
                 <RepostItem
                     onLikeToggle={(postId, step) => props.toggleLike(postId, step)}
                     onPressComment={(postId) => props.onPressComment(postId)}
-                    onPressNavigate={() => console.log("action")}
+                    onPressNavigate={(userId) => props.onNavigate(userId)}
                     onRepost={(postId) => props.onRepostIcon(postId)}
                     post={post}
                 /> :
                 <PostItem
                     onLikeToggle={(postId, step) => props.toggleLike(postId, step)}
                     onPressComment={(postId) => props.onPressComment(postId)}
-                    onPressNavigate={() => console.log("action")}
+                    onPressNavigate={(userId) =>props.onNavigate(userId)}
                     onRepost={(postId) => props.onRepostIcon(postId)}
                     post={post}
                 />

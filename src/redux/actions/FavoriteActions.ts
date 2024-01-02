@@ -98,7 +98,6 @@ export const getMoreLikedPostsActions = createAsyncThunk(
 
             const posts = response.data as Thread[]
             const lastOffset = response.meta.lastOffset
-
             return {
                 data: posts,
                 lastOffset: lastOffset

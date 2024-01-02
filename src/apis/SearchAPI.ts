@@ -18,7 +18,13 @@ export const searchUsers = async (term: string) => {
             throw new Error(response.data)
         }
     }
-    catch (err: any) {
-        throw new Error(err?.response?.data)
+    catch (error: any) {
+        if (error.response) {
+            throw new Error(error.response.status + error.response.data.message);
+        } else if (error.request) {
+            throw new Error("No Response from Server");
+        } else {
+            throw new Error("Error:" + error.message);
+        }
     }
 }

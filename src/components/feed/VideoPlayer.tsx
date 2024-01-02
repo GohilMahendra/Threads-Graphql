@@ -1,11 +1,10 @@
 import React, { useCallback, useRef, useState } from "react";
-import { Dimensions, StyleSheet, TouchableOpacity, View } from "react-native";
+import { Dimensions, SafeAreaView, StyleSheet, TouchableOpacity, View } from "react-native";
 import { Slider } from "react-native-elements";
 import { GestureHandlerRootView } from "react-native-gesture-handler";
 import FontAwesome5Icon from "react-native-vector-icons/FontAwesome5";
 import Video from "react-native-video";
 const { height, width } = Dimensions.get("screen")
-console.log(width)
 type VideoPlayerPropTypes =
     {
         uri: string
@@ -34,7 +33,7 @@ const VideoPlayer = (props: VideoPlayerPropTypes) => {
       }, []);
     return (
         <GestureHandlerRootView>
-            <TouchableOpacity
+        <TouchableOpacity
                 onPress={() => togglePause()}
             >
                 <Video

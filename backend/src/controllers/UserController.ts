@@ -150,8 +150,8 @@ const updateUser = async (req: CustomRequest, res: Response) => {
         const result = await User.updateOne({ _id: userId }, { $set: updateUser });
         if (result.modifiedCount > 0) {
             const updatedUser = await User.findById(userId).select("-password -top -token")
-            if(updatedUser?.profile_picture)
-            updatedUser.profile_picture = await getSignedUrl(updatedUser?.profile_picture)
+            if (updatedUser?.profile_picture)
+                updatedUser.profile_picture = await getSignedUrl(updatedUser?.profile_picture)
             res.status(200).json({
                 success: true,
                 user: updatedUser
@@ -163,7 +163,6 @@ const updateUser = async (req: CustomRequest, res: Response) => {
         }
     }
     catch (err) {
-        console.log(err)
         res.status(500).json({
             message: "Internal server Error"
         })
@@ -235,8 +234,8 @@ const sendVerificationEmail = async (email: string, otp: string) => {
     try {
         await transporter.sendMail(mailOptions)
     }
-    catch (err:any) {
-      throw new Error(err)
+    catch (err: any) {
+        throw new Error(err)
     }
 }
 
@@ -347,7 +346,7 @@ const getUserPosts = async (req: CustomRequest, res: Response) => {
             .populate<{ user: UserDocument }>({
                 path: "user",
                 select: "-password -token -otp",
-            }).populate<{ Repost: PostDocument & {user:UserDocument}}>({
+            }).populate<{ Repost: PostDocument & { user: UserDocument } }>({
                 path: "Repost",
                 populate: {
                     path: "user",
@@ -418,14 +417,12 @@ const getLikedPosts = async (req: CustomRequest, res: Response) => {
         const quary: any = {}
         const lastOffset = req.query.lastOffset as string
         const pageSizeParam = req.query.pageSize as string;
-        const pageSize = parseInt(pageSizeParam, 10) || 10;
-
+        const pageSize = parseInt(pageSizeParam, 10) || 10
         quary.user = userId
 
         if (lastOffset) {
             quary._id = { $lt: new mongoose.Types.ObjectId(lastOffset) }
         }
-
         const likedPosts = await Like.find(quary).
             sort({ created_at: -1, _id: 1 })
             .populate<{ user: UserDocument }>({
@@ -449,8 +446,7 @@ const getLikedPosts = async (req: CustomRequest, res: Response) => {
                 ],
             })
             .limit(pageSize)
-
-        let userPosts = likedPosts.map(likePost=>likePost.post)
+        let userPosts = likedPosts.map(likePost => likePost.post)
         const updatedUserPosts = await Promise.all(userPosts.map(async (post, index: number) => {
             const media = post.media;
             const user = post.user;
@@ -492,7 +488,7 @@ const getLikedPosts = async (req: CustomRequest, res: Response) => {
             data: userPosts,
             meta: {
                 pagesize: pageSize,
-                lastOffset: (userPosts.length == pageSize) ? userPosts[userPosts.length - 1]._id : null
+                lastOffset: (userPosts.length == pageSize) ? likedPosts[likedPosts.length - 1]._id : null
             }
         })
     }

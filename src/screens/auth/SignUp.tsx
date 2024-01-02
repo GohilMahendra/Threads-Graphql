@@ -110,7 +110,7 @@ const SignUp = () => {
                 </TouchableOpacity>
 
                 <View style={styles.rowNavigation}>
-                    <Text style={{ color: theme.text_color }}>Already have an account ? </Text>
+                    <Text style={{ color: theme.text_color,fontSize: scaledFont(12) }}>Already have an account ? </Text>
                     <Pressable
                         onPress={() => navigation.navigate("SignIn")}
                     >
@@ -160,6 +160,7 @@ const styles = StyleSheet.create({
     {
         flex: 1,
         padding: 5,
+        fontSize: scaledFont(12)
     },
     btnSignUp:
     {
@@ -183,5 +184,6 @@ const styles = StyleSheet.create({
     txtLoginHere:
     {
         textDecorationLine: "underline",
+        fontSize: scaledFont(12)
     }
 })
