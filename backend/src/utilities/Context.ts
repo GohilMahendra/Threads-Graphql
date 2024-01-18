@@ -1,12 +1,12 @@
 import jwt from "jsonwebtoken";
-import { Response,Request,NextFunction } from "express";
+import { Request } from "express";
 
-interface DecodedToken {
+export interface DecodedToken {
     userId: string;
     iat: number;
 }
 
-const verifyToken = (token: string) => {
+export const verifyToken = (token: string) => {
     try {
         const decodedToken:DecodedToken = jwt.verify(token, process.env.TOKEN_SECRET || "") as DecodedToken
         return { success: true, userId: decodedToken.userId };
@@ -18,11 +18,14 @@ export interface CustomRequest<T = Record<string, any>> extends Request {
     userId?: string;
     customData?: T;
 }
-export const verifyRequest = async(req:CustomRequest,res:Response,next:NextFunction)=>
+
+export interface AuthContext<> 
 {
-    try
-    {
-        const token = req.header("token")
+    req: CustomRequest
+}
+export const verifyRequest = async(context:AuthContext)=>
+{
+        const token =  context.req.header("token")
         if(!token)
         {
            throw Error("Token is not provided")
@@ -30,16 +33,10 @@ export const verifyRequest = async(req:CustomRequest,res:Response,next:NextFunct
         const decodedToken = verifyToken(token)
         if(decodedToken.success)
         {
-            req.userId = decodedToken.userId || ""
-            next()
+            return decodedToken.userId || ""
         }
         else 
         {
             throw Error("Token is not provided")
         }
-    }
-    catch(err)
-    {
-        throw Error("Interal sevrer Error")
-    }
 }

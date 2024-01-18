@@ -1,5 +1,6 @@
 
 import AWSSDK from "aws-sdk";
+import { Readable } from "stream";
 
 AWSSDK.config.update({
     signatureVersion: 'v4'
@@ -22,13 +23,20 @@ export const getSignedUrl = async(key:string) =>
 
     return signedUrl
 }
-
-export const uploadToS3 = async(file: Express.Multer.File, filename: string) =>{
+interface ProfilePictureUpload {
+    filename: string;
+    mimetype: string;
+    encoding: string;
+    createReadStream: () => Readable;
+  }
+export const uploadToS3 = async(file:ProfilePictureUpload , filename: string) =>{
     try {
+
+
         const params = {
             Bucket: process.env.AWS_S3_BUCKET_NAME || "",
             Key: filename,
-            Body: file.buffer,
+            Body: file.createReadStream(),
             ContentType: file.mimetype,
         };
         return s3.upload(params).promise();
