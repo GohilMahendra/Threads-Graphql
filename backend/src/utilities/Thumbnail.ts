@@ -7,13 +7,18 @@ import { s3 } from "./S3Utils";
 
 ffmpeg.setFfmpegPath(ffmpeginstaller.path)
 ffmpeg.setFfprobePath(ffprobeinstaller.path)
-
-export const generateThumbnail = async (file:Express.Multer.File,filename:string) => {
+interface ProfilePictureUpload {
+  filename: string;
+  mimetype: string;
+  encoding: string;
+  createReadStream: () => Readable;
+}
+export const generateThumbnail = async (file:ProfilePictureUpload,filename:string) => {
     
     try {
-        const readableStream = Readable.from(file.buffer); 
+        const stream  =  file.createReadStream()
         const thumbnailStream = ffmpeg()
-          .input(readableStream)
+          .input(stream)
           .inputFormat("mp4")
           .outputOptions("-ss", "00:00:02", "-vframes", "1")
           .outputFormat("image2")

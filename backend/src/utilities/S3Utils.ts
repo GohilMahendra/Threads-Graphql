@@ -18,7 +18,6 @@ export const getSignedUrl = async(key:string) =>
     const signedUrl  = await s3.getSignedUrlPromise('getObject', {
         Bucket: process.env.AWS_S3_BUCKET_NAME,
         Key: key,
-        Expires: CONTENT_EXPIRY_TIME
     });
 
     return signedUrl
@@ -31,17 +30,16 @@ interface ProfilePictureUpload {
   }
 export const uploadToS3 = async(file:ProfilePictureUpload , filename: string) =>{
     try {
-
-
+        console.log(file)
         const params = {
             Bucket: process.env.AWS_S3_BUCKET_NAME || "",
             Key: filename,
             Body: file.createReadStream(),
             ContentType: file.mimetype,
         };
-        return s3.upload(params).promise();
+        return s3.upload(params).promise().catch(err=>console.log(err,"errorin in s23"));
     }
     catch (err) {
-        console.log(JSON.stringify(err))
+        console.log(JSON.stringify(err),"Error in uploading stream")
     }
 }

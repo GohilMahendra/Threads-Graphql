@@ -3,6 +3,7 @@ import bcrypt from 'bcrypt';
 import jwt from 'jsonwebtoken';
 import { v4 as uuid } from "uuid";
 import { User } from "../../models"
+import { getSignedUrl, uploadToS3 } from '../../utilities/S3Utils';
 
 const getSalt = async () => {
     const salted = await bcrypt.genSalt(10)
@@ -78,7 +79,7 @@ export const updateUser = async({userId,fullName,bio,profile_picture}:{
 }) =>
 {
   try {
-    if (!fullName && !bio && (!profile_picture || !profile_picture.encoding || !profile_picture.mimetype)) {
+    if (!fullName && !bio && (!profile_picture)) {
         throw new Error("At least one of fullName, bio, or profile_picture should be present")
     }
 
@@ -90,11 +91,9 @@ export const updateUser = async({userId,fullName,bio,profile_picture}:{
        throw new Error("Invalid bio")
     }
 
-    if (profile_picture && (!profile_picture.encoding || !profile_picture.mimetype)) {
+    if (profile_picture && (!profile_picture?.encoding || !profile_picture?.mimetype)) {
         throw new Error("Invalid profile_picture")
     }
-
-
     const updateUser: any = {}
     if (fullName) {
         updateUser.fullname = fullName.trim()
@@ -102,27 +101,26 @@ export const updateUser = async({userId,fullName,bio,profile_picture}:{
     if (bio) {
         updateUser.bio = bio
     }
-    // if (profile_picture) {
-    //     const extention = profile_picture.mimetype.split("/")[1]
-    //     const name = uuid() + "." + extention
-    //     const filepath = "user/" + userId + "/" + name
-    //     const result = await uploadToS3(profile_picture, filepath)
-    //     updateUser.profile_picture = result?.Key
-    // }
+    if (profile_picture) {
+        const file = profile_picture.file
+        const extention = file.mimetype.split("/")[1]
+        const name = uuid() + "." + extention
+        const filepath = "user/" + userId + "/" + name
+        const result = await uploadToS3(file, filepath)
+        updateUser.profile_picture = result?.Key
+    }
     const result = await User.updateOne({ _id: userId }, { $set: updateUser });
     console.log(result)
     if (result.matchedCount > 0) {
         const updatedUser = await User.findById(userId)
-        // if (updatedUser?.profile_picture)
-        //     updatedUser.profile_picture = await getSignedUrl(updatedUser?.profile_picture)
-        console.log(updateUser,"updated user")
+        if (updatedUser?.profile_picture)
+            updatedUser.profile_picture = await getSignedUrl(updatedUser?.profile_picture)
         return updatedUser;
     } else {
        throw new Error("User not found or no fields were modified")
     }
 }
 catch (err) {
-    console.log(JSON.stringify(err))
     throw new Error("Internal server Error")
 }
 }
