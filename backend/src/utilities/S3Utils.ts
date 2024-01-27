@@ -11,7 +11,7 @@ export interface ProfilePictureUpload {
     mimetype: string;
     encoding: string;
     createReadStream: () => Readable;
-  }
+}
 const CONTENT_EXPIRY_TIME = 60 * 60
 export const s3 = new AWSSDK.S3({
     accessKeyId: process.env.AWS_ACCESS_KEY,
@@ -19,9 +19,8 @@ export const s3 = new AWSSDK.S3({
     region: process.env.AWS_REGION
 });
 
-export const getSignedUrl = async(key:string) =>
-{
-    const signedUrl  = await s3.getSignedUrlPromise('getObject', {
+export const getSignedUrl = async (key: string) => {
+    const signedUrl = await s3.getSignedUrlPromise('getObject', {
         Bucket: process.env.AWS_S3_BUCKET_NAME,
         Key: key,
     });
@@ -29,7 +28,7 @@ export const getSignedUrl = async(key:string) =>
     return signedUrl
 }
 
-export const uploadToS3 = async(file:ProfilePictureUpload , filename: string) =>{
+export const uploadToS3 = async (file: ProfilePictureUpload, filename: string) => {
     try {
         console.log(file)
         const params = {
@@ -38,9 +37,9 @@ export const uploadToS3 = async(file:ProfilePictureUpload , filename: string) =>
             Body: file.createReadStream(),
             ContentType: file.mimetype,
         };
-        return s3.upload(params).promise().catch(err=>console.log(err,"errorin in s23"));
+        return s3.upload(params).promise().catch(err => console.log(err, "errorin in s23"));
     }
     catch (err) {
-        console.log(JSON.stringify(err),"Error in uploading stream")
+        console.log(JSON.stringify(err), "Error in uploading stream")
     }
 }

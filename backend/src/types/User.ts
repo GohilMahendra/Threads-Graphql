@@ -14,7 +14,7 @@ export interface UserDocument extends Document {
   isFollowed: boolean
 }
 
-export type UserResponseDocument = Omit<UserDocument,"token" | "otp" | "password">
+export type UserResponseDocument = Omit<UserDocument, "token" | "otp" | "password">
 
 export interface SignInInput {
   email: string,

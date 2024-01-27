@@ -6,9 +6,13 @@ export interface DecodedToken {
     iat: number;
 }
 
+export interface UserContext {
+    userId: string
+}
+
 export const verifyToken = (token: string) => {
     try {
-        const decodedToken:DecodedToken = jwt.verify(token, process.env.TOKEN_SECRET || "") as DecodedToken
+        const decodedToken: DecodedToken = jwt.verify(token, process.env.TOKEN_SECRET || "") as DecodedToken
         return { success: true, userId: decodedToken.userId };
     } catch (error) {
         return { success: false, error: "Invalid token" };
@@ -19,24 +23,19 @@ export interface CustomRequest<T = Record<string, any>> extends Request {
     customData?: T;
 }
 
-export interface AuthContext<> 
-{
+export interface AuthContext<> {
     req: CustomRequest
 }
-export const verifyRequest = async(context:AuthContext)=>
-{
-        const token =  context.req.header("token")
-        if(!token)
-        {
-           throw Error("Token is not provided")
-        }
-        const decodedToken = verifyToken(token)
-        if(decodedToken.success)
-        {
-            return decodedToken.userId || ""
-        }
-        else 
-        {
-            throw Error("Token is not provided")
-        }
+export const verifyRequest = async (context: AuthContext) => {
+    const token = context.req.header("token")
+    if (!token) {
+        throw Error("Token is not provided")
+    }
+    const decodedToken = verifyToken(token)
+    if (decodedToken.success) {
+        return decodedToken.userId || ""
+    }
+    else {
+        throw Error("Token is not provided")
+    }
 }

@@ -1,5 +1,6 @@
 import Post from "./post";
 import User from "./user";
+import Follow from "./follow"
 export const TypeDefs = `
     scalar Upload
     type SuccessResponse {
@@ -7,23 +8,28 @@ export const TypeDefs = `
     }
     ${User.TypeDef.UserType}
     ${Post.TypeDef.PostType}
+    ${Follow.TypeDef.FollowType}
     type Query {
     ${User.TypeDef.UserQuery}
     ${Post.TypeDef.PostQuery}
+    ${Follow.TypeDef.FollowQuery}
     }
     type Mutation {
     ${User.TypeDef.UserMutation}
     ${Post.TypeDef.PostMutation}
+    ${Follow.TypeDef.FollowMutation}
 }
 `
 export const Resolvers = {
     Query: {
         ...User.QuaryResolver,
-        ...Post.QuaryResolver
+        ...Post.QuaryResolver,
+        ...Follow.QuaryResolver
     },
     Mutation:
     {
         ...User.MutationResolver,
-        ...Post.QuaryResolver
+        ...Post.MutationResolver,
+        ...Follow.MutationResolver
     }
 }

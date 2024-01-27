@@ -5,7 +5,7 @@ import bodyParser from 'body-parser';
 import { ApolloServer ,ApolloError} from 'apollo-server-express';
 import dotenv from 'dotenv';
 import { graphqlUploadExpress } from "graphql-upload-ts";
-import { verifyToken } from './src/utilities/Context';
+import { UserContext, verifyToken } from './src/utilities/Context';
 import { TypeDefs, Resolvers } from "./src/graphql";
 dotenv.config();
 
@@ -22,18 +22,17 @@ const startServer = async () => {
       typeDefs: TypeDefs,
       resolvers: Resolvers,
       introspection: true,
-      context: async ({ req }) => {
+      context: async ({ req }):Promise<UserContext> => {
         const operationName = req.body.operationName
         if (operationName == "SignIn" || operationName == "SignUp" || operationName == "Verify") {
-          return {}
+          return {userId:""}
         }
         const token = req.header("token");
         if (!token)
-          return new ApolloError("Invalid Token Provided")
+          throw new ApolloError("Invalid Token Provided")
         const decodedToken = verifyToken(token);
-        const userId = decodedToken.userId;
+        const userId = decodedToken.userId || "";
         return { userId };
-
       }
     });
     app.use(graphqlUploadExpress())

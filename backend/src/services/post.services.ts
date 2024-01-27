@@ -1,9 +1,9 @@
 import { extractHashtags } from "../utilities/Content"
 import { v4 as uuidv4 } from "uuid";
-import { 
-    ProfilePictureUpload, 
-    getSignedUrl, 
-    uploadToS3 
+import {
+    ProfilePictureUpload,
+    getSignedUrl,
+    uploadToS3
 } from "../utilities/S3Utils";
 import { generateThumbnail } from "../utilities/Thumbnail";
 import { Follower, Like, Post, Reply, User } from "../models";
@@ -14,11 +14,11 @@ import {
     DeleteReplyInput,
     GetCommentsInput,
     GetPostRepostInput,
-    PaginatedResponse,
     PostActionInput,
     PostDocument,
     TextSearchInput,
-    GetPostsInput
+    GetPostsInput,
+    GetPostByUserInput
 } from "../types/Post";
 
 const createPost = async ({ userId, content, isRepost = false, postId, media = [] }: {
@@ -163,10 +163,10 @@ const getPosts = async ({ userId, lastOffset, pageSize = 10, post_type }: GetPos
         throw new Error("internal server Error")
     }
 }
-const getPostsByUser = async ({ userId, lastOffset, pageSize = 10, post_type }: GetPostRepostInput) => {
+const getPostsByUser = async ({ postUserId, userId, lastOffset, pageSize = 10, post_type }: GetPostByUserInput) => {
     try {
         const quary: any = {}
-        quary.user = userId
+        quary.user = postUserId
         if (lastOffset) {
             quary._id = { $lt: new mongoose.Types.ObjectId(lastOffset) }
         }

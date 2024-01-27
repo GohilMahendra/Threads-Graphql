@@ -3,7 +3,7 @@ import jwt from 'jsonwebtoken';
 import { v4 as uuid } from "uuid";
 import { Follower, User } from "../models"
 import { getSignedUrl, uploadToS3 } from '../utilities/S3Utils';
-import { 
+import {
     GetUserInput,
     SearchUsersInput,
     SignInInput,
@@ -12,7 +12,7 @@ import {
     UserDocument,
     UserResponseDocument,
     VerifyEmailInput
- } from "../types/User";
+} from "../types/User";
 const getSalt = async () => {
     const salted = await bcrypt.genSalt(10)
     return salted
@@ -124,7 +124,7 @@ const updateUser = async ({ userId, fullName, bio, profile_picture }: UpdateUser
     }
 }
 
-const getUserById = async ({ profileId, userId }: GetUserInput):Promise<UserResponseDocument> => {
+const getUserById = async ({ profileId, userId }: GetUserInput): Promise<UserResponseDocument> => {
     try {
         const user = await User.findOne({ _id: profileId }).select("-otp -password -token")
 
@@ -168,7 +168,7 @@ const verifyEmail = async ({ email, otp }: VerifyEmailInput) => {
     }
 }
 
-const searchUsers = async ({ query, userId }:SearchUsersInput) => {
+const searchUsers = async ({ query, userId }: SearchUsersInput) => {
     try {
         const users = await User.aggregate([
             {

@@ -1,7 +1,6 @@
-import { User } from "../../models";
 import UserServices from "../../services/user.services";
-import { ExcludeContextType } from "../../types/Global";
-import { GetUserInput, SignUpInput, UpdateUserInput, VerifyEmailInput } from "../../types/User";
+import { SignUpInput, UpdateUserInput, VerifyEmailInput } from "../../types/User";
+import { UserContext } from "../../utilities/Context";
 
 const MutationResolver = {
   SignIn: async (parent: any, { input }: { input: { email: string; password: string } }) => {
@@ -17,7 +16,7 @@ const MutationResolver = {
     })
     return success
   },
-  UpdateUser: async (parent: any, { input }: { input: UpdateUserInput }, context: any) => {
+  UpdateUser: async (parent: any, { input }: { input: UpdateUserInput }, context: UserContext) => {
     const userId = context.userId
     const updatedUser = await UserServices.updateUser({
       userId: userId,
@@ -27,7 +26,7 @@ const MutationResolver = {
     })
     return updatedUser
   },
-  VerifyEmail: async (parent: any, { email, otp }: VerifyEmailInput, context: any) => {
+  VerifyEmail: async (parent: any, { email, otp }: VerifyEmailInput, context: UserContext) => {
     const userId = context.userId
     const successResponse = await UserServices.verifyEmail({
       email,

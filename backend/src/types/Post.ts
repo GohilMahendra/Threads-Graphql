@@ -1,5 +1,5 @@
 import { PopulatedDoc } from "mongoose";
-import { UserDocument } from "./User";
+import { UserResponseDocument } from "./User";
 
 export interface Media {
     media_type: string;
@@ -9,7 +9,7 @@ export interface Media {
 
 export interface PostDocument extends Document {
     _id: string,
-    user: PopulatedDoc<UserDocument>;
+    user: PopulatedDoc<UserResponseDocument>;
     content: string;
     media: Media[];
     hashtags: string[];
@@ -21,7 +21,19 @@ export interface PostDocument extends Document {
     created_at: Date;
     updated_at: Date;
 }
+export interface Comment {
+    _id: string,
+    post: string,
+    user: UserResponseDocument
 
+}
+export interface CommentPost {
+    _id: string,
+    content: string,
+    user: UserResponseDocument,
+    post: PostDocument
+
+}
 export interface GetPostsInput {
     userId: string,
     lastOffset?: string,
@@ -29,13 +41,16 @@ export interface GetPostsInput {
 }
 
 export interface GetPostRepostInput extends GetPostsInput {
-    post_type?: string
+    post_type: string
+}
+export interface GetPostByUserInput extends GetPostRepostInput {
+    postUserId: String
 }
 export interface GetCommentsInput {
     userId: string,
     lastOffset?: string,
     pageSize?: number,
-    postId?: string
+    postId: string
 }
 export interface PostActionInput {
     userId: string,
@@ -51,14 +66,7 @@ export interface TextSearchInput {
     pageSize?: number,
     searchTerm: string
 }
-export type PaginatedResponse<T> =
-    {
-        data: T,
-        meta: {
-            pageSize: number,
-            lastOffset: string | null
-        }
-    }
+
 export interface CommentActionInput extends PostActionInput {
     content: string
 }
