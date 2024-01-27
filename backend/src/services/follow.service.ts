@@ -3,24 +3,11 @@ import Follower from "../models/Follower";
 import mongoose from "mongoose";
 import { UserDocument } from "../types/User";
 import { getSignedUrl } from "../utilities/S3Utils";
-
-interface FollowActionInput {
-    userId: string,
-    followingId: string
-}
-
-interface GetFollowingsInput {
-    followingId: string,
-    pageSize?: number,
-    lastOffset?: string
-}
-
-interface CurrentUserFollowings {
-    userId: string,
-    pageSize?: number,
-    lastOffset?: string,
-}
-
+import { 
+    CurrentUserFollowings,
+    FollowActionInput,
+    GetFollowingsInput 
+} from "../types/Follow";
 const followUser = async ({ followingId, userId }: FollowActionInput) => {
     const transaction = await mongoose.startSession()
     try {

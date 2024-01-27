@@ -1,15 +1,10 @@
 const PostType = `#graphql
-    type MediaType {
-        media_type: String!
-        media_url: String!
-        thumbnail: String
-    }
 
     type Post {
         _id: ID!
         user: OtherUser!
         content: String
-        media: [MediaType!]
+        media: [Media!]
         hashtags: [String]
         likes: Int
         replies: Int
@@ -25,7 +20,7 @@ const PostType = `#graphql
         lastOffset: String
     }
 
-    type PostResponse {
+    type PostsResponse {
         data: [Post!]
         meta: Meta!
     }
@@ -45,14 +40,14 @@ const PostType = `#graphql
 
     input GetPostInput
     {
-        lastOffset: String,
-        pageSize: String,
         post_type: String
+        lastOffset: String
+        pageSize: Int
     }
 `
 
 const PostQuery = `#graphql
-
+    GetPosts(input: GetPostInput!):PostsResponse
 `
 const PostMutation = `#grapqhl
     CreatePost(input: PostInput!): SuccessResponse

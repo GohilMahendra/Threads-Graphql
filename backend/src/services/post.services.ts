@@ -1,62 +1,25 @@
 import { extractHashtags } from "../utilities/Content"
 import { v4 as uuidv4 } from "uuid";
-import { ProfilePictureUpload, getSignedUrl, uploadToS3 } from "../utilities/S3Utils";
+import { 
+    ProfilePictureUpload, 
+    getSignedUrl, 
+    uploadToS3 
+} from "../utilities/S3Utils";
 import { generateThumbnail } from "../utilities/Thumbnail";
 import { Follower, Like, Post, Reply, User } from "../models";
-import mongoose, { MongooseError } from "mongoose";
+import mongoose from "mongoose";
 import { UserDocument } from "../types/User";
-import { PostDocument } from "../types/Post";
-
-interface GetPostsInput {
-    userId: string,
-    lastOffset?: string,
-    pageSize?: number,
-}
-
-interface GetPostRepostInput extends GetPostsInput {
-    post_type?: string
-}
-interface GetCommentsInput {
-    userId: string,
-    lastOffset?: string,
-    pageSize?: number,
-    postId?: string
-}
-interface PostActionInput {
-    userId: string,
-    postId: string
-}
-interface DeleteReplyInput {
-    userId: string,
-    replyId: string
-}
-interface TextSearchInput {
-    userId: string,
-    lastOffset?: string,
-    pageSize?: number,
-    searchTerm: string
-}
-type PaginatedResponse<T> =
-    {
-        data: T,
-        meta: {
-            pageSize: number,
-            lastOffset: string | null
-        }
-    }
-
-type PostResponse =
-    {
-
-    }
-
-interface CommentActionInput extends PostActionInput {
-    content: string
-}
-
-interface SuccessMessage {
-    message: string
-}
+import {
+    CommentActionInput,
+    DeleteReplyInput,
+    GetCommentsInput,
+    GetPostRepostInput,
+    PaginatedResponse,
+    PostActionInput,
+    PostDocument,
+    TextSearchInput,
+    GetPostsInput
+} from "../types/Post";
 
 const createPost = async ({ userId, content, isRepost = false, postId, media = [] }: {
     userId: string,
@@ -276,7 +239,7 @@ const getPostsByUser = async ({ userId, lastOffset, pageSize = 10, post_type }: 
         throw new Error("internal server Error")
     }
 }
-const likePost = async ({ postId, userId }: PostActionInput): Promise<SuccessMessage> => {
+const likePost = async ({ postId, userId }: PostActionInput) => {
     const transaction = await mongoose.startSession()
     try {
         await transaction.withTransaction(async () => {

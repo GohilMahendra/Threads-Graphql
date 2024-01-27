@@ -3,38 +3,16 @@ import jwt from 'jsonwebtoken';
 import { v4 as uuid } from "uuid";
 import { Follower, User } from "../models"
 import { getSignedUrl, uploadToS3 } from '../utilities/S3Utils';
-
-interface SignInInput {
-    email: string,
-    password: string
-}
-
-interface SignUpInput {
-    username: string,
-    fullname: string,
-    email: string,
-    password: string
-}
-interface UpdateUserInput {
-    userId: string
-    fullName?: string,
-    bio?: string,
-    profile_picture?: any
-}
-
-interface GetUserInput {
-    userId: string,
-    profileId: string
-}
-
-interface VerifyEmailInput {
-    email: string,
-    otp: string
-}
-interface SearchUsers {
-    userId: string,
-    quary: string
-}
+import { 
+    GetUserInput,
+    SearchUsersInput,
+    SignInInput,
+    SignUpInput,
+    UpdateUserInput,
+    UserDocument,
+    UserResponseDocument,
+    VerifyEmailInput
+ } from "../types/User";
 const getSalt = async () => {
     const salted = await bcrypt.genSalt(10)
     return salted
@@ -89,7 +67,9 @@ const signUp = async ({ username, fullname, email, password }: SignUpInput) => {
         newUser.otp = "123456"
         newUser.verified = true
         await newUser.save()
-        throw Error("success !! please check your email for verification")
+        return {
+            messsage: "success !! please check your email for verification"
+        }
     }
     catch (err) {
         throw Error("Interval Server Error")
@@ -144,7 +124,7 @@ const updateUser = async ({ userId, fullName, bio, profile_picture }: UpdateUser
     }
 }
 
-const getUserById = async ({ profileId, userId }: GetUserInput) => {
+const getUserById = async ({ profileId, userId }: GetUserInput):Promise<UserResponseDocument> => {
     try {
         const user = await User.findOne({ _id: profileId }).select("-otp -password -token")
 
@@ -158,9 +138,7 @@ const getUserById = async ({ profileId, userId }: GetUserInput) => {
         if (isFollowedBy) {
             user.isFollowed = true
         }
-        return {
-            user: user
-        }
+        return user
     }
     catch (err: any) {
         throw new Error(err)
@@ -190,14 +168,14 @@ const verifyEmail = async ({ email, otp }: VerifyEmailInput) => {
     }
 }
 
-const SearchUsers = async ({ quary, userId }: SearchUsers) => {
+const searchUsers = async ({ query, userId }:SearchUsersInput) => {
     try {
         const users = await User.aggregate([
             {
                 $search: {
                     index: "UserSearch",
                     autocomplete: {
-                        query: quary,
+                        query: query,
                         path: "username"
                     }
                 }
@@ -241,5 +219,5 @@ export default {
     updateUser,
     getUserById,
     verifyEmail,
-    SearchUsers
+    searchUsers
 }
