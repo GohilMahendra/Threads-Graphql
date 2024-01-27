@@ -1,4 +1,4 @@
-import mongoose, { PopulatedDoc } from "mongoose";
+import { PopulatedDoc } from "mongoose";
 import { UserDocument } from "./User";
 
 export interface Media {
@@ -21,3 +21,5 @@ export interface PostDocument extends Document {
     created_at: Date;
     updated_at: Date;
 }
+
+

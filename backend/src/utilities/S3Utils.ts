@@ -6,6 +6,12 @@ AWSSDK.config.update({
     signatureVersion: 'v4'
 });
 
+export interface ProfilePictureUpload {
+    filename: string;
+    mimetype: string;
+    encoding: string;
+    createReadStream: () => Readable;
+  }
 const CONTENT_EXPIRY_TIME = 60 * 60
 export const s3 = new AWSSDK.S3({
     accessKeyId: process.env.AWS_ACCESS_KEY,
@@ -22,12 +28,7 @@ export const getSignedUrl = async(key:string) =>
 
     return signedUrl
 }
-interface ProfilePictureUpload {
-    filename: string;
-    mimetype: string;
-    encoding: string;
-    createReadStream: () => Readable;
-  }
+
 export const uploadToS3 = async(file:ProfilePictureUpload , filename: string) =>{
     try {
         console.log(file)

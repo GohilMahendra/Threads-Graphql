@@ -2,8 +2,8 @@
 import bcrypt from 'bcrypt';
 import jwt from 'jsonwebtoken';
 import { v4 as uuid } from "uuid";
-import { User } from "../../models"
-import { getSignedUrl, uploadToS3 } from '../../utilities/S3Utils';
+import { User } from "../models"
+import { getSignedUrl, uploadToS3 } from '../utilities/S3Utils';
 
 const getSalt = async () => {
     const salted = await bcrypt.genSalt(10)

@@ -1,19 +1,14 @@
-import { extractHashtags } from "../../utilities/Content"
+import { extractHashtags } from "../utilities/Content"
 import { v4 as uuidv4 } from "uuid";
-import { getSignedUrl, uploadToS3 } from "../../utilities/S3Utils";
-import { generateThumbnail } from "../../utilities/Thumbnail";
-import { Follower, Like, Post } from "../../models";
+import { ProfilePictureUpload, getSignedUrl, uploadToS3 } from "../utilities/S3Utils";
+import { generateThumbnail } from "../utilities/Thumbnail";
+import { Follower, Like, Post } from "../models";
 import { Readable } from "stream";
 import mongoose from "mongoose";
-import { UserDocument } from "../../types/User";
-import { PostDocument } from "../../types/Post";
+import { UserDocument } from "../types/User";
+import { PostDocument } from "../types/Post";
 
-interface ProfilePictureUpload {
-    filename: string;
-    mimetype: string;
-    encoding: string;
-    createReadStream: () => Readable;
-  }
+
 export const createPost = async ({userId,content,isRepost = false,postId,media=[]}:{
     userId:string,
     content?:string,
