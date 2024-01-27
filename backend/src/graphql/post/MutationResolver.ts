@@ -1,4 +1,4 @@
-import { createPost } from "../../services/post.services";
+import PostServices from "../../services/post.services";
 const MutationResolver = {
     CreatePost: async (parent: any, { input }: {
         input: {
@@ -10,7 +10,7 @@ const MutationResolver = {
       }, context: any) => {
         const userId = context.userId;
         const { content, isRepost, media, postId } = input
-        const response = await createPost({
+        const response = await PostServices.createPost({
           isRepost: isRepost,
           userId: userId,
           content: content,

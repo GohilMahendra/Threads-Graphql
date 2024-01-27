@@ -1,9 +1,9 @@
-import { signIn, updateUser } from "../../services/user.services";
+import UserServices from "../../services/user.services";
 
 const MutationResolver = {
     SignIn: async (parent: any, { input }: { input: { email: string; password: string } }) => {
         try {
-          const user = await signIn(input);
+          const user = await UserServices.signIn(input);
           return user;
         } catch (error: any) {
           throw new Error(error?.message);
@@ -19,7 +19,7 @@ const MutationResolver = {
       }, context: any) => {
         try {
           const userId = context.userId
-          const updatedUser = await updateUser({
+          const updatedUser = await UserServices.updateUser({
             userId: userId,
             bio: input.bio,
             fullName: input.fullName,
@@ -28,7 +28,6 @@ const MutationResolver = {
           return updatedUser
         }
         catch (error: any) {
-          console.log(error, "Error in the update")
           throw new Error(error?.message);
         }
       },

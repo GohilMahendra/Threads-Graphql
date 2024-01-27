@@ -2,7 +2,7 @@ import express from 'express';
 import cors from 'cors';
 import mongoose from 'mongoose';
 import bodyParser from 'body-parser';
-import { ApolloServer } from 'apollo-server-express';
+import { ApolloServer ,ApolloError} from 'apollo-server-express';
 import dotenv from 'dotenv';
 import { graphqlUploadExpress } from "graphql-upload-ts";
 import { verifyToken } from './src/utilities/Context';
@@ -29,7 +29,7 @@ const startServer = async () => {
         }
         const token = req.header("token");
         if (!token)
-          return {}
+          return new ApolloError("Invalid Token Provided")
         const decodedToken = verifyToken(token);
         const userId = decodedToken.userId;
         return { userId };

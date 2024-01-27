@@ -1,10 +1,40 @@
-// user.service.ts
 import bcrypt from 'bcrypt';
 import jwt from 'jsonwebtoken';
 import { v4 as uuid } from "uuid";
-import { User } from "../models"
+import { Follower, User } from "../models"
 import { getSignedUrl, uploadToS3 } from '../utilities/S3Utils';
 
+interface SignInInput {
+    email: string,
+    password: string
+}
+
+interface SignUpInput {
+    username: string,
+    fullname: string,
+    email: string,
+    password: string
+}
+interface UpdateUserInput {
+    userId: string
+    fullName?: string,
+    bio?: string,
+    profile_picture?: any
+}
+
+interface GetUserInput {
+    userId: string,
+    profileId: string
+}
+
+interface VerifyEmailInput {
+    email: string,
+    otp: string
+}
+interface SearchUsers {
+    userId: string,
+    quary: string
+}
 const getSalt = async () => {
     const salted = await bcrypt.genSalt(10)
     return salted
@@ -15,42 +45,37 @@ const getHashPassword = async (password: string) => {
     const hashed = await bcrypt.hash(password, newSalt)
     return hashed
 }
-export const signIn = async ({ email, password }: { email: string; password: string }) => {
-  const user = await User.findOne({ email });
+const signIn = async ({ email, password }: SignInInput) => {
+    const user = await User.findOne({ email });
 
-  if (!user) {
-    throw new Error('User not found');
-  }
+    if (!user) {
+        throw new Error('User not found');
+    }
 
-  if (!user.verified) {
-    throw new Error('User not verified');
-  }
+    if (!user.verified) {
+        throw new Error('User not verified');
+    }
 
-  const passwordMatched = await bcrypt.compare(password, user.password);
+    const passwordMatched = await bcrypt.compare(password, user.password);
 
-  if (!passwordMatched) {
-    throw new Error('Invalid credentials');
-  }
-  const token = jwt.sign({ userId: user._id }, process.env.TOKEN_SECRET || '');
+    if (!passwordMatched) {
+        throw new Error('Invalid credentials');
+    }
+    const token = jwt.sign({ userId: user._id }, process.env.TOKEN_SECRET || '');
 
-  await User.findOneAndUpdate({ _id: user._id }, { token });
+    await User.findOneAndUpdate({ _id: user._id }, { token });
 
-  user.token = token;
+    user.token = token;
 
-  return user;
+    return user;
 };
 
-export const signUp = async ({ username, fullname, email, password }:{
-    username:string, 
-    fullname:string, 
-    email:string,
-    password:string
-}) => {
+const signUp = async ({ username, fullname, email, password }: SignUpInput) => {
     try {
         email = email.toLowerCase()
         const isUserExist = await User.findOne({ email })
         if (isUserExist) {
-           throw Error("User does Not exist")
+            throw Error("User does Not exist")
         }
         const hashedPassword = await getHashPassword(password)
 
@@ -71,56 +96,150 @@ export const signUp = async ({ username, fullname, email, password }:{
     }
 }
 
-export const updateUser = async({userId,fullName,bio,profile_picture}:{
-  userId: string
-  fullName?: string,
-  bio?: string,
-  profile_picture?: any
-}) =>
-{
-  try {
-    if (!fullName && !bio && (!profile_picture)) {
-        throw new Error("At least one of fullName, bio, or profile_picture should be present")
-    }
+const updateUser = async ({ userId, fullName, bio, profile_picture }: UpdateUserInput) => {
+    try {
+        if (!fullName && !bio && (!profile_picture)) {
+            throw new Error("At least one of fullName, bio, or profile_picture should be present")
+        }
 
-    if (fullName !== undefined && (typeof fullName !== 'string' || fullName.trim() === '')) {
-       throw new Error("Invalid fullName")
-    }
+        if (fullName !== undefined && (typeof fullName !== 'string' || fullName.trim() === '')) {
+            throw new Error("Invalid fullName")
+        }
 
-    if (bio !== undefined && (typeof bio !== 'string' || bio.trim() === '')) {
-       throw new Error("Invalid bio")
-    }
+        if (bio !== undefined && (typeof bio !== 'string' || bio.trim() === '')) {
+            throw new Error("Invalid bio")
+        }
 
-    if (profile_picture && (!profile_picture?.encoding || !profile_picture?.mimetype)) {
-        throw new Error("Invalid profile_picture")
+        if (profile_picture && (!profile_picture?.encoding || !profile_picture?.mimetype)) {
+            throw new Error("Invalid profile_picture")
+        }
+        const updateUser: any = {}
+        if (fullName) {
+            updateUser.fullname = fullName.trim()
+        }
+        if (bio) {
+            updateUser.bio = bio
+        }
+        if (profile_picture) {
+            const file = await profile_picture.file
+            const extention = file.mimetype.split("/")[1]
+            const name = uuid() + "." + extention
+            const filepath = "user/" + userId + "/" + name
+            const result = await uploadToS3(file, filepath)
+            updateUser.profile_picture = result?.Key
+        }
+        const result = await User.updateOne({ _id: userId }, { $set: updateUser });
+        console.log(result)
+        if (result.matchedCount > 0) {
+            const updatedUser = await User.findById(userId)
+            if (updatedUser?.profile_picture)
+                updatedUser.profile_picture = await getSignedUrl(updatedUser?.profile_picture)
+            return updatedUser;
+        } else {
+            throw new Error("User not found or no fields were modified")
+        }
     }
-    const updateUser: any = {}
-    if (fullName) {
-        updateUser.fullname = fullName.trim()
-    }
-    if (bio) {
-        updateUser.bio = bio
-    }
-    if (profile_picture) {
-        const file = profile_picture.file
-        const extention = file.mimetype.split("/")[1]
-        const name = uuid() + "." + extention
-        const filepath = "user/" + userId + "/" + name
-        const result = await uploadToS3(file, filepath)
-        updateUser.profile_picture = result?.Key
-    }
-    const result = await User.updateOne({ _id: userId }, { $set: updateUser });
-    console.log(result)
-    if (result.matchedCount > 0) {
-        const updatedUser = await User.findById(userId)
-        if (updatedUser?.profile_picture)
-            updatedUser.profile_picture = await getSignedUrl(updatedUser?.profile_picture)
-        return updatedUser;
-    } else {
-       throw new Error("User not found or no fields were modified")
+    catch (err) {
+        throw new Error("Internal server Error")
     }
 }
-catch (err) {
-    throw new Error("Internal server Error")
+
+const getUserById = async ({ profileId, userId }: GetUserInput) => {
+    try {
+        const user = await User.findOne({ _id: profileId }).select("-otp -password -token")
+
+        if (!user) {
+            throw new Error("user not found!")
+        }
+        if (user.profile_picture) {
+            user.profile_picture = await getSignedUrl(user.profile_picture)
+        }
+        const isFollowedBy = await Follower.findOne({ follower: userId, following: profileId })
+        if (isFollowedBy) {
+            user.isFollowed = true
+        }
+        return {
+            user: user
+        }
+    }
+    catch (err: any) {
+        throw new Error(err)
+    }
 }
+const verifyEmail = async ({ email, otp }: VerifyEmailInput) => {
+    try {
+        const user = await User.findOne({ email })
+        if (!user) {
+            throw new Error("User does not exist!")
+        }
+
+        if (otp != user.otp) {
+            throw new Error("invalid Otp")
+        }
+
+        user.verified = true
+        user.token = undefined
+        user.otp = undefined
+        await user.save()
+        return {
+            message: "User verified!"
+        }
+    }
+    catch (err: any) {
+        throw new Error(err)
+    }
+}
+
+const SearchUsers = async ({ quary, userId }: SearchUsers) => {
+    try {
+        const users = await User.aggregate([
+            {
+                $search: {
+                    index: "UserSearch",
+                    autocomplete: {
+                        query: quary,
+                        path: "username"
+                    }
+                }
+            },
+            {
+                $project: {
+                    _id: 1,
+                    otp: 0,
+                    token: 0,
+                    password: 0
+                }
+            }
+        ]);
+        if (users.length == 0) {
+            return {
+                data: []
+            }
+        }
+        await Promise.all(users.map(async (user: any) => {
+
+            const isUserFollowed = await Follower.findOne({ follower: userId, following: user._id })
+            if (!isUserFollowed) {
+                user.isFollowed = true
+
+            }
+            if (user.profile_picture)
+                user.profile_picture = await getSignedUrl(user.profile_picture)
+        }))
+        return {
+            data: users
+        }
+    }
+    catch (err: any) {
+        throw new Error(err)
+    }
+
+}
+export default {
+    signIn,
+    signUp,
+    updateUser,
+    getUserById,
+    verifyEmail,
+    SearchUsers
 }
