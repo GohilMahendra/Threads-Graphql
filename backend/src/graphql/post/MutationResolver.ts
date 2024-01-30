@@ -30,7 +30,6 @@ const MutationResolver = {
       postId,
       userId
     })
-    console.log(response)
     return response
   },
   UnLikePost: async (parent: any, { input }: { input: ExcludeContextType<PostActionInput> }, context: UserContext) => {

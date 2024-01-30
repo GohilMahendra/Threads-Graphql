@@ -1,4 +1,5 @@
-import { User, UserResponse } from "../../types/User";
+import { FollowingUserResponse, UserResponse } from "../../types/User";
+import { PaginatedResponse, SuccessResponse } from "../common";
 
 export interface SignInInput {
   input: {
@@ -14,9 +15,19 @@ export interface SignInResponse {
 export interface GetUserFollowingInput {
   followingId: string
 }
+export interface GetCurrentUserFolowingInput {
+  lastOffset?: string,
+  pageSize?: number
+}
 
-export interface GetUserFollowingResponse {
-  GetCurrentUserFollowing: User[]
+export interface FollowUnFollowInput {
+  followingId: string
+}
+
+export type FollowSuccessResponse = SuccessResponse<"FollowUser">
+export type UnFollowSuccessResponse = SuccessResponse<"UnFollowUser">
+export interface GetCurrentUserFollowingResponse {
+  GetCurrentUserFollowing: PaginatedResponse<FollowingUserResponse>
 }
 
 

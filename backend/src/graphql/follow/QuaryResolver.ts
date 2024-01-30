@@ -1,5 +1,5 @@
 import followService from "../../services/follow.service"
-import { CurrentUserFollowings, GetFollowingsInput } from "../../types/Follow"
+import { CurrentUserFollowingsInput, GetFollowingsInput } from "../../types/Follow"
 import { ExcludeContextType } from "../../types/Global"
 import { UserContext } from "../../utilities/Context"
 
@@ -14,13 +14,16 @@ const QueryResolver = {
     })
     return response
   },
-  GetCurrentUserFollowing: async (parent: any, { input }: { input: ExcludeContextType<CurrentUserFollowings> }, context: UserContext) => {
+  GetCurrentUserFollowing: async (parent: any, { input }: { input?: ExcludeContextType<CurrentUserFollowingsInput> }, context: UserContext) => {
     const userId = context.userId
-    const { lastOffset, pageSize } = input
     const response = await followService.getCurrentUserFollowing({
       userId,
-      lastOffset,
-      pageSize
+      ...(input &&
+      {
+        lastOffset: input.lastOffset,
+        pageSize: input.pageSize
+      }
+      ),
     })
     return response
   }

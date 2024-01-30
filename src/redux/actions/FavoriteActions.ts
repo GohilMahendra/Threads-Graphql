@@ -1,23 +1,65 @@
 import { createAsyncThunk } from "@reduxjs/toolkit"
-import { deleteReply, fetchUserLikedPosts, fetchUserRepliedPosts, followUser, getCurrentFollowings, unFollowUser } from "../../apis/UserAPI"
 import { FollowingUserResponse, User } from "../../types/User"
 import { RootState } from "../store"
 import { PAGE_SIZE } from "../../globals/constants"
-import { Thread } from "../../types/Post"
-import { createRepost, likePost, unLikePost } from "../../apis/FeedAPI"
-import { CommentedPost } from "../../types/Comment"
+import { createRepost } from "../../apis/FeedAPI"
+import { getToken } from "../../globals/utilities"
+import { client } from "../../graphql"
+import { GET_CURRENT_USER_FOLLOWINGS } from "../../graphql/user/Query"
+import {
+    FollowSuccessResponse,
+    FollowUnFollowInput,
+    GetCurrentUserFollowingResponse,
+    GetCurrentUserFolowingInput
+} from "../../graphql/user/Types"
+import { GraphQlInputType } from "../../graphql/common"
+import {
+    GET_LIKED_POSTS,
+    GET_REPLIED_POSTS
+} from "../../graphql/post/Query"
+import {
+    DeleteRepliedPostInput,
+    DeleteRepliedPostSuccessResponse,
+    GetLikedPostsInput,
+    GetLikedPostsResponse,
+    GetRepliedPostsResponse,
+    LikePostSuccessResponse,
+    PaginationInput,
+    PostActionInput,
+    UnLikePostSuccessResponse
+} from "../../graphql/post/Types"
+import {
+    DELETE_REPLIED_POST,
+    LIKE_POST,
+    UNLIKE_POST
+} from "../../graphql/post/Mutation"
+import {
+    FOLLOW_USER,
+    UNFOLLOW_USER
+} from "../../graphql/user/Mutation"
 
 export const getUserFollowingAction = createAsyncThunk(
     "Favorites/getUserFollowingAction",
     async (fakeArg: string, { rejectWithValue }) => {
         try {
-            const response = await getCurrentFollowings(PAGE_SIZE)
-            const data: FollowingUserResponse[] = response.data
-
-            const users: User[] = data.map((child) => child.following)
-            return {
-                data: users,
-                lastOffset: response.lastOffset
+            const token = await getToken()
+            const response = await client.query<GetCurrentUserFollowingResponse, GraphQlInputType<GetCurrentUserFolowingInput>>({
+                query: GET_CURRENT_USER_FOLLOWINGS,
+                context: {
+                    headers: { token: token }
+                },
+                fetchPolicy: "no-cache"
+            })
+            if (response.data) {
+                const data: FollowingUserResponse[] = response.data.GetCurrentUserFollowing.data
+                const users: User[] = data.map((child) => child.following)
+                return {
+                    data: users,
+                    lastOffset: response.data.GetCurrentUserFollowing.meta.lastOffset
+                }
+            }
+            else {
+                return rejectWithValue(JSON.stringify(response.errors))
             }
         }
         catch (err) {
@@ -31,7 +73,6 @@ export const getMoreUserFollowingAction = createAsyncThunk(
     "Favorites/getMoreUserFollowingAction",
     async (fakeArg: string, { rejectWithValue, getState }) => {
         try {
-
             const state = getState() as RootState
             const lastOffset = state.Favorite.lastOffset
             if (!lastOffset) {
@@ -40,13 +81,25 @@ export const getMoreUserFollowingAction = createAsyncThunk(
                     lastOffset: null
                 }
             }
-            const response = await getCurrentFollowings(PAGE_SIZE)
-            const data: FollowingUserResponse[] = response.data
+            const token = await getToken()
+            const response = await client.query<GetCurrentUserFollowingResponse, GraphQlInputType<GetCurrentUserFolowingInput>>({
+                query: GET_CURRENT_USER_FOLLOWINGS,
+                context: {
+                    headers: { token: token }
+                },
+                fetchPolicy: "no-cache"
+            })
+            if (response.data) {
+                const data: FollowingUserResponse[] = response.data.GetCurrentUserFollowing.data
 
-            const users: User[] = data.map((child) => child.following)
-            return {
-                data: users,
-                lastOffset: response.meta.lastOffset
+                const users: User[] = data.map((child) => child.following)
+                return {
+                    data: users,
+                    lastOffset: response.data.GetCurrentUserFollowing.meta.lastOffset
+                }
+            }
+            else {
+                return rejectWithValue(JSON.stringify(response.errors))
             }
         }
         catch (err) {
@@ -59,16 +112,26 @@ export const getLikedPostsActions = createAsyncThunk(
     "Favorites/getLikedPostsActions",
     async (fakeArg: string, { rejectWithValue }) => {
         try {
-            const response = await fetchUserLikedPosts({
-                pageSize: PAGE_SIZE
+            const token = await getToken()
+            const response = await client.query<GetLikedPostsResponse, GraphQlInputType<GetLikedPostsInput>>({
+                query: GET_LIKED_POSTS,
+                context: {
+                    headers: {
+                        token: token
+                    }
+                },
+                fetchPolicy: "network-only"
             })
-
-            const posts = response.data as Thread[]
-            const lastOffset = response.meta.lastOffset
-
-            return {
-                data: posts,
-                lastOffset: lastOffset
+            if (response.data) {
+                const posts = response.data.GetLikedPosts.data
+                const lastOffset = response.data.GetLikedPosts.meta.lastOffset
+                return {
+                    data: posts,
+                    lastOffset: lastOffset
+                }
+            }
+            else {
+                return rejectWithValue(JSON.stringify(response.errors))
             }
         }
         catch (err) {
@@ -91,16 +154,32 @@ export const getMoreLikedPostsActions = createAsyncThunk(
                     lastOffset: null
                 }
             }
-            const response = await fetchUserLikedPosts({
-                pageSize: PAGE_SIZE,
-                lastOffset: offset
+            const token = await getToken()
+            const response = await client.query<GetLikedPostsResponse, GraphQlInputType<GetLikedPostsInput>>({
+                query: GET_LIKED_POSTS,
+                context: {
+                    headers: {
+                        token: token
+                    }
+                },
+                variables: {
+                    input: {
+                        lastOffset: offset,
+                        pageSize: PAGE_SIZE
+                    }
+                },
+                fetchPolicy: "network-only"
             })
-
-            const posts = response.data as Thread[]
-            const lastOffset = response.meta.lastOffset
-            return {
-                data: posts,
-                lastOffset: lastOffset
+            if (response.data) {
+                const posts = response.data.GetLikedPosts.data
+                const lastOffset = response.data.GetLikedPosts.meta.lastOffset
+                return {
+                    data: posts,
+                    lastOffset: lastOffset
+                }
+            }
+            else {
+                return rejectWithValue(JSON.stringify(response.errors))
             }
         }
         catch (err) {
@@ -114,14 +193,31 @@ export const favoritesLikeAction = createAsyncThunk(
     "Favorite/favoritesLikeAction",
     async ({ postId, post_type }: { postId: string, post_type: "post" | "reply" }, { rejectWithValue }) => {
         try {
-            const response = await likePost(postId)
-            return {
-                postId: postId,
-                postType: post_type
+            const token = await getToken()
+            const response = await client.mutate<LikePostSuccessResponse, GraphQlInputType<PostActionInput>>({
+                mutation: LIKE_POST,
+                variables: {
+                    input: {
+                        postId: postId
+                    }
+                },
+                context: {
+                    headers: {
+                        token: token
+                    }
+                }
+            })
+            if (response.data && !response.errors) {
+                return {
+                    postId: postId,
+                    postType: post_type
+                }
+            }
+            else {
+                return rejectWithValue(JSON.stringify(response.errors))
             }
         }
         catch (err) {
-            console.log(err)
             return rejectWithValue(JSON.stringify(err))
         }
     }
@@ -130,10 +226,26 @@ export const favoritesUnlikeAction = createAsyncThunk(
     "Favorite/favoritesUnlikeAction",
     async ({ postId, post_type }: { postId: string, post_type: "post" | "reply" }, { rejectWithValue }) => {
         try {
-            const response = await unLikePost(postId)
-            return {
-                postId: postId,
-                postType: post_type
+            const token = await getToken()
+            const response = await client.mutate<UnLikePostSuccessResponse, GraphQlInputType<PostActionInput>>({
+                mutation: UNLIKE_POST,
+                variables: {
+                    input: {
+                        postId: postId
+                    }
+                },
+                context: {
+                    headers: { token: token }
+                }
+            })
+            if (response.data) {
+                return {
+                    postId: postId,
+                    postType: post_type
+                }
+            }
+            else {
+                return rejectWithValue(JSON.stringify(response.errors))
             }
         }
         catch (err) {
@@ -145,10 +257,26 @@ export const favoritesFollowAction = createAsyncThunk(
     "Favorites/favoritesFollowAction",
     async ({ userId }: { userId: string }, { rejectWithValue, getState }) => {
         try {
-            const response = await followUser(userId)
-            return {
-                message: response.message,
-                userId: userId
+            const token = await getToken()
+            const response = await client.mutate<FollowSuccessResponse, GraphQlInputType<FollowUnFollowInput>>({
+                mutation: FOLLOW_USER,
+                variables: {
+                    input: {
+                        followingId: userId
+                    }
+                },
+                context: {
+                    headers: { token: token }
+                }
+            })
+            if (response.data) {
+                return {
+                    message: response.data.FollowUser.message,
+                    userId: userId
+                }
+            }
+            else {
+                return rejectWithValue(JSON.stringify(response.errors))
             }
         }
         catch (err) {
@@ -161,10 +289,27 @@ export const favoritesUnFollowAction = createAsyncThunk(
     "Favorites/favoritesUnFollowAction",
     async ({ userId }: { userId: string }, { rejectWithValue, getState }) => {
         try {
-            const response = await unFollowUser(userId)
-            return {
-                message: response.message,
-                userId: userId
+            const token = await getToken()
+            const response = await client.mutate<FollowSuccessResponse, GraphQlInputType<FollowUnFollowInput>>({
+                mutation: UNFOLLOW_USER,
+                variables: {
+                    input: {
+                        followingId: userId
+                    }
+                },
+                context: {
+                    headers: { token: token }
+                }
+            })
+            if (response.data) {
+                console.log(response.data.FollowUser)
+                return {
+                    message: response.data.FollowUser.message,
+                    userId: userId
+                }
+            }
+            else {
+                return rejectWithValue(JSON.stringify(response.errors))
             }
         }
         catch (err) {
@@ -177,15 +322,24 @@ export const getFavoritesRepliedPostsAction = createAsyncThunk(
     "Favorites/getFavoritesRepliedPostsAction",
     async (fakeArg: string, { rejectWithValue }) => {
         try {
-            const response = await fetchUserRepliedPosts({
-                pageSize: 10
+            const token = await getToken()
+            const response = await client.query<GetRepliedPostsResponse, GraphQlInputType<PaginationInput>>({
+                query: GET_REPLIED_POSTS,
+                context: {
+                    headers: { token: token }
+                },
+                fetchPolicy: "no-cache"
             })
-
-            const posts = response.data as CommentedPost[]
-            const lastOffset = response.meta.lastOffset
-            return {
-                data: posts,
-                lastOffset: lastOffset
+            if (response.data) {
+                const posts = response.data.GetRepliedPosts.data
+                const lastOffset = response.data.GetRepliedPosts.meta.lastOffset
+                return {
+                    data: posts,
+                    lastOffset: lastOffset
+                }
+            }
+            else {
+                return rejectWithValue(JSON.stringify(response.errors))
             }
         }
         catch (err) {
@@ -207,16 +361,30 @@ export const getMoreFavoritesRepliedPostsAction = createAsyncThunk(
                     lastOffset: null
                 }
             }
-            const response = await fetchUserRepliedPosts({
-                pageSize: PAGE_SIZE,
-                lastOffset: offset
+            const token = await getToken()
+            const response = await client.query<GetRepliedPostsResponse, GraphQlInputType<PaginationInput>>({
+                query: GET_REPLIED_POSTS,
+                context: {
+                    headers: { token: token }
+                },
+                variables: {
+                    input: {
+                        lastOffset: offset,
+                        pageSize: PAGE_SIZE
+                    },
+                },
+                fetchPolicy: "no-cache"
             })
-
-            const posts = response.data as CommentedPost[]
-            const lastOffset = response.meta.lastOffset
-            return {
-                data: posts,
-                lastOffset: lastOffset
+            if (response.data) {
+                const posts = response.data.GetRepliedPosts.data
+                const lastOffset = response.data.GetRepliedPosts.meta.lastOffset
+                return {
+                    data: posts,
+                    lastOffset: lastOffset
+                }
+            }
+            else {
+                return rejectWithValue(JSON.stringify(response.errors))
             }
         }
         catch (err) {
@@ -246,11 +414,24 @@ export const deleteFavoritesReplyAction = createAsyncThunk(
     "Favorite/deleteFavoritesReplyAction",
     async ({ replyId }: { replyId: string }, { rejectWithValue }) => {
         try {
-            const response = await deleteReply(replyId)
-            return {
-                message: response.message,
-                replyId
-            }
+            const token = await getToken()
+            const response = await client.mutate<DeleteRepliedPostSuccessResponse, GraphQlInputType<DeleteRepliedPostInput>>({
+                mutation: DELETE_REPLIED_POST,
+                variables: {
+                    input: { replyId: replyId }
+                },
+                context: {
+                    headers: { token: token }
+                }
+            })
+            console.log(response)
+            if (response.data)
+                return {
+                    message: response.data.DeletePostReply.message,
+                    replyId
+                }
+            else
+                return rejectWithValue(JSON.stringify(response.errors))
         }
         catch (err) {
             console.log(err)

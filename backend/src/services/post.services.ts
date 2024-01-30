@@ -85,7 +85,6 @@ const createPost = async ({ userId, content, isRepost = false, postId, media = [
 }
 const getPosts = async ({ userId, lastOffset, pageSize = 10, post_type }: GetPostRepostInput) => {
     try {
-        console.log(lastOffset, "lastoffset from backend")
         const quary: any = {}
         if (lastOffset) {
             quary._id = { $lt: new mongoose.Types.ObjectId(lastOffset) }
@@ -241,6 +240,7 @@ const getPostsByUser = async ({ postUserId, userId, lastOffset, pageSize = 10, p
 }
 const likePost = async ({ postId, userId }: PostActionInput) => {
     const transaction = await mongoose.startSession()
+    let result = {}
     try {
         await transaction.withTransaction(async () => {
             if (!userId || !postId) {
@@ -252,12 +252,11 @@ const likePost = async ({ postId, userId }: PostActionInput) => {
             }
             const existingLike = await Like.findOne({ user: userId, post: postId });
             if (existingLike) {
-                transaction.commitTransaction()
-                return {
+                result = {
                     message: "post is already liked by current user"
                 }
+                return
             }
-
             post.likes++
             const newLike = new Like({
                 post: postId,
@@ -265,22 +264,22 @@ const likePost = async ({ postId, userId }: PostActionInput) => {
             })
             await newLike.save()
             await post.save()
-            transaction.commitTransaction()
-            return {
-                message: "liked succesfully"
+            result = {
+                message: "post is already liked by current user"
             }
         })
     }
     catch (err: any) {
-        transaction.abortTransaction()
         throw new Error(err)
     }
     finally {
         transaction.endSession()
     }
+    return result
 }
 const unLikePost = async ({ postId, userId }: PostActionInput) => {
     const transaction = await mongoose.startSession()
+    let result = {}
     try {
         await transaction.withTransaction(async () => {
             if (!userId || !postId) {
@@ -293,9 +292,10 @@ const unLikePost = async ({ postId, userId }: PostActionInput) => {
             const exist_liked = await Like.exists({ user: userId, post: postId })
             const isLiked = exist_liked != null
             if (!isLiked) {
-                return {
+                result = {
                     message: "post is already un-liked"
                 }
+                return
             }
             if (post.likes > 0)
                 post.likes--
@@ -303,7 +303,7 @@ const unLikePost = async ({ postId, userId }: PostActionInput) => {
             await Like.findOneAndDelete({ user: userId, post: postId })
             await post.save()
 
-            return {
+            result = {
                 message: "unLiked succesfully"
             }
         })
@@ -314,6 +314,7 @@ const unLikePost = async ({ postId, userId }: PostActionInput) => {
     finally {
         transaction.endSession()
     }
+    return result
 }
 const commentPost = async ({ content, postId, userId }: CommentActionInput) => {
     try {
@@ -772,6 +773,7 @@ const getRepliedPosts = async ({ userId, lastOffset, pageSize = 10 }: GetPostsIn
 }
 const deletePostReply = async ({ replyId, userId }: DeleteReplyInput) => {
     const transacttion = await mongoose.startSession()
+    let result = {}
     try {
         await transacttion.withTransaction(async () => {
             if (!userId || !replyId) {
@@ -790,7 +792,7 @@ const deletePostReply = async ({ replyId, userId }: DeleteReplyInput) => {
             await Post.findByIdAndUpdate(userId, {
                 $inc: { replies: -1 }
             });
-            return {
+            result = {
                 message: "deleted reply succesfully"
             }
         })
@@ -801,6 +803,7 @@ const deletePostReply = async ({ replyId, userId }: DeleteReplyInput) => {
     finally {
         transacttion.endSession()
     }
+    return result
 }
 export default {
     createPost,

@@ -1,6 +1,6 @@
 import { gql } from "@apollo/client";
 
-export const GET_USER_FOLLOWINGS = gql`
+export const GET_CURRENT_USER_FOLLOWINGS = gql`
 query GetCurrentUserFollowing($input: GetCurrentUserFollowingsInput) {
   GetCurrentUserFollowing(input: $input) {
     data {

@@ -18,3 +18,19 @@ export const SIGN_IN_USER = gql`
     }
   }
 `;
+
+export const FOLLOW_USER = gql`
+mutation FollowUser($input: FollowActionInput!) {
+  FollowUser(input: $input) {
+    message
+  }
+}
+`
+
+export const UNFOLLOW_USER = gql`
+mutation UnFollowUser($input: FollowActionInput!) {
+  UnFollowUser(input: $input) {
+    message
+  }
+}
+`

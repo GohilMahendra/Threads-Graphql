@@ -109,7 +109,6 @@ const updateUser = async ({ userId, fullName, bio, profile_picture }: UpdateUser
             updateUser.profile_picture = result?.Key
         }
         const result = await User.updateOne({ _id: userId }, { $set: updateUser });
-        console.log(result)
         if (result.matchedCount > 0) {
             const updatedUser = await User.findById(userId)
             if (updatedUser?.profile_picture)

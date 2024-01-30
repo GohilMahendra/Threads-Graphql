@@ -104,8 +104,8 @@ const PostQuery = `#graphql
     GetComments(input: GetCommentsInput): CommentResponse
     GetPostsFullTextSearch(input:GetPostsFullTextSearchInput):PostsResponse
     GetUserPosts(input:GetPostRepostInput!):PostsResponse
-    GetLikedPosts(input: GetPostInput!): PostsResponse
-    GetRepliedPosts(input: GetPostInput!): CommentedPostResponse
+    GetLikedPosts(input: GetPostInput): PostsResponse
+    GetRepliedPosts(input: GetPostInput): CommentedPostResponse
 `
 const PostMutation = `#grapqhl
     CreatePost(input: PostInput!): SuccessResponse

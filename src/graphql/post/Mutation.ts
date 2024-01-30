@@ -29,3 +29,11 @@ export const COMMENT_POST = gql`
         }
     }
 `
+
+export const DELETE_REPLIED_POST = gql`
+mutation DeletePostReply($input: DeletePostReplyInput!) {
+    DeletePostReply(input: $input) {
+      message
+    }
+  }
+`

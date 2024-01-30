@@ -1,12 +1,7 @@
-import { SuccessResponse } from "..";
+import { PaginationMeta, SuccessResponse } from "../common";
 import { Thread } from "../../types/Post"
-import {   } from "graphql";
+import { CommentedPost } from "../../types/Comment";
 
-export interface PaginationMeta 
-{
-    pageSize:number,
-    lastOffset: string | null
-}
 export interface GetPostRepostResponse
 {
     GetPosts:{
@@ -51,7 +46,37 @@ export interface RepostInpt
     postId: string
 }
 
+export interface GetLikedPostsInput
+{
+    pageSize?:number,
+    lastOffset?: string
+}
+
+export interface GetLikedPostsResponse
+{
+    GetLikedPosts:
+    {
+        data: Thread[],
+        meta: PaginationMeta
+    }
+}
+
+export interface GetRepliedPostsResponse
+{
+    GetRepliedPosts:
+    {
+        data: CommentedPost[],
+        meta: PaginationMeta
+    }
+}
+
+export interface DeleteRepliedPostInput
+{
+    replyId: string
+}
+
 export type LikePostSuccessResponse = SuccessResponse<"LikePost">
 export type UnLikePostSuccessResponse = SuccessResponse<"UnLikePost">
 export type CreateCommentSucceessResponse = SuccessResponse<"CommentPost">
 export type CreateRepostSuccessResponse = SuccessResponse<"CreatePost">
+export type DeleteRepliedPostSuccessResponse = SuccessResponse<"DeletePostReply">

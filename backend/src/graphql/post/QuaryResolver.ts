@@ -71,26 +71,28 @@ const QuaryResolver = {
         return response
     },
     GetLikedPosts: async (parent: any,
-        { input }: { input: ExcludeContextType<GetPostsInput> },
+        { input }: { input?: ExcludeContextType<GetPostsInput> },
         context: UserContext) => {
         const userId = context.userId
-        const { lastOffset, pageSize } = input
         const response = await postServices.getLikedPosts({
             userId,
-            lastOffset,
-            pageSize
-        })
+            ...(input && {
+                lastOffset: input.lastOffset,
+                pageSize: input.pageSize
+            })
+        });
         return response
     },
     GetRepliedPosts: async (parent: any,
-        { input }: { input: ExcludeContextType<GetPostsInput> },
+        { input }: { input?: ExcludeContextType<GetPostsInput> },
         context: UserContext) => {
         const userId = context.userId
-        const { lastOffset, pageSize } = input
         const response = await postServices.getRepliedPosts({
             userId,
-            lastOffset,
-            pageSize
+            ...(input && {
+                lastOffset: input.lastOffset,
+                pageSize: input.pageSize
+            })
         })
         return response
     }

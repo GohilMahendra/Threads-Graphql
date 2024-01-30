@@ -4,12 +4,13 @@ import mongoose from "mongoose";
 import { UserDocument } from "../types/User";
 import { getSignedUrl } from "../utilities/S3Utils";
 import {
-    CurrentUserFollowings,
+    CurrentUserFollowingsInput,
     FollowActionInput,
     GetFollowingsInput
 } from "../types/Follow";
 const followUser = async ({ followingId, userId }: FollowActionInput) => {
     const transaction = await mongoose.startSession()
+    let result = {}
     try {
         await transaction.withTransaction(async () => {
 
@@ -25,9 +26,10 @@ const followUser = async ({ followingId, userId }: FollowActionInput) => {
             const isCurrentFollowedAleady = await Follower.findOne({ follower: userId, following: followingId })
 
             if (isCurrentFollowedAleady) {
-                return {
+                result = {
                     message: "user is already follwing the given profile"
                 }
+                return
             }
 
             await User.findByIdAndUpdate(userId, { $inc: { following: 1 } });
@@ -38,7 +40,7 @@ const followUser = async ({ followingId, userId }: FollowActionInput) => {
                 following: followingId
             })
             newFollower.save()
-            return {
+            result =  {
                 message: 'User followed successfully',
             }
         })
@@ -49,6 +51,7 @@ const followUser = async ({ followingId, userId }: FollowActionInput) => {
     finally {
         transaction.endSession()
     }
+    return result
 }
 const getUserFollowings = async ({ followingId, pageSize = 10, lastOffset }: GetFollowingsInput) => {
     try {
@@ -87,7 +90,7 @@ const getUserFollowings = async ({ followingId, pageSize = 10, lastOffset }: Get
         throw new Error(err)
     }
 }
-const getCurrentUserFollowing = async ({ userId, lastOffset, pageSize = 10 }: CurrentUserFollowings) => {
+const getCurrentUserFollowing = async ({ userId, lastOffset, pageSize = 10 }: CurrentUserFollowingsInput) => {
     try {
         const quary: any =
         {
@@ -111,7 +114,7 @@ const getCurrentUserFollowing = async ({ userId, lastOffset, pageSize = 10 }: Cu
             }
             following.following.isFollowed = true
         }))
-        console.log(followings)
+
         return {
             data: followings,
             meta: {
@@ -127,6 +130,7 @@ const getCurrentUserFollowing = async ({ userId, lastOffset, pageSize = 10 }: Cu
 }
 const unFollowUser = async ({ followingId, userId }: FollowActionInput) => {
     const transaction = await mongoose.startSession()
+    let result = {}
     try {
         await transaction.withTransaction(async () => {
 
@@ -142,16 +146,17 @@ const unFollowUser = async ({ followingId, userId }: FollowActionInput) => {
             const isCurrentFollowedAleady = await Follower.findOne({ follower: userId, following: followingId })
 
             if (!isCurrentFollowedAleady) {
-                return {
+                result = {
                     message: "User is not following Profile"
                 }
+                return
             }
 
             await User.findByIdAndUpdate(userId, { $inc: { following: -1 } });
             await User.findByIdAndUpdate(followingId, { $inc: { following: -1 } });
 
             await Follower.findOneAndDelete({ follower: currentUser, following: followingId })
-            return {
+            result = {
                 message: 'unfollowed successfully',
             }
         })
@@ -162,6 +167,7 @@ const unFollowUser = async ({ followingId, userId }: FollowActionInput) => {
     finally {
         transaction.endSession()
     }
+    return result
 }
 
 export default { followUser, getUserFollowings, getCurrentUserFollowing, unFollowUser }

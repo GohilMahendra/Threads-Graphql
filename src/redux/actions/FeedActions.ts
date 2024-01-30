@@ -14,7 +14,7 @@ import {
     RepostInpt,
     UnLikePostSuccessResponse,
 } from "../../graphql/post/Types"
-import { GraphQlInputType } from "../../graphql";
+import { GraphQlInputType } from "../../graphql/common";
 import { getToken } from "../../globals/utilities"
 import { PAGE_SIZE } from "../../globals/constants"
 import { COMMENT_POST, CREATE_POST, LIKE_POST, UNLIKE_POST } from "../../graphql/post/Mutation"
@@ -37,6 +37,7 @@ export const FetchPostsAction = createAsyncThunk(
                         pageSize: PAGE_SIZE
                     }
                 },
+                fetchPolicy:"cache-first"
             })
             if (getPostsResponse.data && !getPostsResponse.errors) {
                 const response = getPostsResponse.data.GetPosts
@@ -102,7 +103,7 @@ export const FetchMorePostsAction = createAsyncThunk(
                         pageSize: PAGE_SIZE
                     }
                 },
-
+                fetchPolicy:"cache-first"
             })
             if (getPostsResponse.data && !getPostsResponse.errors) {
                 const response = getPostsResponse.data.GetPosts
