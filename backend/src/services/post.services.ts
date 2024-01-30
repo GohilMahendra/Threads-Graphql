@@ -85,8 +85,8 @@ const createPost = async ({ userId, content, isRepost = false, postId, media = [
 }
 const getPosts = async ({ userId, lastOffset, pageSize = 10, post_type }: GetPostRepostInput) => {
     try {
+        console.log(lastOffset, "lastoffset from backend")
         const quary: any = {}
-
         if (lastOffset) {
             quary._id = { $lt: new mongoose.Types.ObjectId(lastOffset) }
         }
@@ -252,6 +252,7 @@ const likePost = async ({ postId, userId }: PostActionInput) => {
             }
             const existingLike = await Like.findOne({ user: userId, post: postId });
             if (existingLike) {
+                transaction.commitTransaction()
                 return {
                     message: "post is already liked by current user"
                 }
@@ -264,13 +265,14 @@ const likePost = async ({ postId, userId }: PostActionInput) => {
             })
             await newLike.save()
             await post.save()
-
+            transaction.commitTransaction()
             return {
                 message: "liked succesfully"
             }
         })
     }
     catch (err: any) {
+        transaction.abortTransaction()
         throw new Error(err)
     }
     finally {

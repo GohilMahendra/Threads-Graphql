@@ -6,7 +6,6 @@ export const timeDifference = (timestamp: string) => {
     const now = new Date();
     const time = new Date(timestamp);
     const seconds: number = Math.floor((now.getTime() - time.getTime()) / 1000);
-
     const MINUTE = 60;
     const HOUR = 60 * MINUTE;
     const DAY = 24 * HOUR;

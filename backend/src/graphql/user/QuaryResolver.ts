@@ -4,16 +4,18 @@ import { GetUserInput, SearchUsersInput, UserResponseDocument, VerifyEmailInput 
 import { UserContext } from "../../utilities/Context"
 
 const QueryResolver = {
-  GetUserById: async (parent: any, { profileId }: ExcludeContextType<GetUserInput>, context: UserContext) => {
+  GetUserById: async (parent: any, { input }: { input: ExcludeContextType<GetUserInput> }, context: UserContext) => {
     const userId = context.userId
+    const { profileId } = input
     const userResponse = await userServices.getUserById({
       profileId,
       userId
     })
     return userResponse
   },
-  SearchUsers: async (parent: any, { query }: SearchUsersInput, context: UserContext) => {
+  SearchUsers: async (parent: any, { input }: { input: ExcludeContextType<SearchUsersInput> }, context: UserContext) => {
     const userId = context.userId
+    const { query } = input
     const response = await userServices.searchUsers({
       query,
       userId

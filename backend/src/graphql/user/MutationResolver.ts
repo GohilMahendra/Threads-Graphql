@@ -7,7 +7,8 @@ const MutationResolver = {
     const user = await UserServices.signIn(input);
     return user;
   },
-  SignUp: async (parent: any, { email, fullname, password, username }: SignUpInput) => {
+  SignUp: async (parent: any, { input }: { input: SignUpInput }) => {
+    const { email, fullname, password, username } = input
     const success = await UserServices.signUp({
       email,
       fullname,
@@ -26,8 +27,9 @@ const MutationResolver = {
     })
     return updatedUser
   },
-  VerifyEmail: async (parent: any, { email, otp }: VerifyEmailInput, context: UserContext) => {
+  VerifyEmail: async (parent: any, { input }: { input: VerifyEmailInput }, context: UserContext) => {
     const userId = context.userId
+    const { email, otp } = input
     const successResponse = await UserServices.verifyEmail({
       email,
       otp

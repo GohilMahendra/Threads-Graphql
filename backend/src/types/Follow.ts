@@ -9,7 +9,7 @@ export interface GetFollowingsInput {
     lastOffset?: string
 }
 
-export interface CurrentUserFollowings {
+export interface CurrentUserFollowingsInput {
     userId: string,
     pageSize?: number,
     lastOffset?: string,

@@ -49,6 +49,5 @@ const PostSchema = new mongoose.Schema({
         default: false
     }
 }, { timestamps: { createdAt: 'created_at', updatedAt: 'updated_at' } })
-export type PostType = InferSchemaType<typeof PostSchema>
-const Post = mongoose.model<PostType>("Post", PostSchema)
+const Post = mongoose.model("Post", PostSchema)
 export default Post

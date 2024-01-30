@@ -3,8 +3,13 @@ import User from "./user";
 import Follow from "./follow"
 export const TypeDefs = `
     scalar Upload
+    scalar Date
     type SuccessResponse {
-        message: String
+        message: String!
+    }
+    type Meta {
+        pagesize: Int,
+        lastOffset: String
     }
     ${User.TypeDef.UserType}
     ${Post.TypeDef.PostType}

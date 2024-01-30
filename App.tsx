@@ -6,24 +6,23 @@
  */
 import 'react-native-gesture-handler'
 import React from 'react';
-import {
-  Platform,
-  SafeAreaView,
-  StatusBar,
-  Text
-} from 'react-native';
 import RootStack from './src/navigations/RootStack';
 import { ThemeProvider } from './src/globals/ThemeProvider';
 import { Provider } from 'react-redux';
 import store from './src/redux/store';
+import { ApolloProvider  } from "@apollo/client";
+import { client } from './src/graphql';
+
 const App = () =>
 {
   return(
-    <Provider store={store}>
-      <ThemeProvider>
-        <RootStack/>
-      </ThemeProvider>
-    </Provider>
+    <ApolloProvider client={client}>
+        <Provider store={store}>
+        <ThemeProvider>
+          <RootStack/>
+        </ThemeProvider>
+      </Provider>
+    </ApolloProvider>
   )
 }
 export default App;

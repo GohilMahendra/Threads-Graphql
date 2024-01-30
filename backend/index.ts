@@ -27,9 +27,7 @@ const startServer = async () => {
         if (operationName == "SignIn" || operationName == "SignUp" || operationName == "Verify") {
           return {userId:""}
         }
-        const token = req.header("token");
-        if (!token)
-          throw new ApolloError("Invalid Token Provided")
+        const token = req.header("token") || "";
         const decodedToken = verifyToken(token);
         const userId = decodedToken.userId || "";
         return { userId };

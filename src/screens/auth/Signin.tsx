@@ -1,5 +1,15 @@
 import React, { useState } from 'react'
-import { View, Text, SafeAreaView, Image, Dimensions, TextInput, TouchableOpacity, Pressable, StyleSheet } from 'react-native'
+import { 
+    View, 
+    Text, 
+    SafeAreaView, 
+    Image, 
+    Dimensions, 
+    TextInput, 
+    TouchableOpacity, 
+    Pressable, 
+    StyleSheet 
+} from 'react-native'
 import { useNavigation } from '@react-navigation/native';
 import UseTheme from '../../globals/UseTheme';
 import { RootState, useAppDispatch } from '../../redux/store';
@@ -18,6 +28,7 @@ const SignIn = () => {
     const { theme } = UseTheme()
     const navigation = useNavigation<composeteAuthRootStack>()
     const dispatch = useAppDispatch()
+    
     const signInUser = async () => {
         const responseStaus = await dispatch(SignInAction({
             email: email,

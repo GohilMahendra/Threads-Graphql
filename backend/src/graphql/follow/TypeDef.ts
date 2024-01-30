@@ -10,6 +10,19 @@ type SuccessResponse {
 */}
 
 export const FollowType = `#graphql
+  type FollowingUser
+  {
+    _id: ID!
+    follower:ID!
+    following:OtherUser
+  }
+
+  type GetFollowingsResponse
+  {
+    data: [FollowingUser!]!
+    meta: Meta
+  }
+
   input GetFollowingsInput {
     followingId: ID!,
     pageSize: Int,
@@ -25,11 +38,10 @@ export const FollowType = `#graphql
   input FollowActionInput{
     followingId: String
   }
-
 `
 export const FollowQuery = `#graphql
-    GetUserFollowings(input:GetFollowingsInput!): [OtherUser!]!
-    GetCurrentUserFollowing(input: GetCurrentUserFollowingsInput!):[OtherUser!]!
+    GetUserFollowings(input:GetFollowingsInput!): GetFollowingsResponse!
+    GetCurrentUserFollowing(input: GetCurrentUserFollowingsInput):GetFollowingsResponse!
 `
 export const FollowMutation = `#graphql
     FollowUser(input:FollowActionInput!):SuccessResponse

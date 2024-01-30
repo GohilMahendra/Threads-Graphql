@@ -1,18 +1,31 @@
 import { createAsyncThunk } from "@reduxjs/toolkit"
-import { deleteUserPost, fetchUserPosts, loginUser, signUpUser, updateUser, verifyOtp } from "../../apis/UserAPI"
-import { SignUpArgsType, UpdateArgsType, User, UserResponse } from "../../types/User"
+import { deleteUserPost, fetchUserPosts, signUpUser, updateUser, verifyOtp } from "../../apis/UserAPI"
+import { SignUpArgsType, UpdateArgsType, User } from "../../types/User"
 import AsyncStorage from "@react-native-async-storage/async-storage"
 import { Thread, UploadMedia } from "../../types/Post"
 import { PAGE_SIZE } from "../../globals/constants"
 import { RootState } from "../store"
 import { createPost, createRepost } from "../../apis/FeedAPI"
+import { SignInInput, SignInResponse } from "../../graphql/user/Types"
+import { SIGN_IN_USER } from "../../graphql/user/Mutation";
+import { client } from "../../graphql"
 
 export const SignInAction = createAsyncThunk(
     "user/SignInAction",
     async ({ email, password }: { email: string, password: string }, { rejectWithValue }) => {
-        try {
-            const response = await loginUser(email, password)
-            const userResponse = response.user as UserResponse
+        try {      
+            const mutationResponse = await client.mutate<SignInResponse,SignInInput>({
+                mutation: SIGN_IN_USER,
+                variables:{
+                    input:{
+                        email:email,password:password
+                    }
+                }
+            })
+
+            if(mutationResponse.data)
+            {
+            const userResponse  = mutationResponse.data.SignIn
             await AsyncStorage.setItem("token", userResponse.token)
             await AsyncStorage.setItem("email", email)
             await AsyncStorage.setItem("password", password)
@@ -31,7 +44,13 @@ export const SignInAction = createAsyncThunk(
             }
             return user
         }
+        else
+        {
+            return rejectWithValue(JSON.stringify(mutationResponse.errors))
+        }
+        }
         catch (err) {
+            console.log(err)
             return rejectWithValue(JSON.stringify(err))
         }
     })

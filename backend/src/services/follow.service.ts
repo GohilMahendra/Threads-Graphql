@@ -111,10 +111,14 @@ const getCurrentUserFollowing = async ({ userId, lastOffset, pageSize = 10 }: Cu
             }
             following.following.isFollowed = true
         }))
+        console.log(followings)
         return {
             data: followings,
-            lastOffset: followings.length == pageSize ?
-                followings[followings.length - 1]._id : null
+            meta: {
+                pageSize: pageSize,
+                lastOffset: followings.length == pageSize ?
+                    followings[followings.length - 1]._id : null
+            }
         }
     }
     catch (err: any) {

@@ -1,5 +1,4 @@
 const PostType = `#graphql
-
     type Post {
         _id: ID!
         user: OtherUser!
@@ -11,13 +10,8 @@ const PostType = `#graphql
         isRepost: Boolean
         Repost: Post
         isLiked: Boolean
-        created_at: String
-        updated_at: String
-    }
-
-    type Meta {
-        pagesize: Int,
-        lastOffset: String
+        created_at: Date
+        updated_at: Date
     }
 
     type PostsResponse {
