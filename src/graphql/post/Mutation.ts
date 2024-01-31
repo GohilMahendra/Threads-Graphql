@@ -37,3 +37,11 @@ mutation DeletePostReply($input: DeletePostReplyInput!) {
     }
   }
 `
+
+export const DELETE_USER_POST = gql`
+mutation DeletePost($input: PostActionInput!) {
+    DeletePost(input: $input) {
+      message
+    }
+  }
+`

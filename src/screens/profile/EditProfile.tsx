@@ -13,7 +13,12 @@ import { UpdateAction } from '../../redux/actions/UserActions'
 import UseTheme from '../../globals/UseTheme'
 import Loader from '../../components/global/Loader'
 import { ScrollView } from 'react-native'
-import { scaledFont } from '../../globals/utilities'
+import { getToken, scaledFont } from '../../globals/utilities'
+import { client } from '../../graphql'
+import { UPADATE_USER } from '../../graphql/user/Mutation'
+import { GraphQlInputType } from '../../graphql/common'
+import { UpdateUserInput, UpdateUserSuccessResponse } from '../../graphql/user/Types'
+import { tokens } from 'react-native-paper/lib/typescript/styles/themes/v3/tokens'
 const { height, width } = Dimensions.get("screen")
 const EditProfile = () => {
 
@@ -62,21 +67,38 @@ const EditProfile = () => {
     }
 
     const updateProfile = async () => {
-        disptach(UpdateAction({
-            bio: bio,
-            fullname: fullname,
-            profile_picture: ProfilePicture
-        }))
+
+        const token = await getToken()
+        const response = await client.mutate<UpdateUserSuccessResponse,GraphQlInputType<UpdateUserInput>>({
+            mutation: UPADATE_USER,
+            variables:{
+                input:{
+                    profile_picture: ProfilePicture.uri
+                }
+            },
+            context:{
+                headers:{token: token}
+            }
+            
+        })
+        console.log(response)
+
+
+        // disptach(UpdateAction({
+        //     bio: bio,
+        //     fullname: fullname,
+        //     profile_picture: ProfilePicture
+        // }))
     }
 
     return (
         <SafeAreaView style={[styles.container, {
             backgroundColor: theme.background_color
         }]}>
-            {loading && <Loader/>}
-            <ScrollView 
-            contentContainerStyle={{flex:1}}
-            style={styles.innerContainer}>
+            {loading && <Loader />}
+            <ScrollView
+                contentContainerStyle={{ flex: 1 }}
+                style={styles.innerContainer}>
                 <View style={styles.headerContainer}>
                     <View style={styles.headerInnerContainer}>
                         <AntDesign
@@ -108,7 +130,7 @@ const EditProfile = () => {
                     </TouchableOpacity>
                     <View style={[styles.nameContainer, {
                         backgroundColor: theme.secondary_background_color
-                        ,borderWidth:0.5
+                        , borderWidth: 0.5
                     }]}>
                         <TextInput
                             autoCapitalize={"none"}
@@ -116,10 +138,10 @@ const EditProfile = () => {
                             onChangeText={text => setFullName(text)}
                             placeholderTextColor={theme.placeholder_color}
                             placeholder={"full name ..."}
-                            style={[styles.inputFullname, { color: theme.text_color}]}
+                            style={[styles.inputFullname, { color: theme.text_color }]}
                         />
                     </View>
-                    <View style={[styles.bioContainer, { backgroundColor: theme.secondary_background_color, borderWidth:0.5}]}>
+                    <View style={[styles.bioContainer, { backgroundColor: theme.secondary_background_color, borderWidth: 0.5 }]}>
                         <TextInput
                             value={bio}
                             multiline={true}

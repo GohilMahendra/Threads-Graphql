@@ -588,7 +588,6 @@ const getUserPosts = async ({
 
             }
         }));
-
         return {
             data: userPosts,
             meta: {

@@ -11,7 +11,7 @@ import {
     GetPostRepostResponse,
     LikePostSuccessResponse,
     PostActionInput,
-    RepostInpt,
+    RepostInput,
     UnLikePostSuccessResponse,
 } from "../../graphql/post/Types"
 import { GraphQlInputType } from "../../graphql/common";
@@ -240,7 +240,7 @@ export const feedCreateRepostAction = createAsyncThunk(
     async ({ postId, content }: { postId: string, content?: string }, { rejectWithValue }) => {
         try {
             const token = await getToken()
-            const response = await client.mutate<CreateRepostSuccessResponse,GraphQlInputType<RepostInpt>>({
+            const response = await client.mutate<CreateRepostSuccessResponse,GraphQlInputType<RepostInput>>({
                 mutation: CREATE_POST,
                 variables: {
                     input:{

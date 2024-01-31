@@ -1,5 +1,5 @@
 import { PaginationMeta, SuccessResponse } from "../common";
-import { Thread } from "../../types/Post"
+import { Media, Thread, UploadMedia } from "../../types/Post"
 import { CommentedPost } from "../../types/Comment";
 
 export interface GetPostRepostResponse
@@ -35,12 +35,12 @@ export interface CommentActionInput
 export interface PostInput
 {
     content?: string,
-    isRepost?: string,
+    isRepost?: Boolean,
     postId?: string,
-    media?: string
+    media?: UploadMedia[]
 }
 
-export interface RepostInpt 
+export interface RepostInput 
 {
     content?: string,
     postId: string
@@ -70,6 +70,31 @@ export interface GetRepliedPostsResponse
     }
 }
 
+export interface GetUserPostsRepostResponse
+{
+    GetUserPosts:
+    {
+        data: Thread[],
+        meta: PaginationMeta
+    }
+}
+
+export interface GetPostsFullTextSearchInput
+{
+    searchTerm: string,
+    lastOffset?: string,
+    pageSize?: number
+}
+
+export interface GetPostsFullTextSearchResponse
+{
+    GetPostsFullTextSearch:
+    {
+        data: Thread[],
+        meta: PaginationMeta
+    }
+}
+
 export interface DeleteRepliedPostInput
 {
     replyId: string
@@ -80,3 +105,4 @@ export type UnLikePostSuccessResponse = SuccessResponse<"UnLikePost">
 export type CreateCommentSucceessResponse = SuccessResponse<"CommentPost">
 export type CreateRepostSuccessResponse = SuccessResponse<"CreatePost">
 export type DeleteRepliedPostSuccessResponse = SuccessResponse<"DeletePostReply">
+export type DeleteUserPostSuccessResponse = SuccessResponse<"DeletePost">

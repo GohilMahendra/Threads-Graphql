@@ -26,3 +26,38 @@ query GetCurrentUserFollowing($input: GetCurrentUserFollowingsInput) {
   }
 }
 `
+
+export const SEARCH_USERS = gql`
+query SearchUsers($input: SearchUsersInput!) {
+  SearchUsers(input: $input) {
+    data {
+      _id
+      username
+      fullname
+      email
+      bio
+      followers
+      following
+      profile_picture
+      verified
+      isFollowed
+    }
+  }
+}
+`
+export const GET_USER_BY_ID = gql`
+query GetUserById($input: GetUserByIdInput!) {
+  GetUserById(input: $input) {
+    _id
+    username
+    fullname
+    email
+    bio
+    followers
+    following
+    profile_picture
+    verified
+    isFollowed
+  }
+}
+`

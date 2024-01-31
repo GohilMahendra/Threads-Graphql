@@ -1,53 +1,73 @@
 import { createAsyncThunk } from "@reduxjs/toolkit"
-import { deleteUserPost, fetchUserPosts, signUpUser, updateUser, verifyOtp } from "../../apis/UserAPI"
-import { SignUpArgsType, UpdateArgsType, User } from "../../types/User"
+import { updateUser } from "../../apis/UserAPI"
+import {
+    SignUpArgsType,
+    UpdateArgsType,
+    User
+} from "../../types/User"
 import AsyncStorage from "@react-native-async-storage/async-storage"
 import { Thread, UploadMedia } from "../../types/Post"
-import { PAGE_SIZE } from "../../globals/constants"
 import { RootState } from "../store"
-import { createPost, createRepost } from "../../apis/FeedAPI"
-import { SignInInput, SignInResponse } from "../../graphql/user/Types"
-import { SIGN_IN_USER } from "../../graphql/user/Mutation";
+import {
+    SignInInput,
+    SignInResponse,
+    SignUpInput,
+    SignUpSuccessResponse,
+    VerifyEmailInput,
+    VerifyEmailSuccessResponse
+} from "../../graphql/user/Types"
+import { SIGN_IN_USER, SIGN_UP_USER, VERIFY_EMAIL } from "../../graphql/user/Mutation";
 import { client } from "../../graphql"
+import { GraphQlInputType } from "../../graphql/common"
+import {
+    CreateRepostSuccessResponse,
+    DeleteUserPostSuccessResponse,
+    GetPostRepostInput,
+    GetUserPostsRepostResponse,
+    PostActionInput,
+    PostInput,
+    RepostInput
+} from "../../graphql/post/Types"
+import { CREATE_POST, DELETE_USER_POST } from "../../graphql/post/Mutation"
+import { getToken } from "../../globals/utilities"
+import { GET_USER_POSTS } from "../../graphql/post/Query"
 
 export const SignInAction = createAsyncThunk(
     "user/SignInAction",
     async ({ email, password }: { email: string, password: string }, { rejectWithValue }) => {
-        try {      
-            const mutationResponse = await client.mutate<SignInResponse,SignInInput>({
+        try {
+            const mutationResponse = await client.mutate<SignInResponse, SignInInput>({
                 mutation: SIGN_IN_USER,
-                variables:{
-                    input:{
-                        email:email,password:password
+                variables: {
+                    input: {
+                        email: email, password: password
                     }
                 }
             })
 
-            if(mutationResponse.data)
-            {
-            const userResponse  = mutationResponse.data.SignIn
-            await AsyncStorage.setItem("token", userResponse.token)
-            await AsyncStorage.setItem("email", email)
-            await AsyncStorage.setItem("password", password)
-            const user: User =
-            {
-                email: userResponse.email,
-                followers: userResponse.followers,
-                following: userResponse.following,
-                _id: userResponse._id,
-                username: userResponse.username,
-                profile_picture: userResponse.profile_picture,
-                fullname: userResponse.fullname,
-                bio: userResponse.bio,
-                verified: userResponse.verified,
-                isFollowed: false
+            if (mutationResponse.data) {
+                const userResponse = mutationResponse.data.SignIn
+                await AsyncStorage.setItem("token", userResponse.token)
+                await AsyncStorage.setItem("email", email)
+                await AsyncStorage.setItem("password", password)
+                const user: User =
+                {
+                    email: userResponse.email,
+                    followers: userResponse.followers,
+                    following: userResponse.following,
+                    _id: userResponse._id,
+                    username: userResponse.username,
+                    profile_picture: userResponse.profile_picture,
+                    fullname: userResponse.fullname,
+                    bio: userResponse.bio,
+                    verified: userResponse.verified,
+                    isFollowed: false
+                }
+                return user
             }
-            return user
-        }
-        else
-        {
-            return rejectWithValue(JSON.stringify(mutationResponse.errors))
-        }
+            else {
+                return rejectWithValue(JSON.stringify(mutationResponse.errors))
+            }
         }
         catch (err) {
             console.log(err)
@@ -58,8 +78,21 @@ export const SignUpAction = createAsyncThunk(
     "user/SignUpAction",
     async (args: SignUpArgsType, { rejectWithValue }) => {
         try {
-            const response = await signUpUser(args)
-            return response.message
+            const response = await client.mutate<SignUpSuccessResponse, GraphQlInputType<SignUpInput>>({
+                mutation: SIGN_UP_USER,
+                variables: {
+                    input: {
+                        email: args.email,
+                        fullname: args.fullname,
+                        password: args.password,
+                        username: args.username
+                    }
+                }
+            })
+            if (response.data)
+                return response.data.SignUp.message
+            else
+                return rejectWithValue(JSON.stringify(response.errors))
         }
         catch (err) {
             return rejectWithValue(JSON.stringify(err))
@@ -83,8 +116,19 @@ export const verifyOtpUserAction = createAsyncThunk(
     "user/verifyOtpUserAction",
     async ({ otp, email }: { otp: string, email: string }, { rejectWithValue }) => {
         try {
-            const response = await verifyOtp(email, otp)
-            return response.message as string
+            const response = await client.mutate<VerifyEmailSuccessResponse, GraphQlInputType<VerifyEmailInput>>({
+                mutation: VERIFY_EMAIL,
+                variables: {
+                    input: {
+                        email: email,
+                        otp: otp
+                    }
+                }
+            })
+            if (response.data)
+                return response.data.VerifyEmail.message
+            else
+                return rejectWithValue(JSON.stringify(response.errors))
         }
         catch (err) {
             return rejectWithValue(JSON.stringify(err))
@@ -95,8 +139,23 @@ export const createRepostAction = createAsyncThunk(
     "user/createRepostAction",
     async ({ postId, content }: { postId: string, content?: string }, { rejectWithValue }) => {
         try {
-            const response = await createRepost(postId, content)
-            return response.data
+            const token = await getToken()
+            const response = await client.mutate<CreateRepostSuccessResponse, GraphQlInputType<RepostInput>>({
+                mutation: CREATE_POST,
+                variables: {
+                    input: {
+                        content,
+                        postId
+                    }
+                },
+                context: {
+                    headers: { token: token }
+                }
+            })
+            if (response.data)
+                return response.data.CreatePost.message
+            else
+                return rejectWithValue(JSON.stringify(response.errors))
         }
         catch (err) {
             return rejectWithValue(JSON.stringify(err))
@@ -108,13 +167,20 @@ export const createPostAction = createAsyncThunk(
     "user/createPostAction",
     async ({ content, media }: { content?: string, media: UploadMedia[] }, { rejectWithValue }) => {
         try {
-            const response = await createPost({
-                args: {
-                    content: content,
-                    media: media
+            const token = await getToken()
+            const response = await client.mutate<CreateRepostSuccessResponse, GraphQlInputType<PostInput>>({
+                mutation: CREATE_POST,
+                variables: {
+                    input: { content: content }
+                },
+                context: {
+                    headers: { token: token }
                 }
             })
-            return response.data
+            if (response.data)
+                return response.data.CreatePost.message
+            else
+                return rejectWithValue(JSON.stringify(response.errors))
         }
         catch (err) {
             return rejectWithValue(JSON.stringify(err))
@@ -127,37 +193,54 @@ export const FetchUserPostsAction = createAsyncThunk(
     "user/FetchPostsAction",
     async ({ post_type }: { post_type: string }, { rejectWithValue }) => {
         try {
-            const response = await fetchUserPosts({
-                pageSize: 3,
-                post_type: post_type
-            })
-            const posts: Thread[] = []
-            const theads: Thread[] = response.data
-            theads.forEach((item, index) => {
-                const post: Thread =
-                {
-                    _id: item._id,
-                    content: item.content,
-                    created_at: item.created_at,
-                    hashtags: item.hashtags,
-                    isLiked: item.isLiked,
-                    isRepost: item.isRepost,
-                    likes: item.likes,
-                    media: item.media,
-                    replies: item.replies,
-                    Repost: item.Repost,
-                    updated_at: item.updated_at,
-                    user: item.user
+            console.log(post_type, "post type")
+            const token = await getToken()
+            console.log(token)
+            const response = await client.query<GetUserPostsRepostResponse, GraphQlInputType<GetPostRepostInput>>({
+                query: GET_USER_POSTS,
+                context: {
+                    headers: { token: token }
+                },
+                variables: {
+                    input: {
+                        post_type: post_type
+                    }
                 }
-                posts.push(post)
             })
-            return {
-                data: posts,
-                lastOffset: response.meta.lastOffset
+            console.log(response)
+            if (response.data) {
+                const posts: Thread[] = []
+                const theads: Thread[] = response.data.GetUserPosts.data
+                theads.forEach((item, index) => {
+                    const post: Thread =
+                    {
+                        _id: item._id,
+                        content: item.content,
+                        created_at: item.created_at,
+                        hashtags: item.hashtags,
+                        isLiked: item.isLiked,
+                        isRepost: item.isRepost,
+                        likes: item.likes,
+                        media: item.media,
+                        replies: item.replies,
+                        Repost: item.Repost,
+                        updated_at: item.updated_at,
+                        user: item.user
+                    }
+                    posts.push(post)
+                    console.log(posts, "posts")
+                })
+                return {
+                    data: posts,
+                    lastOffset: response.data.GetUserPosts.meta.lastOffset
+                }
             }
+            else
+                return rejectWithValue(JSON.stringify(response.errors))
 
         }
         catch (err) {
+            console.log(err)
             return rejectWithValue(JSON.stringify(err))
         }
     })
@@ -174,36 +257,46 @@ export const FetchMoreUserPostsAction = createAsyncThunk(
                     lastOffset: null
                 }
             }
-            const response = await fetchUserPosts({
-                pageSize: PAGE_SIZE,
-                lastOffset: lastOffset,
-                post_type: post_type
-            })
-            const posts: Thread[] = []
-            const theads: Thread[] = response.data
-            theads.forEach((item, index) => {
-                const post: Thread =
-                {
-                    _id: item._id,
-                    content: item.content,
-                    created_at: item.created_at,
-                    hashtags: item.hashtags,
-                    isLiked: item.isLiked,
-                    isRepost: item.isRepost,
-                    likes: item.likes,
-                    media: item.media,
-                    replies: item.replies,
-                    Repost: item.Repost,
-                    updated_at: item.updated_at,
-                    user: item.user
+            const token = await getToken()
+            const response = await client.query<GetUserPostsRepostResponse, GraphQlInputType<GetPostRepostInput>>({
+                query: GET_USER_POSTS,
+                context: {
+                    headers: { token: token }
+                },
+                variables: {
+                    input: {
+                        post_type: post_type
+                    }
                 }
-                posts.push(post)
             })
-            return {
-                data: posts,
-                lastOffset: response.meta.lastOffset
+            if (response.data) {
+                const posts: Thread[] = []
+                const theads: Thread[] = response.data.GetUserPosts.data
+                theads.forEach((item, index) => {
+                    const post: Thread =
+                    {
+                        _id: item._id,
+                        content: item.content,
+                        created_at: item.created_at,
+                        hashtags: item.hashtags,
+                        isLiked: item.isLiked,
+                        isRepost: item.isRepost,
+                        likes: item.likes,
+                        media: item.media,
+                        replies: item.replies,
+                        Repost: item.Repost,
+                        updated_at: item.updated_at,
+                        user: item.user
+                    }
+                    posts.push(post)
+                })
+                return {
+                    data: posts,
+                    lastOffset: response.data.GetUserPosts.meta.lastOffset
+                }
             }
-
+            else
+                return rejectWithValue(JSON.stringify(response.errors))
         }
         catch (err) {
             return rejectWithValue(JSON.stringify(err))
@@ -214,11 +307,22 @@ export const DeletePostAction = createAsyncThunk(
     "user/DeletePostAction",
     async ({ postId }: { postId: string }, { rejectWithValue, getState }) => {
         try {
-            const response = await deleteUserPost(postId)
-
-            return {
-                postId: postId
-            }
+            const token = await getToken()
+            const response = await client.mutate<DeleteUserPostSuccessResponse, GraphQlInputType<PostActionInput>>({
+                mutation: DELETE_USER_POST,
+                variables: {
+                    input: { postId: postId }
+                },
+                context: {
+                    headers: { token: token }
+                }
+            })
+            if (response.data)
+                return {
+                    postId: postId
+                }
+            else
+                return rejectWithValue(JSON.stringify(response.errors))
         }
         catch (err) {
             return rejectWithValue(JSON.stringify(err))

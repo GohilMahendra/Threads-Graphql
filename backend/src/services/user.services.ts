@@ -45,6 +45,9 @@ const signIn = async ({ email, password }: SignInInput) => {
 
     user.token = token;
 
+    if(user.profile_picture)
+    user.profile_picture = await getSignedUrl(user.profile_picture)
+
     return user;
 };
 
@@ -110,10 +113,11 @@ const updateUser = async ({ userId, fullName, bio, profile_picture }: UpdateUser
         }
         const result = await User.updateOne({ _id: userId }, { $set: updateUser });
         if (result.matchedCount > 0) {
-            const updatedUser = await User.findById(userId)
-            if (updatedUser?.profile_picture)
-                updatedUser.profile_picture = await getSignedUrl(updatedUser?.profile_picture)
-            return updatedUser;
+            const userUpdated = await User.findById(userId)
+            if (userUpdated?.profile_picture)
+            userUpdated.profile_picture = await getSignedUrl(userUpdated?.profile_picture)
+
+            return userUpdated;
         } else {
             throw new Error("User not found or no fields were modified")
         }

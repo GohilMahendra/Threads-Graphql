@@ -22,6 +22,10 @@ import Loader from '../../components/global/Loader'
 import { scaledFont } from '../../globals/utilities'
 import Animated, { useSharedValue, withTiming } from 'react-native-reanimated'
 import { compositeUserProfileRootNavigation } from '../../navigations/Types'
+import { useQuery } from '@apollo/client'
+import { GET_USER_BY_ID } from '../../graphql/user/Query'
+import { GraphQlInputType } from '../../graphql/common'
+import { GetUserByIdInput, GetUserByIdResponse } from '../../graphql/user/Types'
 const { height, width } = Dimensions.get("screen")
 const UserProfile = () => {
     const [user, setUser] = useState<User>({
@@ -36,6 +40,7 @@ const UserProfile = () => {
         profile_picture: "",
         isFollowed: false
     })
+    const { data} = useQuery<GetUserByIdResponse, GraphQlInputType<GetUserByIdInput>>(GET_USER_BY_ID);
     const [loading, setLoading] = useState(false)
     const [moreLoading, setMoreLoading] = useState(false)
     const [screenLoading, setScreenLoading] = useState(false)
@@ -161,7 +166,7 @@ const UserProfile = () => {
     }
     const getUser = async () => {
         try {
-            const response = await fetchUserById(userId)
+            const response = await FetchUserQuery()
             setUser(response.user)
         }
         catch (err) {
