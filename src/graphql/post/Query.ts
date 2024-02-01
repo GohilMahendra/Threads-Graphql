@@ -210,8 +210,8 @@ query GetRepliedPosts($input: GetPostInput) {
 }
 `
 export const GET_USER_POSTS = gql`
-query GetUserPosts($getUserPostsInput: GetPostRepostInput!) {
-  GetUserPosts(input: $getUserPostsInput) {
+query GetUserPosts($input: GetPostRepostInput!) {
+  GetUserPosts(input: $input) {
     data {
       _id
       user {
@@ -274,7 +274,6 @@ query GetUserPosts($getUserPostsInput: GetPostRepostInput!) {
     }
   }
 }
-
 `
 export const GET_SEARCH_POSTS = gql`
 query GetPostsFullTextSearch($input: GetPostsFullTextSearchInput) {
@@ -342,4 +341,69 @@ query GetPostsFullTextSearch($input: GetPostsFullTextSearchInput) {
   }
 }
 `
-
+export const GET_POSTS_BY_USER = gql`
+query GetPostsByUser($input: GetPostByUserInput!) {
+  GetPostsByUser(input: $input) {
+    data {
+      _id
+      user {
+        _id
+        username
+        fullname
+        email
+        bio
+        followers
+        following
+        profile_picture
+        verified
+        isFollowed
+      }
+      content
+      media {
+        media_type
+        media_url
+        thumbnail
+      }
+      hashtags
+      likes
+      replies
+      isRepost
+      Repost {
+        _id
+        user {
+          _id
+          username
+          fullname
+          email
+          bio
+          followers
+          following
+          profile_picture
+          verified
+          isFollowed
+        }
+        content
+        media {
+          media_type
+          media_url
+          thumbnail
+        }
+        hashtags
+        likes
+        replies
+        isRepost
+        isLiked
+        created_at
+        updated_at
+      }
+      isLiked
+      created_at
+      updated_at
+    }
+    meta {
+      pagesize
+      lastOffset
+    }
+  }
+}
+`

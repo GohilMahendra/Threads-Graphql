@@ -2,10 +2,8 @@ import { FollowingUserResponse, User, UserResponse } from "../../types/User";
 import { PaginatedResponse, SuccessResponse } from "../common";
 
 export interface SignInInput {
-  input: {
     email: string,
     password: string
-  }
 }
 
 export interface SignInResponse {

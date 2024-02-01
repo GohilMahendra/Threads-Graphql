@@ -48,7 +48,9 @@ export const getUserFollowingAction = createAsyncThunk(
                 context: {
                     headers: { token: token }
                 },
-                fetchPolicy: "no-cache"
+                variables:{
+                    input: {pageSize: PAGE_SIZE}
+                }
             })
             if (response.data) {
                 const data: FollowingUserResponse[] = response.data.GetCurrentUserFollowing.data
@@ -63,7 +65,6 @@ export const getUserFollowingAction = createAsyncThunk(
             }
         }
         catch (err) {
-            console.log(err)
             return rejectWithValue(JSON.stringify(err))
         }
 
@@ -87,7 +88,10 @@ export const getMoreUserFollowingAction = createAsyncThunk(
                 context: {
                     headers: { token: token }
                 },
-                fetchPolicy: "no-cache"
+                variables:{input:{
+                    lastOffset: lastOffset,
+                    pageSize: PAGE_SIZE
+                }}
             })
             if (response.data) {
                 const data: FollowingUserResponse[] = response.data.GetCurrentUserFollowing.data
@@ -120,7 +124,11 @@ export const getLikedPostsActions = createAsyncThunk(
                         token: token
                     }
                 },
-                fetchPolicy: "network-only"
+                variables:{
+                    input:{
+                        pageSize: PAGE_SIZE 
+                    }
+                }
             })
             if (response.data) {
                 const posts = response.data.GetLikedPosts.data
@@ -135,7 +143,6 @@ export const getLikedPostsActions = createAsyncThunk(
             }
         }
         catch (err) {
-            console.log(JSON.stringify(err))
             return rejectWithValue(JSON.stringify(err))
         }
 
@@ -167,8 +174,7 @@ export const getMoreLikedPostsActions = createAsyncThunk(
                         lastOffset: offset,
                         pageSize: PAGE_SIZE
                     }
-                },
-                fetchPolicy: "network-only"
+                }
             })
             if (response.data) {
                 const posts = response.data.GetLikedPosts.data
@@ -302,7 +308,6 @@ export const favoritesUnFollowAction = createAsyncThunk(
                 }
             })
             if (response.data) {
-                console.log(response.data.FollowUser)
                 return {
                     message: response.data.FollowUser.message,
                     userId: userId
@@ -328,7 +333,9 @@ export const getFavoritesRepliedPostsAction = createAsyncThunk(
                 context: {
                     headers: { token: token }
                 },
-                fetchPolicy: "no-cache"
+                variables:{
+                    input: {pageSize: PAGE_SIZE}
+                }
             })
             if (response.data) {
                 const posts = response.data.GetRepliedPosts.data
@@ -372,8 +379,7 @@ export const getMoreFavoritesRepliedPostsAction = createAsyncThunk(
                         lastOffset: offset,
                         pageSize: PAGE_SIZE
                     },
-                },
-                fetchPolicy: "no-cache"
+                }
             })
             if (response.data) {
                 const posts = response.data.GetRepliedPosts.data
@@ -405,7 +411,6 @@ export const favoriteCreateRepostAction = createAsyncThunk(
             }
         }
         catch (err) {
-            console.log(err)
             return rejectWithValue(JSON.stringify(err))
         }
     }
@@ -424,7 +429,6 @@ export const deleteFavoritesReplyAction = createAsyncThunk(
                     headers: { token: token }
                 }
             })
-            console.log(response)
             if (response.data)
                 return {
                     message: response.data.DeletePostReply.message,

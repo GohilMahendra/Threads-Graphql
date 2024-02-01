@@ -1,59 +1,45 @@
 import { PaginationMeta, SuccessResponse } from "../common";
-import { Media, Thread, UploadMedia } from "../../types/Post"
+import { Thread, UploadMedia } from "../../types/Post"
 import { CommentedPost } from "../../types/Comment";
 
-export interface GetPostRepostResponse
-{
-    GetPosts:{
-        data:Thread[],
-        meta:PaginationMeta
+export interface GetPostRepostResponse {
+    GetPosts: {
+        data: Thread[],
+        meta: PaginationMeta
     }
 }
 
-export interface PaginationInput 
-{
-    pageSize?:number,
+export interface PaginationInput {
+    pageSize?: number,
     lastOffset?: string
 }
 
-export interface GetPostRepostInput extends PaginationInput
-{
+export interface GetPostRepostInput extends PaginationInput {
     post_type: string,
-} 
+}
 
-export interface PostActionInput
-{
+export interface PostActionInput {
     postId: string
 }
 
-export interface CommentActionInput
-{
-    postId: string,
-    content: string
-}
-
-export interface PostInput
-{
+export interface PostInput {
     content?: string,
     isRepost?: Boolean,
     postId?: string,
     media?: UploadMedia[]
 }
 
-export interface RepostInput 
-{
+export interface RepostInput {
     content?: string,
     postId: string
 }
 
-export interface GetLikedPostsInput
-{
-    pageSize?:number,
+export interface GetLikedPostsInput {
+    pageSize?: number,
     lastOffset?: string
 }
 
-export interface GetLikedPostsResponse
-{
+export interface GetLikedPostsResponse {
     GetLikedPosts:
     {
         data: Thread[],
@@ -61,8 +47,7 @@ export interface GetLikedPostsResponse
     }
 }
 
-export interface GetRepliedPostsResponse
-{
+export interface GetRepliedPostsResponse {
     GetRepliedPosts:
     {
         data: CommentedPost[],
@@ -70,8 +55,7 @@ export interface GetRepliedPostsResponse
     }
 }
 
-export interface GetUserPostsRepostResponse
-{
+export interface GetUserPostsRepostResponse {
     GetUserPosts:
     {
         data: Thread[],
@@ -79,15 +63,13 @@ export interface GetUserPostsRepostResponse
     }
 }
 
-export interface GetPostsFullTextSearchInput
-{
+export interface GetPostsFullTextSearchInput {
     searchTerm: string,
     lastOffset?: string,
     pageSize?: number
 }
 
-export interface GetPostsFullTextSearchResponse
-{
+export interface GetPostsFullTextSearchResponse {
     GetPostsFullTextSearch:
     {
         data: Thread[],
@@ -95,14 +77,34 @@ export interface GetPostsFullTextSearchResponse
     }
 }
 
-export interface DeleteRepliedPostInput
-{
+export interface GetPostsFullTextSearch {
+    GetPostsFullTextSearch:
+    {
+        data: Thread[],
+        meta: PaginationMeta
+    }
+}
+
+export interface GetPostsByUserInput {
+    post_type: string,
+    lastOffset?: string,
+    pageSize?: number,
+    postUserId: string
+}
+
+export interface GetPostsByUserResponse {
+    GetPostsByUser: {
+        data: Thread[],
+        meta: PaginationMeta
+    }
+}
+
+export interface DeleteRepliedPostInput {
     replyId: string
 }
 
 export type LikePostSuccessResponse = SuccessResponse<"LikePost">
 export type UnLikePostSuccessResponse = SuccessResponse<"UnLikePost">
-export type CreateCommentSucceessResponse = SuccessResponse<"CommentPost">
 export type CreateRepostSuccessResponse = SuccessResponse<"CreatePost">
 export type DeleteRepliedPostSuccessResponse = SuccessResponse<"DeletePostReply">
 export type DeleteUserPostSuccessResponse = SuccessResponse<"DeletePost">

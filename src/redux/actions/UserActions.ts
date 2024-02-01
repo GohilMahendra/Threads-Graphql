@@ -31,12 +31,13 @@ import {
 import { CREATE_POST, DELETE_USER_POST } from "../../graphql/post/Mutation"
 import { getToken } from "../../globals/utilities"
 import { GET_USER_POSTS } from "../../graphql/post/Query"
+import { PAGE_SIZE } from "../../globals/constants"
 
 export const SignInAction = createAsyncThunk(
     "user/SignInAction",
     async ({ email, password }: { email: string, password: string }, { rejectWithValue }) => {
         try {
-            const mutationResponse = await client.mutate<SignInResponse, SignInInput>({
+            const mutationResponse = await client.mutate<SignInResponse, GraphQlInputType<SignInInput>>({
                 mutation: SIGN_IN_USER,
                 variables: {
                     input: {
@@ -70,7 +71,6 @@ export const SignInAction = createAsyncThunk(
             }
         }
         catch (err) {
-            console.log(err)
             return rejectWithValue(JSON.stringify(err))
         }
     })
@@ -193,9 +193,7 @@ export const FetchUserPostsAction = createAsyncThunk(
     "user/FetchPostsAction",
     async ({ post_type }: { post_type: string }, { rejectWithValue }) => {
         try {
-            console.log(post_type, "post type")
             const token = await getToken()
-            console.log(token)
             const response = await client.query<GetUserPostsRepostResponse, GraphQlInputType<GetPostRepostInput>>({
                 query: GET_USER_POSTS,
                 context: {
@@ -203,11 +201,11 @@ export const FetchUserPostsAction = createAsyncThunk(
                 },
                 variables: {
                     input: {
-                        post_type: post_type
+                        post_type: post_type,
+                        pageSize: PAGE_SIZE
                     }
                 }
             })
-            console.log(response)
             if (response.data) {
                 const posts: Thread[] = []
                 const theads: Thread[] = response.data.GetUserPosts.data
@@ -228,19 +226,18 @@ export const FetchUserPostsAction = createAsyncThunk(
                         user: item.user
                     }
                     posts.push(post)
-                    console.log(posts, "posts")
                 })
                 return {
                     data: posts,
                     lastOffset: response.data.GetUserPosts.meta.lastOffset
                 }
             }
-            else
+            else {
                 return rejectWithValue(JSON.stringify(response.errors))
+            }
 
         }
         catch (err) {
-            console.log(err)
             return rejectWithValue(JSON.stringify(err))
         }
     })
@@ -265,7 +262,9 @@ export const FetchMoreUserPostsAction = createAsyncThunk(
                 },
                 variables: {
                     input: {
-                        post_type: post_type
+                        post_type: post_type,
+                        lastOffset: lastOffset,
+                        pageSize: PAGE_SIZE
                     }
                 }
             })

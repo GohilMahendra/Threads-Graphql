@@ -27,8 +27,11 @@ const PostType = `#graphql
     type Comment
     {
         _id: ID!
+        content: String!
         post: ID!
         user: OtherUser!
+        created_at: Date
+        updated_at: Date
     }
     type CommentResponse
     {
@@ -83,8 +86,9 @@ const PostType = `#graphql
     }
     input GetCommentsInput
     {
-        content: String!
         postId: ID!
+        lastOffset: String
+        pageSize: Int
     }
     input GetPostsFullTextSearchInput
     {
@@ -101,7 +105,7 @@ const PostType = `#graphql
 const PostQuery = `#graphql
     GetPosts(input: GetPostRepostInput!):PostsResponse
     GetPostsByUser(input: GetPostByUserInput!):PostsResponse
-    GetComments(input: GetCommentsInput): CommentResponse
+    GetComments(input: GetCommentsInput!): CommentResponse
     GetPostsFullTextSearch(input:GetPostsFullTextSearchInput):PostsResponse
     GetUserPosts(input:GetPostRepostInput!):PostsResponse
     GetLikedPosts(input: GetPostInput): PostsResponse

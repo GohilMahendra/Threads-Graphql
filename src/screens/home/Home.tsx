@@ -1,13 +1,36 @@
-import { View, FlatList, TouchableOpacity, ActivityIndicator, SafeAreaView, StyleSheet } from 'react-native'
-import React, { memo, useCallback, useEffect, useMemo, useRef, useState } from 'react'
+import {
+  View,
+  FlatList,
+  TouchableOpacity,
+  ActivityIndicator,
+  SafeAreaView,
+  StyleSheet
+} from 'react-native'
+import React, {
+  useCallback,
+  useEffect,
+  useMemo,
+  useRef,
+  useState
+} from 'react'
 import FontAwesome from 'react-native-vector-icons/FontAwesome'
 import { Thread } from '../../types/Post'
 import PostItem from '../../components/feed/PostItem'
 import { useSelector } from 'react-redux'
 import { RootState, useAppDispatch } from '../../redux/store'
-import { FetchMorePostsAction,feedCreateRepostAction, FetchPostsAction, LikeAction, unLikeAction } from '../../redux/actions/FeedActions'
+import {
+  FetchMorePostsAction,
+  feedCreateRepostAction,
+  FetchPostsAction,
+  LikeAction,
+  unLikeAction
+} from '../../redux/actions/FeedActions'
 import Replies from '../../components/feed/Replies'
-import { BottomSheetBackdrop, BottomSheetModal, BottomSheetModalProvider } from "@gorhom/bottom-sheet";
+import {
+  BottomSheetBackdrop,
+  BottomSheetModal,
+  BottomSheetModalProvider
+} from "@gorhom/bottom-sheet";
 import { Text } from 'react-native-elements'
 import { GestureHandlerRootView } from 'react-native-gesture-handler'
 import RepostItem from '../../components/feed/RepostItem'

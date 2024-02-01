@@ -1,5 +1,5 @@
 import { View, Text, SafeAreaView, Image, StyleSheet, TouchableOpacity, ActivityIndicator, Dimensions, RefreshControl } from 'react-native'
-import React, { useCallback, useEffect, useId, useMemo, useRef, useState } from 'react'
+import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { placeholder_image } from '../../globals/asstes'
 import { useSelector } from 'react-redux'
 import { RootState, useAppDispatch } from '../../redux/store'
@@ -9,8 +9,16 @@ import { ProfileStacktype } from '../../navigations/ProfileStack'
 import { FlatList } from 'react-native'
 import { Thread } from '../../types/Post'
 import ProfilePost from '../../components/profile/PofilePost'
-import { DeletePostAction, FetchMoreUserPostsAction, FetchUserPostsAction, } from '../../redux/actions/UserActions'
-import { BottomSheetBackdrop, BottomSheetModal, BottomSheetModalProvider } from '@gorhom/bottom-sheet'
+import {
+  DeletePostAction,
+  FetchMoreUserPostsAction,
+  FetchUserPostsAction
+} from '../../redux/actions/UserActions'
+import {
+  BottomSheetBackdrop,
+  BottomSheetModal,
+  BottomSheetModalProvider
+} from '@gorhom/bottom-sheet'
 import { GestureHandlerRootView } from 'react-native-gesture-handler'
 import UseTheme from '../../globals/UseTheme'
 import ProfileRepost from '../../components/profile/ProfileRepost'
@@ -18,7 +26,6 @@ import Loader from '../../components/global/Loader'
 import { scaledFont } from '../../globals/utilities'
 import Animated, {
   useSharedValue,
-  withSpring,
   withTiming
 } from 'react-native-reanimated';
 const { height } = Dimensions.get("screen")
@@ -54,10 +61,10 @@ const Profile = () => {
 
   }
   const onNavigate = (userId: string) => {
-    if(userId != user._id)
-    navigation.navigate("UserProfile", {
-      userId: userId
-    })
+    if (userId != user._id)
+      navigation.navigate("UserProfile", {
+        userId: userId
+      })
   }
   const dispatch = useAppDispatch()
   const renderPosts = (item: Thread, index: number) => {
@@ -65,12 +72,12 @@ const Profile = () => {
       item.Repost && item.isRepost ?
         <ProfileRepost
           post={item}
-          onPressNavigate = {(userId)=> onNavigate(userId)}
+          onPressNavigate={(userId) => onNavigate(userId)}
           onPressThreeDots={(postId: string) => handleThreedotPress(postId)}
         /> :
         <ProfilePost
           post={item}
-          onPressNavigate = {(userId)=> onNavigate(userId)}
+          onPressNavigate={(userId) => onNavigate(userId)}
           onPressThreeDots={(postId: string) => handleThreedotPress(postId)}
         />
     )
@@ -150,14 +157,14 @@ const Profile = () => {
       </View>
     )
   }
-  
+
   const renderEmptyComponent = () => {
-      return (
-          <View style={styles.emptyContainer}>
-              <Text style={[styles.txtEmpty,
-              {color: theme.secondary_text_color}]}>No Posts Created By {user.username}</Text>
-          </View>
-      )
+    return (
+      <View style={styles.emptyContainer}>
+        <Text style={[styles.txtEmpty,
+        { color: theme.secondary_text_color }]}>No Posts Created By {user.username}</Text>
+      </View>
+    )
   }
 
   useEffect(() => {
@@ -368,6 +375,6 @@ const styles = StyleSheet.create({
   },
   txtEmpty:
   {
-      fontSize: scaledFont(15),
+    fontSize: scaledFont(15),
   }
 })

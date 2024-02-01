@@ -22,13 +22,6 @@ export const UNLIKE_POST = gql`
         }
     }
 `
-export const COMMENT_POST = gql`
-    mutation CommentPost($commentPostInput: CommentActionInput!) {
-        CommentPost(input: $commentPostInput) {
-        message
-        }
-    }
-`
 
 export const DELETE_REPLIED_POST = gql`
 mutation DeletePostReply($input: DeletePostReplyInput!) {

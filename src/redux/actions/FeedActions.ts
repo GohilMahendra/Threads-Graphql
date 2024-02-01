@@ -4,8 +4,6 @@ import { RootState } from "../store"
 import { client } from "../../graphql"
 import { GET_POST_REPOSTS } from "../../graphql/post/Query"
 import {
-    CommentActionInput,
-    CreateCommentSucceessResponse,
     CreateRepostSuccessResponse,
     GetPostRepostInput,
     GetPostRepostResponse,
@@ -14,10 +12,19 @@ import {
     RepostInput,
     UnLikePostSuccessResponse,
 } from "../../graphql/post/Types"
+import { 
+    CommentActionInput,
+    CreateCommentSucceessResponse,
+ } from "../../graphql/comment/Types";
+import { COMMENT_POST } from "../../graphql/comment/Mutation";
 import { GraphQlInputType } from "../../graphql/common";
 import { getToken } from "../../globals/utilities"
 import { PAGE_SIZE } from "../../globals/constants"
-import { COMMENT_POST, CREATE_POST, LIKE_POST, UNLIKE_POST } from "../../graphql/post/Mutation"
+import { 
+    CREATE_POST, 
+    LIKE_POST, 
+    UNLIKE_POST 
+} from "../../graphql/post/Mutation"
 
 export const FetchPostsAction = createAsyncThunk(
     "Feed/FetchPostsAction",
@@ -88,7 +95,6 @@ export const FetchMorePostsAction = createAsyncThunk(
                 }
             }
             const token = await getToken()
-            console.log(lastOffset)
             const getPostsResponse = await client.query<GetPostRepostResponse, GraphQlInputType<GetPostRepostInput>>({
                 query: GET_POST_REPOSTS,
                 context: {
@@ -127,7 +133,6 @@ export const FetchMorePostsAction = createAsyncThunk(
                     }
                     posts.push(post)
                 })
-                console.log(lastOffset, "offset i am getting from earch ")
                 return {
                     data: posts,
                     lastOffset: response.meta.lastOffset

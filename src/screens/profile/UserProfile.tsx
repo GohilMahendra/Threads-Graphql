@@ -1,4 +1,14 @@
-import { View, Text, SafeAreaView, Image, TouchableOpacity, Dimensions, StyleSheet, ActivityIndicator, RefreshControl } from 'react-native'
+import { 
+    View, 
+    Text, 
+    SafeAreaView, 
+    Image, 
+    TouchableOpacity, 
+    Dimensions, 
+    StyleSheet, 
+    ActivityIndicator, 
+    RefreshControl 
+} from 'react-native'
 import React, { useEffect, useMemo, useRef, useState } from 'react'
 import { placeholder_image } from '../../globals/asstes'
 import FontAwesome5Icon from 'react-native-vector-icons/FontAwesome5'
@@ -7,25 +17,52 @@ import AntDesign from 'react-native-vector-icons/AntDesign'
 import { RouteProp, useNavigation, StackActions, useRoute } from '@react-navigation/native'
 import { FlatList } from 'react-native'
 import { Thread } from '../../types/Post'
-import { BottomSheetBackdrop, BottomSheetModal, BottomSheetModalProvider, } from '@gorhom/bottom-sheet'
+import { 
+    BottomSheetBackdrop, 
+    BottomSheetModal, 
+    BottomSheetModalProvider
+ } from '@gorhom/bottom-sheet'
 import { GestureHandlerRootView } from 'react-native-gesture-handler'
 import UseTheme from '../../globals/UseTheme'
 import { User } from '../../types/User'
 import { SearchStackParams } from '../../navigations/SearchStack'
-import { fetchUserById, followUser, unFollowUser } from '../../apis/UserAPI'
-import { createRepost, fetchPostsByUser, likePost, unLikePost } from '../../apis/FeedAPI'
 import RepostItem from '../../components/feed/RepostItem'
 import PostItem from '../../components/feed/PostItem'
 import { PAGE_SIZE } from '../../globals/constants'
 import Replies from '../../components/feed/Replies'
 import Loader from '../../components/global/Loader'
-import { scaledFont } from '../../globals/utilities'
+import { getToken, scaledFont } from '../../globals/utilities'
 import Animated, { useSharedValue, withTiming } from 'react-native-reanimated'
 import { compositeUserProfileRootNavigation } from '../../navigations/Types'
-import { useQuery } from '@apollo/client'
 import { GET_USER_BY_ID } from '../../graphql/user/Query'
 import { GraphQlInputType } from '../../graphql/common'
-import { GetUserByIdInput, GetUserByIdResponse } from '../../graphql/user/Types'
+import { 
+    FollowSuccessResponse, 
+    FollowUnFollowInput, 
+    GetUserByIdInput, 
+    GetUserByIdResponse, 
+    UnFollowSuccessResponse 
+} from '../../graphql/user/Types'
+import { client } from '../../graphql'
+import { 
+    CreateRepostSuccessResponse, 
+    GetPostsByUserInput, 
+    GetPostsByUserResponse, 
+    LikePostSuccessResponse, 
+    PostActionInput, 
+    RepostInput, 
+    UnLikePostSuccessResponse
+ } from '../../graphql/post/Types'
+import { GET_POSTS_BY_USER } from '../../graphql/post/Query'
+import { 
+    FOLLOW_USER, 
+    UNFOLLOW_USER 
+} from '../../graphql/user/Mutation'
+import { 
+    CREATE_POST, 
+    LIKE_POST, 
+    UNLIKE_POST 
+} from '../../graphql/post/Mutation'
 const { height, width } = Dimensions.get("screen")
 const UserProfile = () => {
     const [user, setUser] = useState<User>({
@@ -40,7 +77,6 @@ const UserProfile = () => {
         profile_picture: "",
         isFollowed: false
     })
-    const { data} = useQuery<GetUserByIdResponse, GraphQlInputType<GetUserByIdInput>>(GET_USER_BY_ID);
     const [loading, setLoading] = useState(false)
     const [moreLoading, setMoreLoading] = useState(false)
     const [screenLoading, setScreenLoading] = useState(false)
@@ -83,8 +119,23 @@ const UserProfile = () => {
         try {
             repostBottomSheetRef.current?.close()
             setScreenLoading(true)
-            const repostResponse = await createRepost(postId)
-            setScreenLoading(false)
+            const token = await getToken()
+            const repostResponse = await client.mutate<CreateRepostSuccessResponse, GraphQlInputType<RepostInput>>({
+                mutation: CREATE_POST,
+                variables: {
+                    input: { postId: postId }
+                },
+                context: {
+                    headers: { token: token }
+                }
+            })
+            if (repostResponse.data) {
+                setScreenLoading(false)
+            }
+            else {
+                console.log(JSON.stringify(repostResponse.errors))
+                setScreenLoading(false)
+            }
         }
         catch (err) {
             setScreenLoading(false)
@@ -128,36 +179,69 @@ const UserProfile = () => {
         try {
             setLoading(true)
             setPosts([])
-            const response = await fetchPostsByUser({
-                pageSize: PAGE_SIZE,
-                post_type: field,
-                userId: userId,
+            const token = await getToken()
+            const response = await client.query<GetPostsByUserResponse, GraphQlInputType<GetPostsByUserInput>>({
+                query: GET_POSTS_BY_USER,
+                context: {
+                    headers: { token: token }
+                },
+                variables: {
+                    input: {
+                        post_type: field,
+                        postUserId: userId
+                    }
+                }
             })
-            setPosts(response.data)
-            setLastOffset(response.meta.lastOffset)
-            setLoading(false)
+            if (response.data) {
+                const PostResponse = response.data.GetPostsByUser.data
+                const MetaResponse = response.data.GetPostsByUser.meta
+                setPosts(PostResponse)
+                setLastOffset(MetaResponse.lastOffset)
+                setLoading(false)
+            }
+            else {
+                console.log(JSON.stringify(response.errors))
+                setLoading(false)
+            }
         }
         catch (err) {
             setLoading(false)
             console.log(JSON.stringify(err))
         }
     }
-    const getMorePosts = async () => {
+    const getMorePosts = async (field: "Thread" | "Repost") => {
         try {
             if (!lastOffset) {
-                console.log("last offset", lastOffset)
                 return null
             }
             setMoreLoading(true)
-            const response = await fetchPostsByUser({
-                pageSize: PAGE_SIZE,
-                post_type: selectedSection,
-                userId: userId,
-                lastOffset: lastOffset
+            const token = await getToken()
+            const response = await client.query<GetPostsByUserResponse, GraphQlInputType<GetPostsByUserInput>>({
+                query: GET_POSTS_BY_USER,
+                context: {
+                    headers: { token: token }
+                },
+                variables: {
+                    input: {
+                        post_type: field,
+                        postUserId: userId,
+                        lastOffset: lastOffset,
+                        pageSize: PAGE_SIZE
+                    }
+                }
             })
-            setPosts([...posts, ...response.data])
-            setLastOffset(response.meta.lastOffset)
-            setMoreLoading(false)
+            if (response.data) {
+                const PostResponse = response.data.GetPostsByUser.data
+                const MetaReponse = response.data.GetPostsByUser.meta
+                setPosts([...posts, ...PostResponse])
+                setLastOffset(MetaReponse.lastOffset)
+                setMoreLoading(false)
+            }
+            else {
+                console.log(JSON.stringify(response.errors))
+                setMoreLoading(false)
+            }
+
         }
         catch (err) {
             setMoreLoading(false)
@@ -166,8 +250,20 @@ const UserProfile = () => {
     }
     const getUser = async () => {
         try {
-            const response = await FetchUserQuery()
-            setUser(response.user)
+            const token = await getToken()
+            const response = await client.query<GetUserByIdResponse, GraphQlInputType<GetUserByIdInput>>({
+                query: GET_USER_BY_ID,
+                variables: {
+                    input: { profileId: userId }
+                },
+                context: {
+                    headers: { token: token }
+                }
+            })
+            if (response.data)
+                setUser(response.data.GetUserById)
+            else
+                console.log(response.errors)
         }
         catch (err) {
             console.log(err)
@@ -197,12 +293,36 @@ const UserProfile = () => {
     const toggleFollow = async () => {
         try {
             if (user.isFollowed) {
-                const response = await unFollowUser(userId)
-                setUser(prevUser => ({ ...prevUser, isFollowed: false, followers: prevUser.followers - 1 }));
+                const token = await getToken()
+                const response = await client.mutate<UnFollowSuccessResponse, GraphQlInputType<FollowUnFollowInput>>({
+                    mutation: UNFOLLOW_USER,
+                    variables: {
+                        input: { followingId: userId }
+                    },
+                    context: {
+                        headers: { token: token }
+                    }
+                })
+                if (response.data)
+                    setUser(prevUser => ({ ...prevUser, isFollowed: false, followers: prevUser.followers - 1 }));
+                else
+                    console.log(JSON.stringify(response.errors))
             }
             else {
-                const response = await followUser(userId)
-                setUser(prevUser => ({ ...prevUser, isFollowed: true, followers: prevUser.followers + 1 }));
+                const token = await getToken()
+                const response = await client.mutate<FollowSuccessResponse, GraphQlInputType<FollowUnFollowInput>>({
+                    mutation: FOLLOW_USER,
+                    variables: {
+                        input: { followingId: userId }
+                    },
+                    context: {
+                        headers: { token: token }
+                    }
+                })
+                if (response.data)
+                    setUser(prevUser => ({ ...prevUser, isFollowed: true, followers: prevUser.followers + 1 }));
+                else
+                    console.log(JSON.stringify(response.errors))
             }
         }
         catch (err) {
@@ -212,28 +332,56 @@ const UserProfile = () => {
     const toggleLike = async (postId: string, step: "like" | "unlike") => {
         try {
             if (step == "like") {
-                const respose = await likePost(postId)
-                const index = posts.findIndex(post => post._id == postId)
-                if (index != -1) {
-                    const postThreads = [...posts]
-                    postThreads[index].isLiked = true
-                    postThreads[index].likes++
-                    setPosts(postThreads)
+                const token = await getToken()
+                const respose = await client.mutate<LikePostSuccessResponse, GraphQlInputType<PostActionInput>>({
+                    mutation: LIKE_POST,
+                    variables: {
+                        input: { postId: postId }
+                    },
+                    context: {
+                        headers: { token: token }
+                    }
+                })
+                if (respose.data) {
+                    const index = posts.findIndex(post => post._id == postId)
+                    if (index != -1) {
+                        const postThreads = [...posts]
+                        postThreads[index].isLiked = true
+                        postThreads[index].likes++
+                        setPosts(postThreads)
+                    }
+                }
+                else {
+                    console.log(JSON.stringify(respose.errors))
                 }
             }
             else {
-                const response = await unLikePost(postId)
-                const index = posts.findIndex(post => post._id == postId)
-                if (index != -1) {
-                    const postThreads = [...posts]
-                    postThreads[index].isLiked = false
-                    postThreads[index].likes--
-                    setPosts(postThreads)
+                const token = await getToken()
+                const response = await client.mutate<UnLikePostSuccessResponse, GraphQlInputType<PostActionInput>>({
+                    mutation: UNLIKE_POST,
+                    variables: {
+                        input: { postId: postId }
+                    },
+                    context: {
+                        headers: { token: token }
+                    }
+                })
+                if (response.data) {
+                    const index = posts.findIndex(post => post._id == postId)
+                    if (index != -1) {
+                        const postThreads = [...posts]
+                        postThreads[index].isLiked = false
+                        postThreads[index].likes--
+                        setPosts(postThreads)
+                    }
+                }
+                else {
+                    console.log(JSON.stringify(response.errors))
                 }
             }
         }
         catch (err) {
-
+            console.log(JSON.stringify(err))
         }
     }
     const getUserAndPosts = async () => {
@@ -284,7 +432,7 @@ const UserProfile = () => {
                         />
                     </View>
                     {renderBioWithPressableHashtags(user.bio || "")}
-                    <Text style={{ color: theme.secondary_text_color ,fontSize: scaledFont(12)}}>{user.followers} Followers</Text>
+                    <Text style={{ color: theme.secondary_text_color, fontSize: scaledFont(12) }}>{user.followers} Followers</Text>
                     <TouchableOpacity
                         onPress={() => toggleFollow()}
                         style={[styles.btnFollow, {
@@ -333,7 +481,7 @@ const UserProfile = () => {
         return (
             <View style={styles.emptyContainer}>
                 <Text style={[styles.txtEmpty,
-                {color: theme.secondary_text_color}]}>No posts created by {user.username}</Text>
+                { color: theme.secondary_text_color }]}>No posts created by {user.username}</Text>
             </View>
         )
     }
@@ -353,7 +501,7 @@ const UserProfile = () => {
                     backgroundColor: theme.background_color,
                     transform: [{ translateY: translateY }],
                     position: "absolute",
-                    paddingTop: 20,
+                    paddingTop: scaledFont(40),
                     zIndex: 1000
                 }}>
                     <View style={styles.optionContainer}>
@@ -406,7 +554,7 @@ const UserProfile = () => {
                     scrollEventThrottle={10}
                     onScroll={(event) => scrollHandler(event.nativeEvent.contentOffset.y)}
                     renderItem={({ item, index }) => renderPosts(item, index)}
-                    onEndReached={() => lastOffset && getMorePosts()
+                    onEndReached={() => lastOffset && getMorePosts(selectedSection)
                     }
                 />
             </SafeAreaView>

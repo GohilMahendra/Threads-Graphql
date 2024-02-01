@@ -1,14 +1,25 @@
 import { createAsyncThunk } from "@reduxjs/toolkit"
-import { createRepost, likePost, searchPosts, unLikePost } from "../../apis/FeedAPI"
 import { Thread } from "../../types/Post"
 import { RootState } from "../store"
 import { PAGE_SIZE } from "../../globals/constants"
 import { client } from "../../graphql"
 import { GET_SEARCH_POSTS } from "../../graphql/post/Query"
-import { CreateRepostSuccessResponse, GetPostsFullTextSearchInput, GetPostsFullTextSearchResponse, LikePostSuccessResponse, PostActionInput, RepostInput, UnLikePostSuccessResponse } from "../../graphql/post/Types"
+import { 
+    CreateRepostSuccessResponse, 
+    GetPostsFullTextSearchInput, 
+    GetPostsFullTextSearchResponse, 
+    LikePostSuccessResponse, 
+    PostActionInput, 
+    RepostInput, 
+    UnLikePostSuccessResponse 
+} from "../../graphql/post/Types"
 import { GraphQlInputType } from "../../graphql/common"
 import { getToken } from "../../globals/utilities"
-import { CREATE_POST, LIKE_POST, UNLIKE_POST } from "../../graphql/post/Mutation"
+import { 
+    CREATE_POST, 
+    LIKE_POST, 
+    UNLIKE_POST 
+} from "../../graphql/post/Mutation"
 
 export const fetchPostSearchAction = createAsyncThunk(
     "PostSearch/fetchPostSearchAction",
@@ -24,10 +35,10 @@ export const fetchPostSearchAction = createAsyncThunk(
                 },
                 variables: {
                     input: {
-                        searchTerm: searchTerm
+                        searchTerm: searchTerm,
+                        pageSize: PAGE_SIZE
                     }
-                },
-                fetchPolicy: "no-cache"
+                }
             })
             if (response.data) {
                 const posts: Thread[] = []

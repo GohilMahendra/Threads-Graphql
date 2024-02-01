@@ -73,6 +73,7 @@ const GridViewer = (props: GridViewerPropTypes) => {
                                     resizeMode="cover"
                                     source={{ uri: getMediaImage(image) }}
                                     style={style.image2x}
+                                    key={image._id}
                                 />
                                 {
                                     image.media_type.includes("video")
