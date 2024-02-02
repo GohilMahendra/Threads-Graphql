@@ -38,13 +38,13 @@ export const FetchPostsAction = createAsyncThunk(
                         token: token
                     },
                 },
+                fetchPolicy:"no-cache",
                 variables: {
                     input: {
                         post_type: post_type,
                         pageSize: PAGE_SIZE
                     }
-                },
-                fetchPolicy:"cache-first"
+                }
             })
             if (getPostsResponse.data && !getPostsResponse.errors) {
                 const response = getPostsResponse.data.GetPosts
@@ -102,14 +102,14 @@ export const FetchMorePostsAction = createAsyncThunk(
                         token: token
                     },
                 },
+            fetchPolicy:"no-cache",
                 variables: {
                     input: {
                         post_type: post_type,
                         lastOffset: lastOffset,
                         pageSize: PAGE_SIZE
                     }
-                },
-                fetchPolicy:"cache-first"
+                }
             })
             if (getPostsResponse.data && !getPostsResponse.errors) {
                 const response = getPostsResponse.data.GetPosts
@@ -250,7 +250,8 @@ export const feedCreateRepostAction = createAsyncThunk(
                 variables: {
                     input:{
                         content,
-                        postId
+                        postId,
+                        isRepost: true
                     }
                 },
                 context:{

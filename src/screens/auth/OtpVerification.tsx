@@ -10,7 +10,7 @@ const OtpVerification = () => {
     const [otp, setOtp] = useState<string>("")
     const [otpArrary, setOtpArray] = useState(["", "", "", "", "", ""])
     const route = useRoute<RouteProp<AuthStackType, "OtpVerification">>()
-    const email = "mpgohilse@gmail.com"
+    const email =  route.params.email
     const dispatch = useAppDispatch()
     const otpRef = useRef<any[]>([])
     const navigation = useNavigation<NavigationProp<AuthStackType, "OtpVerification">>()

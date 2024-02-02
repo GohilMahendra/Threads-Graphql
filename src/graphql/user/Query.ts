@@ -1,22 +1,14 @@
 import { gql } from "@apollo/client";
-
+import { USER_FRAGMENT } from "../common";
 export const GET_CURRENT_USER_FOLLOWINGS = gql`
+${USER_FRAGMENT}
 query GetCurrentUserFollowing($input: GetCurrentUserFollowingsInput) {
   GetCurrentUserFollowing(input: $input) {
     data {
       _id
       follower
       following {
-        _id
-        username
-        fullname
-        email
-        bio
-        followers
-        following
-        profile_picture
-        verified
-        isFollowed
+       ...UserFragment
       }
     }
     meta {
@@ -28,36 +20,20 @@ query GetCurrentUserFollowing($input: GetCurrentUserFollowingsInput) {
 `
 
 export const SEARCH_USERS = gql`
+${USER_FRAGMENT}
 query SearchUsers($input: SearchUsersInput!) {
   SearchUsers(input: $input) {
     data {
-      _id
-      username
-      fullname
-      email
-      bio
-      followers
-      following
-      profile_picture
-      verified
-      isFollowed
+      ...UserFragment
     }
   }
 }
 `
 export const GET_USER_BY_ID = gql`
+${USER_FRAGMENT}
 query GetUserById($input: GetUserByIdInput!) {
   GetUserById(input: $input) {
-    _id
-    username
-    fullname
-    email
-    bio
-    followers
-    following
-    profile_picture
-    verified
-    isFollowed
+    ...UserFragment
   }
 }
 `

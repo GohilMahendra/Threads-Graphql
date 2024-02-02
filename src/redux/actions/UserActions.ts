@@ -1,5 +1,4 @@
 import { createAsyncThunk } from "@reduxjs/toolkit"
-import { updateUser } from "../../apis/UserAPI"
 import {
     SignUpArgsType,
     UpdateArgsType,
@@ -13,13 +12,17 @@ import {
     SignInResponse,
     SignUpInput,
     SignUpSuccessResponse,
+    UpdateUserInput,
+    UpdateUserSuccessResponse,
     VerifyEmailInput,
     VerifyEmailSuccessResponse
 } from "../../graphql/user/Types"
-import { SIGN_IN_USER, SIGN_UP_USER, VERIFY_EMAIL } from "../../graphql/user/Mutation";
+import { SIGN_IN_USER, SIGN_UP_USER, UPADATE_USER, VERIFY_EMAIL } from "../../graphql/user/Mutation";
 import { client } from "../../graphql"
 import { GraphQlInputType } from "../../graphql/common"
 import {
+    CreatePostInput,
+    CreatePostSuccessResponse,
     CreateRepostSuccessResponse,
     DeleteUserPostSuccessResponse,
     GetPostRepostInput,
@@ -32,6 +35,7 @@ import { CREATE_POST, DELETE_USER_POST } from "../../graphql/post/Mutation"
 import { getToken } from "../../globals/utilities"
 import { GET_USER_POSTS } from "../../graphql/post/Query"
 import { PAGE_SIZE } from "../../globals/constants"
+import { ReactNativeFile } from "apollo-upload-client"
 
 export const SignInAction = createAsyncThunk(
     "user/SignInAction",
@@ -102,13 +106,37 @@ export const UpdateAction = createAsyncThunk(
     "user/UpdateAction",
     async (args: UpdateArgsType, { rejectWithValue }) => {
         try {
-            const response = await updateUser(args)
-            const user = response.user as User
-            return {
-                user: user
+            const token = await getToken()
+            const response = await client.mutate<UpdateUserSuccessResponse, GraphQlInputType<UpdateUserInput>>({
+                mutation: UPADATE_USER,
+                fetchPolicy: "no-cache",
+                variables: {
+                    input: {
+                        ...(args.bio && { bio: args.bio }),
+                        ...(args.profile_picture && { profile_picture: new ReactNativeFile(args.profile_picture) }),
+                        ...(args.fullname && { fullName: args.fullname }),
+                    }
+                },
+                context: {
+                    headers: { token: token }
+                }
+
+            })
+            if (response.data) {
+
+                console.log("success")
+                const user = response.data.UpdateUser
+                return {
+                    user: user
+                }
+            }
+            else {
+                console.log("err", response.errors)
+                return rejectWithValue(JSON.stringify(response.errors))
             }
         }
         catch (err) {
+            console.log(err)
             return rejectWithValue(JSON.stringify(err))
         }
     })
@@ -145,7 +173,8 @@ export const createRepostAction = createAsyncThunk(
                 variables: {
                     input: {
                         content,
-                        postId
+                        postId,
+                        isRepost: true
                     }
                 },
                 context: {
@@ -165,13 +194,26 @@ export const createRepostAction = createAsyncThunk(
 )
 export const createPostAction = createAsyncThunk(
     "user/createPostAction",
-    async ({ content, media }: { content?: string, media: UploadMedia[] }, { rejectWithValue }) => {
+    async ({ content, media }: { content?: string, media?: UploadMedia[] }, { rejectWithValue }) => {
         try {
             const token = await getToken()
-            const response = await client.mutate<CreateRepostSuccessResponse, GraphQlInputType<PostInput>>({
+
+            let MediaUpload: UploadMedia[] = []
+            if (media && media.length > 0) {
+                for (const mediaObj of media) {
+                    const GraphqlMedia = new ReactNativeFile(mediaObj)
+                    MediaUpload.push(GraphqlMedia)
+                }
+            }
+            const response = await client.mutate<CreatePostSuccessResponse, GraphQlInputType<CreatePostInput>>({
                 mutation: CREATE_POST,
+                fetchPolicy: "no-cache",
                 variables: {
-                    input: { content: content }
+                    input: {
+                        isRepost: false,
+                        content: content,
+                        media: MediaUpload
+                    }
                 },
                 context: {
                     headers: { token: token }
@@ -199,6 +241,7 @@ export const FetchUserPostsAction = createAsyncThunk(
                 context: {
                     headers: { token: token }
                 },
+                fetchPolicy: "no-cache",
                 variables: {
                     input: {
                         post_type: post_type,
@@ -260,6 +303,7 @@ export const FetchMoreUserPostsAction = createAsyncThunk(
                 context: {
                     headers: { token: token }
                 },
+                fetchPolicy: "no-cache",
                 variables: {
                     input: {
                         post_type: post_type,

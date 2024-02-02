@@ -1,7 +1,7 @@
 import { extractHashtags } from "../utilities/Content"
 import { v4 as uuidv4 } from "uuid";
 import {
-    ProfilePictureUpload,
+    Upload,
     getSignedUrl,
     uploadToS3
 } from "../utilities/S3Utils";
@@ -26,7 +26,7 @@ const createPost = async ({ userId, content, isRepost = false, postId, media = [
     content?: string,
     isRepost: boolean,
     postId?: string,
-    media?: ProfilePictureUpload[]
+    media?: Upload[]
 }) => {
     try {
         if (isRepost && !postId) {
@@ -39,30 +39,33 @@ const createPost = async ({ userId, content, isRepost = false, postId, media = [
         if (content) {
             hashTags = extractHashtags(content)
         }
-
-        type mediaType = {
-            media_type: string,
-            media_url: string,
-            thumbnail?: string
-        }
-        const files: mediaType[] = []
-        for (const file of media) {
-            const { mimetype } = file;
-            const extention = mimetype.split("/")[1]
-            const filename = uuidv4() + "." + extention
-            const filePath = "posts" + "/" + userId + "/" + filename
-            const result = await uploadToS3(file, filePath)
-            const media: mediaType = {
-                media_type: mimetype,
-                media_url: result?.Key || "",
+        type MediaType =
+            {
+                media_type: string
+                media_url: string
+                thumbnail?: string
             }
-            if (mimetype.includes("video")) {
-                const thumbnailName = uuidv4() + ".jpeg"
-                const thumbnailPath = "thumbnails/" + userId + "/" + thumbnailName
-                const thumbnail = await generateThumbnail(file, thumbnailPath)
-                media.thumbnail = thumbnail.Key
+        let files: MediaType[] = []
+        if (media && media.length > 0) {
+            for (const file of media) {
+                const MediaFile = await file.file
+                const { mimetype } = MediaFile
+                const extention = mimetype.split("/")[1]
+                const filename = uuidv4() + "." + extention
+                const filePath = "posts" + "/" + userId + "/" + filename
+                const result = await uploadToS3(MediaFile, filePath)
+                const media: MediaType = {
+                    media_type: mimetype,
+                    media_url: result?.Key || "",
+                }
+                if (mimetype.includes("video")) {
+                    const thumbnailName = uuidv4() + ".jpeg"
+                    const thumbnailPath = "thumbnails/" + userId + "/" + thumbnailName
+                    const thumbnail = await generateThumbnail(MediaFile, thumbnailPath)
+                    media.thumbnail = thumbnail.Key
+                }
+                files.push(media)
             }
-            files.push(media)
         }
         const newPost = new Post({
             content: content,

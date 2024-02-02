@@ -181,6 +181,7 @@ const Profile = () => {
           backgroundColor: theme.background_color,
           position: "absolute",
           zIndex: 1000,
+          marginTop: scaledFont(50),
           transform: [{ translateY: translateY }]
         }]}>
           <View style={styles.selectionRowContainer}>

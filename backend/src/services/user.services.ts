@@ -45,8 +45,8 @@ const signIn = async ({ email, password }: SignInInput) => {
 
     user.token = token;
 
-    if(user.profile_picture)
-    user.profile_picture = await getSignedUrl(user.profile_picture)
+    if (user.profile_picture)
+        user.profile_picture = await getSignedUrl(user.profile_picture)
 
     return user;
 };
@@ -81,6 +81,7 @@ const signUp = async ({ username, fullname, email, password }: SignUpInput) => {
 
 const updateUser = async ({ userId, fullName, bio, profile_picture }: UpdateUserInput) => {
     try {
+
         if (!fullName && !bio && (!profile_picture)) {
             throw new Error("At least one of fullName, bio, or profile_picture should be present")
         }
@@ -91,10 +92,6 @@ const updateUser = async ({ userId, fullName, bio, profile_picture }: UpdateUser
 
         if (bio !== undefined && (typeof bio !== 'string' || bio.trim() === '')) {
             throw new Error("Invalid bio")
-        }
-
-        if (profile_picture && (!profile_picture?.encoding || !profile_picture?.mimetype)) {
-            throw new Error("Invalid profile_picture")
         }
         const updateUser: any = {}
         if (fullName) {
@@ -115,7 +112,7 @@ const updateUser = async ({ userId, fullName, bio, profile_picture }: UpdateUser
         if (result.matchedCount > 0) {
             const userUpdated = await User.findById(userId)
             if (userUpdated?.profile_picture)
-            userUpdated.profile_picture = await getSignedUrl(userUpdated?.profile_picture)
+                userUpdated.profile_picture = await getSignedUrl(userUpdated?.profile_picture)
 
             return userUpdated;
         } else {

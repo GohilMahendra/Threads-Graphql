@@ -7,8 +7,6 @@ type SearchType =
     loading: boolean,
     error: null | string,
 }
-
-
 const initialState: SearchType = 
 {
     users:[],
@@ -16,8 +14,6 @@ const initialState: SearchType =
     error: null,
 
 }
-
-
 export const SearchSlice = createSlice({
     name:"Search",
     initialState: initialState,

@@ -2,7 +2,6 @@ import { createAsyncThunk } from "@reduxjs/toolkit"
 import { FollowingUserResponse, User } from "../../types/User"
 import { RootState } from "../store"
 import { PAGE_SIZE } from "../../globals/constants"
-import { createRepost } from "../../apis/FeedAPI"
 import { getToken } from "../../globals/utilities"
 import { client } from "../../graphql"
 import { GET_CURRENT_USER_FOLLOWINGS } from "../../graphql/user/Query"
@@ -18,6 +17,7 @@ import {
     GET_REPLIED_POSTS
 } from "../../graphql/post/Query"
 import {
+    CreateRepostSuccessResponse,
     DeleteRepliedPostInput,
     DeleteRepliedPostSuccessResponse,
     GetLikedPostsInput,
@@ -26,9 +26,11 @@ import {
     LikePostSuccessResponse,
     PaginationInput,
     PostActionInput,
+    RepostInput,
     UnLikePostSuccessResponse
 } from "../../graphql/post/Types"
 import {
+    CREATE_POST,
     DELETE_REPLIED_POST,
     LIKE_POST,
     UNLIKE_POST
@@ -48,8 +50,9 @@ export const getUserFollowingAction = createAsyncThunk(
                 context: {
                     headers: { token: token }
                 },
-                variables:{
-                    input: {pageSize: PAGE_SIZE}
+                fetchPolicy: "no-cache",
+                variables: {
+                    input: { pageSize: PAGE_SIZE }
                 }
             })
             if (response.data) {
@@ -88,10 +91,13 @@ export const getMoreUserFollowingAction = createAsyncThunk(
                 context: {
                     headers: { token: token }
                 },
-                variables:{input:{
-                    lastOffset: lastOffset,
-                    pageSize: PAGE_SIZE
-                }}
+                fetchPolicy: "no-cache",
+                variables: {
+                    input: {
+                        lastOffset: lastOffset,
+                        pageSize: PAGE_SIZE
+                    }
+                }
             })
             if (response.data) {
                 const data: FollowingUserResponse[] = response.data.GetCurrentUserFollowing.data
@@ -124,9 +130,10 @@ export const getLikedPostsActions = createAsyncThunk(
                         token: token
                     }
                 },
-                variables:{
-                    input:{
-                        pageSize: PAGE_SIZE 
+                fetchPolicy: "no-cache",
+                variables: {
+                    input: {
+                        pageSize: PAGE_SIZE
                     }
                 }
             })
@@ -169,6 +176,7 @@ export const getMoreLikedPostsActions = createAsyncThunk(
                         token: token
                     }
                 },
+                fetchPolicy: "no-cache",
                 variables: {
                     input: {
                         lastOffset: offset,
@@ -189,7 +197,6 @@ export const getMoreLikedPostsActions = createAsyncThunk(
             }
         }
         catch (err) {
-            console.log(JSON.stringify(err))
             return rejectWithValue(JSON.stringify(err))
         }
 
@@ -333,8 +340,9 @@ export const getFavoritesRepliedPostsAction = createAsyncThunk(
                 context: {
                     headers: { token: token }
                 },
-                variables:{
-                    input: {pageSize: PAGE_SIZE}
+                fetchPolicy: "no-cache",
+                variables: {
+                    input: { pageSize: PAGE_SIZE }
                 }
             })
             if (response.data) {
@@ -350,7 +358,6 @@ export const getFavoritesRepliedPostsAction = createAsyncThunk(
             }
         }
         catch (err) {
-            console.log(JSON.stringify(err))
             return rejectWithValue(JSON.stringify(err))
         }
 
@@ -374,6 +381,7 @@ export const getMoreFavoritesRepliedPostsAction = createAsyncThunk(
                 context: {
                     headers: { token: token }
                 },
+                fetchPolicy: "no-cache",
                 variables: {
                     input: {
                         lastOffset: offset,
@@ -394,7 +402,6 @@ export const getMoreFavoritesRepliedPostsAction = createAsyncThunk(
             }
         }
         catch (err) {
-            console.log(JSON.stringify(err))
             return rejectWithValue(JSON.stringify(err))
         }
 
@@ -405,10 +412,27 @@ export const favoriteCreateRepostAction = createAsyncThunk(
     "Favorite/favoriteCreateRepostAction",
     async ({ postId }: { postId: string }, { rejectWithValue }) => {
         try {
-            const response = await createRepost(postId)
-            return {
-                message: response.message
-            }
+            const token = await getToken()
+            const response = await client.mutate<CreateRepostSuccessResponse, GraphQlInputType<RepostInput>>({
+                mutation: CREATE_POST,
+                variables: {
+                    input: {
+                        postId,
+                        isRepost: true
+                    }
+                },
+                context: {
+                    headers: {
+                        token: token
+                    }
+                }
+            })
+            if (response.data)
+                return {
+                    message: response.data.CreatePost.message
+                }
+            else
+                return rejectWithValue(JSON.stringify(response.errors))
         }
         catch (err) {
             return rejectWithValue(JSON.stringify(err))
@@ -438,7 +462,6 @@ export const deleteFavoritesReplyAction = createAsyncThunk(
                 return rejectWithValue(JSON.stringify(response.errors))
         }
         catch (err) {
-            console.log(err)
             return rejectWithValue(JSON.stringify(err))
         }
     }

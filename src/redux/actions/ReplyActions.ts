@@ -53,6 +53,7 @@ export const getCommentsAction = createAsyncThunk(
                         pageSize: PAGE_SIZE
                     }
                 },
+                fetchPolicy:"no-cache",
                 context: {
                     headers: { token: token }
                 }
@@ -96,6 +97,7 @@ export const getMoreCommentsAction = createAsyncThunk(
                         lastOffset: offset
                     }
                 },
+                fetchPolicy:"no-cache",
                 context: {
                     headers: { token: token }
                 }

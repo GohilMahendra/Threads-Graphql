@@ -68,9 +68,8 @@ export const UserSlice = createSlice({
             state.loading = true
             state.error = null
         })
-        builder.addCase(SignUpAction.fulfilled, (state, action: PayloadAction<User>) => {
+        builder.addCase(SignUpAction.fulfilled, (state, action: PayloadAction<string>) => {
             state.loading = false
-            state.user = action.payload
         })
         builder.addCase(SignUpAction.rejected, (state, action) => {
             state.loading = false

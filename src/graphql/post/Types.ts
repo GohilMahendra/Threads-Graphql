@@ -1,6 +1,7 @@
 import { PaginationMeta, SuccessResponse } from "../common";
 import { Thread, UploadMedia } from "../../types/Post"
 import { CommentedPost } from "../../types/Comment";
+import { Bool } from "aws-sdk/clients/connectparticipant";
 
 export interface GetPostRepostResponse {
     GetPosts: {
@@ -14,6 +15,18 @@ export interface PaginationInput {
     lastOffset?: string
 }
 
+export type RequireOne<T, K extends keyof T = keyof T> = {
+    [P in K]: T[P];
+  } & Partial<T>;
+  
+export interface CreatePostInput 
+{
+    content?: string,
+    isRepost?: Boolean,
+    media?: UploadMedia[],
+    postId?: string
+}
+
 export interface GetPostRepostInput extends PaginationInput {
     post_type: string,
 }
@@ -24,14 +37,15 @@ export interface PostActionInput {
 
 export interface PostInput {
     content?: string,
-    isRepost?: Boolean,
+    isRepost: Boolean,
     postId?: string,
     media?: UploadMedia[]
 }
 
 export interface RepostInput {
     content?: string,
-    postId: string
+    postId: string,
+    isRepost: Boolean,
 }
 
 export interface GetLikedPostsInput {
@@ -108,3 +122,4 @@ export type UnLikePostSuccessResponse = SuccessResponse<"UnLikePost">
 export type CreateRepostSuccessResponse = SuccessResponse<"CreatePost">
 export type DeleteRepliedPostSuccessResponse = SuccessResponse<"DeletePostReply">
 export type DeleteUserPostSuccessResponse = SuccessResponse<"DeletePost">
+export type CreatePostSuccessResponse = SuccessResponse<"CreatePost">

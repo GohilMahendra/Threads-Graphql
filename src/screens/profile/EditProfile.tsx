@@ -13,30 +13,19 @@ import { UpdateAction } from '../../redux/actions/UserActions'
 import UseTheme from '../../globals/UseTheme'
 import Loader from '../../components/global/Loader'
 import { ScrollView } from 'react-native'
-import { getToken, scaledFont } from '../../globals/utilities'
-import { client } from '../../graphql'
-import { UPADATE_USER } from '../../graphql/user/Mutation'
-import { GraphQlInputType } from '../../graphql/common'
-import { UpdateUserInput, UpdateUserSuccessResponse } from '../../graphql/user/Types'
-import { tokens } from 'react-native-paper/lib/typescript/styles/themes/v3/tokens'
+import { scaledFont } from '../../globals/utilities'
+import { UploadMedia } from '../../types/Post'
 const { height, width } = Dimensions.get("screen")
 const EditProfile = () => {
 
     const disptach = useAppDispatch()
-    type MediaType =
-        {
-            name: string,
-            uri: string,
-            type: string
-        }
-
     const user = useSelector((state: RootState) => state.User.user)
     const loading = useSelector((state: RootState) => state.User.loading)
     const image = user.profile_picture
     const name = user.fullname
     const user_bio = user.bio
     const { theme } = UseTheme()
-    const [ProfilePicture, setProfilePicture] = useState<MediaType>({
+    const [ProfilePicture, setProfilePicture] = useState<UploadMedia>({
         uri: image || "",
         name: "",
         type: ""
@@ -67,28 +56,11 @@ const EditProfile = () => {
     }
 
     const updateProfile = async () => {
-
-        const token = await getToken()
-        const response = await client.mutate<UpdateUserSuccessResponse,GraphQlInputType<UpdateUserInput>>({
-            mutation: UPADATE_USER,
-            variables:{
-                input:{
-                    profile_picture: ProfilePicture.uri
-                }
-            },
-            context:{
-                headers:{token: token}
-            }
-            
-        })
-        console.log(response)
-
-
-        // disptach(UpdateAction({
-        //     bio: bio,
-        //     fullname: fullname,
-        //     profile_picture: ProfilePicture
-        // }))
+        disptach(UpdateAction({
+            bio: bio,
+            fullname: fullname,
+            profile_picture: ProfilePicture
+        }))
     }
 
     return (

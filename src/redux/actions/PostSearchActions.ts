@@ -33,6 +33,7 @@ export const fetchPostSearchAction = createAsyncThunk(
                         token: token
                     },
                 },
+                fetchPolicy:"no-cache",
                 variables: {
                     input: {
                         searchTerm: searchTerm,
@@ -95,14 +96,14 @@ export const fetchMorePostSearchAction = createAsyncThunk(
                 context: {
                     headers: { token: token },
                 },
+                fetchPolicy:"no-cache",
                 variables: {
                     input: {
                         searchTerm: searchTerm,
                         lastOffset: lastOffset,
                         pageSize: PAGE_SIZE
                     }
-                },
-                fetchPolicy: "no-cache"
+                }
             })
             if (response.data) {
                 const posts: Thread[] = []
@@ -204,7 +205,8 @@ export const createRepostSearchAction = createAsyncThunk(
                 variables: {
                     input: {
                         content,
-                        postId
+                        postId,
+                        isRepost: true
                     }
                 },
                 context: {

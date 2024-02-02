@@ -1,3 +1,4 @@
+import { UploadMedia } from "../../types/Post";
 import { FollowingUserResponse, User, UserResponse } from "../../types/User";
 import { PaginatedResponse, SuccessResponse } from "../common";
 
@@ -25,7 +26,7 @@ export interface FollowUnFollowInput {
 export interface UpdateUserInput {
   bio?: string,
   fullName?: string,
-  profile_picture?: string
+  profile_picture?: UploadMedia
 }
 
 export interface UpdateUserSuccessResponse {
