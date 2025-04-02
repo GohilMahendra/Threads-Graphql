@@ -52,6 +52,86 @@ Make sure you have Node.js and npm installed on your machine. If not, you can do
      ```bash
     yarn dev
 
+## Screenshots
+
+### Dark Mode
+
+| Settings Dark Mode| Settings logout | Sign In |
+| ------------ | ------------ | ------------ |
+| ![Screenshot 1](screenshots/dark%20mode//Simulator%20Screenshot%20-%20iPhone%2015%20Pro%20Max%20-%202023-12-31%20at%2006.09.14.png) | ![Screenshot 2](screenshots/dark%20mode/Simulator%20Screenshot%20-%20iPhone%2015%20Pro%20Max%20-%202023-12-31%20at%2006.09.17.png) | ![Screenshot 3](screenshots/dark%20mode/Simulator%20Screenshot%20-%20iPhone%2015%20Pro%20Max%20-%202023-12-31%20at%2006.09.21.png) |
+
+| Sign Up| Delete Thread | User Profile |
+| ------------ | ------------ | ------------ |
+| ![Screenshot 1](screenshots/dark%20mode/Simulator%20Screenshot%20-%20iPhone%2015%20Pro%20Max%20-%202023-12-31%20at%2006.09.23.png) | ![Screenshot 2](screenshots/dark%20mode/Simulator%20Screenshot%20-%20iPhone%2015%20Pro%20Max%20-%202023-12-31%20at%2006.10.14.png) | ![Screenshot 3](screenshots/dark%20mode/Simulator%20Screenshot%20-%20iPhone%2015%20Pro%20Max%20-%202023-12-31%20at%2006.10.35.png) |
+
+| Following | Comment 1 | Comment 2 |
+| ------------ | ------------ | ------------ |
+| ![Screenshot 1](screenshots/dark%20mode//Simulator%20Screenshot%20-%20iPhone%2015%20Pro%20Max%20-%202023-12-31%20at%2006.10.44.png) | ![Screenshot 2](screenshots/dark%20mode/Simulator%20Screenshot%20-%20iPhone%2015%20Pro%20Max%20-%202023-12-31%20at%2006.11.17.png) | ![Screenshot 3](screenshots/dark%20mode/Simulator%20Screenshot%20-%20iPhone%2015%20Pro%20Max%20-%202023-12-31%20at%2006.11.21.png) |
+
+| Comment 3 | Favorites -Reply | Favorites -Reply Delete |
+| ------------ | ------------ | ------------ |
+| ![Screenshot 1](screenshots/dark%20mode/Simulator%20Screenshot%20-%20iPhone%2015%20Pro%20Max%20-%202023-12-31%20at%2006.11.55.png) | ![Screenshot 2](screenshots/dark%20mode//Simulator%20Screenshot%20-%20iPhone%2015%20Pro%20Max%20-%202023-12-31%20at%2006.13.11.png) | ![Screenshot 3](screenshots/dark%20mode/Simulator%20Screenshot%20-%20iPhone%2015%20Pro%20Max%20-%202023-12-31%20at%2006.22.53.png) |
+
+| Favorites -liked | Follwing | Favorites -follwings |
+| ------------ | ------------ | ------------ |
+| ![Screenshot 1](screenshots/dark%20mode/Simulator%20Screenshot%20-%20iPhone%2015%20Pro%20Max%20-%202023-12-31%20at%2006.23.06.png) | ![Screenshot 2](screenshots/dark%20mode/Simulator%20Screenshot%20-%20iPhone%2015%20Pro%20Max%20-%202023-12-31%20at%2006.23.31.png) | ![Screenshot 3](screenshots/dark%20mode/Simulator%20Screenshot%20-%20iPhone%2015%20Pro%20Max%20-%202023-12-31%20at%2006.23.40.png) |
+
+| Full Text search 1 | Full Text search 2 | Full Text search 3 |
+| ------------ | ------------ | ------------ |
+| ![Screenshot 1](screenshots/dark%20mode/Simulator%20Screenshot%20-%20iPhone%2015%20Pro%20-%202024-01-02%20at%2002.12.37.png) | ![Screenshot 2](screenshots/dark%20mode/Simulator%20Screenshot%20-%20iPhone%2015%20Pro%20-%202024-01-02%20at%2002.18.52.png) | ![Screenshot 3](screenshots/dark%20mode/Simulator%20Screenshot%20-%20iPhone%2015%20Pro%20-%202024-01-02%20at%2002.12.49.png) |
+
+| Profile 01 | Profile 02 | Create Thread |
+| ------------ | ------------ | ------------ |
+| ![Screenshot 1](screenshots/dark%20mode/Simulator%20Screenshot%20-%20iPhone%2015%20Pro%20Max%20-%202023-12-31%20at%2006.23.45.png) | ![Screenshot 2](screenshots/dark%20mode/Simulator%20Screenshot%20-%20iPhone%2015%20Pro%20Max%20-%202023-12-31%20at%2006.25.01.png) | ![Screenshot 3](screenshots/dark%20mode/Simulator%20Screenshot%20-%20iPhone%2015%20Pro%20Max%20-%202023-12-31%20at%2006.26.32.png) |
+
+| Profile Posts | User Profile Posts | Video Player |
+| ------------ | ------------ | ------------ |
+| ![Screenshot 1](screenshots/dark%20mode/Simulator%20Screenshot%20-%20iPhone%2015%20Pro%20Max%20-%202023-12-31%20at%2006.26.36.png) | ![Screenshot 2](screenshots/dark%20mode/Simulator%20Screenshot%20-%20iPhone%2015%20Pro%20Max%20-%202023-12-31%20at%2006.27.20.png) | ![Screenshot 3](screenshots/dark%20mode/Simulator%20Screenshot%20-%20iPhone%2015%20Pro%20Max%20-%202023-12-31%20at%2006.27.47.png) |
+
+
+### Light Mode
+| Sign In| Sign Up | Feed1 |
+| ------------ | ------------ | ------------ |
+| ![Screenshot 1](screenshots/light%20mode/Simulator%20Screenshot%20-%20iPhone%2015%20Pro%20Max%20-%202023-12-31%20at%2005.45.02.png) | ![Screenshot 2](screenshots/light%20mode/Simulator%20Screenshot%20-%20iPhone%2015%20Pro%20Max%20-%202023-12-31%20at%2005.45.09.png) | ![Screenshot 3](screenshots/light%20mode//Simulator%20Screenshot%20-%20iPhone%2015%20Pro%20Max%20-%202023-12-31%20at%2005.46.39.png) |
+
+| Feed2 | Feee3 | Feed4 |
+| ------------ | ------------ | ------------ |
+| ![Screenshot 1](screenshots/light%20mode/Simulator%20Screenshot%20-%20iPhone%2015%20Pro%20Max%20-%202023-12-31%20at%2005.46.43.png) | ![Screenshot 2](screenshots/light%20mode/Simulator%20Screenshot%20-%20iPhone%2015%20Pro%20Max%20-%202023-12-31%20at%2005.47.09.png) | ![Screenshot 3](screenshots/light%20mode/Simulator%20Screenshot%20-%20iPhone%2015%20Pro%20Max%20-%202023-12-31%20at%2005.47.21.png) |
+
+| Repost | User Posts | Comments |
+| ------------ | ------------ | ------------ |
+| ![Screenshot 1](screenshots/light%20mode/Simulator%20Screenshot%20-%20iPhone%2015%20Pro%20Max%20-%202023-12-31%20at%2005.51.36.png) | ![Screenshot 2](screenshots/light%20mode/Simulator%20Screenshot%20-%20iPhone%2015%20Pro%20Max%20-%202023-12-31%20at%2005.52.08.png) | ![Screenshot 3](screenshots/light%20mode/Simulator%20Screenshot%20-%20iPhone%2015%20Pro%20Max%20-%202023-12-31%20at%2005.55.40.png) |
+
+| Add Comment | Feed5 | UserProfile |
+| ------------ | ------------ | ------------ |
+| ![Screenshot 1](screenshots/light%20mode/Simulator%20Screenshot%20-%20iPhone%2015%20Pro%20Max%20-%202023-12-31%20at%2005.56.42.png) | ![Screenshot 2](screenshots/light%20mode/Simulator%20Screenshot%20-%20iPhone%2015%20Pro%20Max%20-%202023-12-31%20at%2005.57.35.png) | ![Screenshot 3](screenshots/light%20mode/Simulator%20Screenshot%20-%20iPhone%2015%20Pro%20Max%20-%202023-12-31%20at%2005.57.49.png) |
+
+| Qoute Post | Qoute Post 2 | Search |
+| ------------ | ------------ | ------------ |
+| ![Screenshot 1](screenshots/light%20mode/Simulator%20Screenshot%20-%20iPhone%2015%20Pro%20Max%20-%202023-12-31%20at%2005.58.48.png) | ![Screenshot 2](screenshots/light%20mode/Simulator%20Screenshot%20-%20iPhone%2015%20Pro%20Max%20-%202023-12-31%20at%2005.58.48.png) | ![Screenshot 3](screenshots/light%20mode/Simulator%20Screenshot%20-%20iPhone%2015%20Pro%20Max%20-%202023-12-31%20at%2005.59.22.png) |
+
+| Full Text search 1 | Full Text search 2 | Full Text search 3 |
+| ------------ | ------------ | ------------ |
+| ![Screenshot 1](screenshots/light%20mode/Simulator%20Screenshot%20-%20iPhone%2015%20Pro%20-%202024-01-02%20at%2002.13.04.png) | ![Screenshot 2](screenshots/light%20mode/Simulator%20Screenshot%20-%20iPhone%2015%20Pro%20-%202024-01-02%20at%2002.18.59.png) | ![Screenshot 3](screenshots/light%20mode/Simulator%20Screenshot%20-%20iPhone%2015%20Pro%20-%202024-01-02%20at%2002.13.10.png) |
+
+| Create Threads | User Profile | Edit Profile |
+| ------------ | ------------ | ------------ |
+| ![Screenshot 1](screenshots/light%20mode/Simulator%20Screenshot%20-%20iPhone%2015%20Pro%20Max%20-%202023-12-31%20at%2005.59.55.png) | ![Screenshot 2](screenshots/light%20mode/Simulator%20Screenshot%20-%20iPhone%2015%20Pro%20Max%20-%202023-12-31%20at%2006.00.09.png) | ![Screenshot 3](screenshots/light%20mode/Simulator%20Screenshot%20-%20iPhone%2015%20Pro%20Max%20-%202023-12-31%20at%2006.01.04.png) |
+
+| User Profile | User Profile 2 |  Favorites |
+| ------------ | ------------ | ------------ |
+| ![Screenshot 1](screenshots/light%20mode/Simulator%20Screenshot%20-%20iPhone%2015%20Pro%20Max%20-%202023-12-31%20at%2006.01.11.png) | ![Screenshot 2](screenshots/light%20mode/Simulator%20Screenshot%20-%20iPhone%2015%20Pro%20Max%20-%202023-12-31%20at%2006.05.58.png) | ![Screenshot 3](screenshots/light%20mode/Simulator%20Screenshot%20-%20iPhone%20SE%20(3rd%20generation)%20-%202024-01-01%20at%2000.57.44.png) |
+
+| Favorites 2 | Favorites 3 | Favorites 4 |
+| ------------ | ------------ | ------------ |
+| ![Screenshot 1](screenshots/light%20mode/Simulator%20Screenshot%20-%20iPhone%2015%20Pro%20Max%20-%202023-12-31%20at%2006.07.01.png) | ![Screenshot 2](screenshots/light%20mode/Simulator%20Screenshot%20-%20iPhone%2015%20Pro%20Max%20-%202023-12-31%20at%2006.07.06.png) | ![Screenshot 3](screenshots/light%20mode/Simulator%20Screenshot%20-%20iPhone%2015%20Pro%20Max%20-%202023-12-31%20at%2006.07.12.png) |
+
+| Profile | Settings ||
+| ------------ | ------------ | ------------ |
+| ![Screenshot 1](screenshots/light%20mode/Simulator%20Screenshot%20-%20iPhone%2015%20Pro%20Max%20-%202023-12-31%20at%2006.08.48.png) | ![Screenshot 2](screenshots/light%20mode/Simulator%20Screenshot%20-%20iPhone%2015%20Pro%20Max%20-%202023-12-31%20at%2006.09.11.png) ||
+
+
+
 ### Atlas search indexes
 - UserSearch (username,fullname) User Schema
    ```bash {
@@ -156,82 +236,3 @@ Make sure you have Node.js and npm installed on your machine. If not, you can do
 - comment on post
 - get posts in which you replies
 - delete the reply
-
-## Screenshots
-
-### Dark Mode
-
-| Settings Dark Mode| Settings logout | Sign In |
-| ------------ | ------------ | ------------ |
-| ![Screenshot 1](screenshots/dark%20mode//Simulator%20Screenshot%20-%20iPhone%2015%20Pro%20Max%20-%202023-12-31%20at%2006.09.14.png) | ![Screenshot 2](screenshots/dark%20mode/Simulator%20Screenshot%20-%20iPhone%2015%20Pro%20Max%20-%202023-12-31%20at%2006.09.17.png) | ![Screenshot 3](screenshots/dark%20mode/Simulator%20Screenshot%20-%20iPhone%2015%20Pro%20Max%20-%202023-12-31%20at%2006.09.21.png) |
-
-| Sign Up| Delete Thread | User Profile |
-| ------------ | ------------ | ------------ |
-| ![Screenshot 1](screenshots/dark%20mode/Simulator%20Screenshot%20-%20iPhone%2015%20Pro%20Max%20-%202023-12-31%20at%2006.09.23.png) | ![Screenshot 2](screenshots/dark%20mode/Simulator%20Screenshot%20-%20iPhone%2015%20Pro%20Max%20-%202023-12-31%20at%2006.10.14.png) | ![Screenshot 3](screenshots/dark%20mode/Simulator%20Screenshot%20-%20iPhone%2015%20Pro%20Max%20-%202023-12-31%20at%2006.10.35.png) |
-
-| Following | Comment 1 | Comment 2 |
-| ------------ | ------------ | ------------ |
-| ![Screenshot 1](screenshots/dark%20mode//Simulator%20Screenshot%20-%20iPhone%2015%20Pro%20Max%20-%202023-12-31%20at%2006.10.44.png) | ![Screenshot 2](screenshots/dark%20mode/Simulator%20Screenshot%20-%20iPhone%2015%20Pro%20Max%20-%202023-12-31%20at%2006.11.17.png) | ![Screenshot 3](screenshots/dark%20mode/Simulator%20Screenshot%20-%20iPhone%2015%20Pro%20Max%20-%202023-12-31%20at%2006.11.21.png) |
-
-| Comment 3 | Favorites -Reply | Favorites -Reply Delete |
-| ------------ | ------------ | ------------ |
-| ![Screenshot 1](screenshots/dark%20mode/Simulator%20Screenshot%20-%20iPhone%2015%20Pro%20Max%20-%202023-12-31%20at%2006.11.55.png) | ![Screenshot 2](screenshots/dark%20mode//Simulator%20Screenshot%20-%20iPhone%2015%20Pro%20Max%20-%202023-12-31%20at%2006.13.11.png) | ![Screenshot 3](screenshots/dark%20mode/Simulator%20Screenshot%20-%20iPhone%2015%20Pro%20Max%20-%202023-12-31%20at%2006.22.53.png) |
-
-| Favorites -liked | Follwing | Favorites -follwings |
-| ------------ | ------------ | ------------ |
-| ![Screenshot 1](screenshots/dark%20mode/Simulator%20Screenshot%20-%20iPhone%2015%20Pro%20Max%20-%202023-12-31%20at%2006.23.06.png) | ![Screenshot 2](screenshots/dark%20mode/Simulator%20Screenshot%20-%20iPhone%2015%20Pro%20Max%20-%202023-12-31%20at%2006.23.31.png) | ![Screenshot 3](screenshots/dark%20mode/Simulator%20Screenshot%20-%20iPhone%2015%20Pro%20Max%20-%202023-12-31%20at%2006.23.40.png) |
-
-| Full Text search 1 | Full Text search 2 | Full Text search 3 |
-| ------------ | ------------ | ------------ |
-| ![Screenshot 1](screenshots/dark%20mode/Simulator%20Screenshot%20-%20iPhone%2015%20Pro%20-%202024-01-02%20at%2002.12.37.png) | ![Screenshot 2](screenshots/dark%20mode/Simulator%20Screenshot%20-%20iPhone%2015%20Pro%20-%202024-01-02%20at%2002.18.52.png) | ![Screenshot 3](screenshots/dark%20mode/Simulator%20Screenshot%20-%20iPhone%2015%20Pro%20-%202024-01-02%20at%2002.12.49.png) |
-
-| Profile 01 | Profile 02 | Create Thread |
-| ------------ | ------------ | ------------ |
-| ![Screenshot 1](screenshots/dark%20mode/Simulator%20Screenshot%20-%20iPhone%2015%20Pro%20Max%20-%202023-12-31%20at%2006.23.45.png) | ![Screenshot 2](screenshots/dark%20mode/Simulator%20Screenshot%20-%20iPhone%2015%20Pro%20Max%20-%202023-12-31%20at%2006.25.01.png) | ![Screenshot 3](screenshots/dark%20mode/Simulator%20Screenshot%20-%20iPhone%2015%20Pro%20Max%20-%202023-12-31%20at%2006.26.32.png) |
-
-| Profile Posts | User Profile Posts | Video Player |
-| ------------ | ------------ | ------------ |
-| ![Screenshot 1](screenshots/dark%20mode/Simulator%20Screenshot%20-%20iPhone%2015%20Pro%20Max%20-%202023-12-31%20at%2006.26.36.png) | ![Screenshot 2](screenshots/dark%20mode/Simulator%20Screenshot%20-%20iPhone%2015%20Pro%20Max%20-%202023-12-31%20at%2006.27.20.png) | ![Screenshot 3](screenshots/dark%20mode/Simulator%20Screenshot%20-%20iPhone%2015%20Pro%20Max%20-%202023-12-31%20at%2006.27.47.png) |
-
-
-### Light Mode
-| Sign In| Sign Up | Feed1 |
-| ------------ | ------------ | ------------ |
-| ![Screenshot 1](screenshots/light%20mode/Simulator%20Screenshot%20-%20iPhone%2015%20Pro%20Max%20-%202023-12-31%20at%2005.45.02.png) | ![Screenshot 2](screenshots/light%20mode/Simulator%20Screenshot%20-%20iPhone%2015%20Pro%20Max%20-%202023-12-31%20at%2005.45.09.png) | ![Screenshot 3](screenshots/light%20mode//Simulator%20Screenshot%20-%20iPhone%2015%20Pro%20Max%20-%202023-12-31%20at%2005.46.39.png) |
-
-| Feed2 | Feee3 | Feed4 |
-| ------------ | ------------ | ------------ |
-| ![Screenshot 1](screenshots/light%20mode/Simulator%20Screenshot%20-%20iPhone%2015%20Pro%20Max%20-%202023-12-31%20at%2005.46.43.png) | ![Screenshot 2](screenshots/light%20mode/Simulator%20Screenshot%20-%20iPhone%2015%20Pro%20Max%20-%202023-12-31%20at%2005.47.09.png) | ![Screenshot 3](screenshots/light%20mode/Simulator%20Screenshot%20-%20iPhone%2015%20Pro%20Max%20-%202023-12-31%20at%2005.47.21.png) |
-
-| Repost | User Posts | Comments |
-| ------------ | ------------ | ------------ |
-| ![Screenshot 1](screenshots/light%20mode/Simulator%20Screenshot%20-%20iPhone%2015%20Pro%20Max%20-%202023-12-31%20at%2005.51.36.png) | ![Screenshot 2](screenshots/light%20mode/Simulator%20Screenshot%20-%20iPhone%2015%20Pro%20Max%20-%202023-12-31%20at%2005.52.08.png) | ![Screenshot 3](screenshots/light%20mode/Simulator%20Screenshot%20-%20iPhone%2015%20Pro%20Max%20-%202023-12-31%20at%2005.55.40.png) |
-
-| Add Comment | Feed5 | UserProfile |
-| ------------ | ------------ | ------------ |
-| ![Screenshot 1](screenshots/light%20mode/Simulator%20Screenshot%20-%20iPhone%2015%20Pro%20Max%20-%202023-12-31%20at%2005.56.42.png) | ![Screenshot 2](screenshots/light%20mode/Simulator%20Screenshot%20-%20iPhone%2015%20Pro%20Max%20-%202023-12-31%20at%2005.57.35.png) | ![Screenshot 3](screenshots/light%20mode/Simulator%20Screenshot%20-%20iPhone%2015%20Pro%20Max%20-%202023-12-31%20at%2005.57.49.png) |
-
-| Qoute Post | Qoute Post 2 | Search |
-| ------------ | ------------ | ------------ |
-| ![Screenshot 1](screenshots/light%20mode/Simulator%20Screenshot%20-%20iPhone%2015%20Pro%20Max%20-%202023-12-31%20at%2005.58.48.png) | ![Screenshot 2](screenshots/light%20mode/Simulator%20Screenshot%20-%20iPhone%2015%20Pro%20Max%20-%202023-12-31%20at%2005.58.48.png) | ![Screenshot 3](screenshots/light%20mode/Simulator%20Screenshot%20-%20iPhone%2015%20Pro%20Max%20-%202023-12-31%20at%2005.59.22.png) |
-
-| Full Text search 1 | Full Text search 2 | Full Text search 3 |
-| ------------ | ------------ | ------------ |
-| ![Screenshot 1](screenshots/light%20mode/Simulator%20Screenshot%20-%20iPhone%2015%20Pro%20-%202024-01-02%20at%2002.13.04.png) | ![Screenshot 2](screenshots/light%20mode/Simulator%20Screenshot%20-%20iPhone%2015%20Pro%20-%202024-01-02%20at%2002.18.59.png) | ![Screenshot 3](screenshots/light%20mode/Simulator%20Screenshot%20-%20iPhone%2015%20Pro%20-%202024-01-02%20at%2002.13.10.png) |
-
-| Create Threads | User Profile | Edit Profile |
-| ------------ | ------------ | ------------ |
-| ![Screenshot 1](screenshots/light%20mode/Simulator%20Screenshot%20-%20iPhone%2015%20Pro%20Max%20-%202023-12-31%20at%2005.59.55.png) | ![Screenshot 2](screenshots/light%20mode/Simulator%20Screenshot%20-%20iPhone%2015%20Pro%20Max%20-%202023-12-31%20at%2006.00.09.png) | ![Screenshot 3](screenshots/light%20mode/Simulator%20Screenshot%20-%20iPhone%2015%20Pro%20Max%20-%202023-12-31%20at%2006.01.04.png) |
-
-| User Profile | User Profile 2 |  Favorites |
-| ------------ | ------------ | ------------ |
-| ![Screenshot 1](screenshots/light%20mode/Simulator%20Screenshot%20-%20iPhone%2015%20Pro%20Max%20-%202023-12-31%20at%2006.01.11.png) | ![Screenshot 2](screenshots/light%20mode/Simulator%20Screenshot%20-%20iPhone%2015%20Pro%20Max%20-%202023-12-31%20at%2006.05.58.png) | ![Screenshot 3](screenshots/light%20mode/Simulator%20Screenshot%20-%20iPhone%20SE%20(3rd%20generation)%20-%202024-01-01%20at%2000.57.44.png) |
-
-| Favorites 2 | Favorites 3 | Favorites 4 |
-| ------------ | ------------ | ------------ |
-| ![Screenshot 1](screenshots/light%20mode/Simulator%20Screenshot%20-%20iPhone%2015%20Pro%20Max%20-%202023-12-31%20at%2006.07.01.png) | ![Screenshot 2](screenshots/light%20mode/Simulator%20Screenshot%20-%20iPhone%2015%20Pro%20Max%20-%202023-12-31%20at%2006.07.06.png) | ![Screenshot 3](screenshots/light%20mode/Simulator%20Screenshot%20-%20iPhone%2015%20Pro%20Max%20-%202023-12-31%20at%2006.07.12.png) |
-
-| Profile | Settings ||
-| ------------ | ------------ | ------------ |
-| ![Screenshot 1](screenshots/light%20mode/Simulator%20Screenshot%20-%20iPhone%2015%20Pro%20Max%20-%202023-12-31%20at%2006.08.48.png) | ![Screenshot 2](screenshots/light%20mode/Simulator%20Screenshot%20-%20iPhone%2015%20Pro%20Max%20-%202023-12-31%20at%2006.09.11.png) ||
-
